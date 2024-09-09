@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Employee Home";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <form asp-action="CheckIn" asp-controller="EmployeeAttendance" method="post">
+        <button type="submit" class="btn btn-primary">Check In</button>
+    </form>
+
+    <form asp-action="CheckOut" asp-controller="EmployeeAttendance" method="post">
+        <button type="submit" class="btn btn-danger">Check Out</button>
+    </form>
+</div>
