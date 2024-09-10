@@ -1,0 +1,54 @@
+﻿@using SparkHRMS.ViewModels;
+@using System.Globalization
+
+@model List<EmployeeAttendanceDto>
+@{
+    ViewData["Title"] = "Employee Attendance";
+    var selectedDate = ViewBag.SelectedDate.ToString("yyyy-MM-dd");
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Date Filter -->
+        <div class="col-md-12 mb-3">
+            <form method="get" asp-action="Dashboard" asp-controller="Home">
+                <div class="input-group">
+                    <input type="date" name="date" value="@selectedDate" class="form-control" />
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Attendance Data Table -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5>Employee Attendance for @ViewBag.SelectedDate.ToString("dd MMM yyyy")</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Check-In Time</th>
+                                <th>Check-Out Time</th>
+                                <th>Working Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model)
+                            {
+                                <tr>
+                                    <td>@record.EmployeeName</td>
+                                    <td>@record.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture)</td>
+                                    <td>@(record.CheckOutTime.HasValue ? record.CheckOutTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture) : "Not Checked Out")</td>
+                                    <td>@record.WorkingHours</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

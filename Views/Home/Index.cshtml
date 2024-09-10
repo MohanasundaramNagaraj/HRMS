@@ -2,13 +2,123 @@
     ViewData["Title"] = "Employee Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <form asp-action="CheckIn" asp-controller="EmployeeAttendance" method="post">
-        <button type="submit" class="btn btn-primary">Check In</button>
-    </form>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Left Column: Employee Details -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5>Employee Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <img src="@Model.EmployeeDetails.ImageUrl" alt="Employee Image" class="img-thumbnail" style="max-width: 150px;">
+                    </div>
+                    <p><strong>Name:</strong> @Model.EmployeeDetails.Name</p>
+                    <p><strong>Phone Number:</strong> @Model.EmployeeDetails.PhoneNumber</p>
+                    <p><strong>Email:</strong> @Model.EmployeeDetails.Email</p>
+                    <p><strong>Date of Joining:</strong> @Model.EmployeeDetails.DateOfJoining?.ToString("dd MMM yyyy")</p>
+                    <p><strong>Address:</strong> @Model.EmployeeDetails.Address</p>
+                </div>
+            </div>
+        </div>
 
-    <form asp-action="CheckOut" asp-controller="EmployeeAttendance" method="post">
-        <button type="submit" class="btn btn-danger">Check Out</button>
-    </form>
+        <!-- Right Column: Check-In/Out and Monthly Summary -->
+        <div class="col-md-8">
+            <!-- Check-In/Out Buttons -->
+            <div class="d-flex justify-content-end mb-3">
+                <button id="checkInBtn" class="btn btn-primary me-2">Check In</button>
+                <button id="checkOutBtn" class="btn btn-danger">Check Out</button>
+            </div>
+
+            <!-- This Month's Summary -->
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5>This Month's Summary</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Check-In Time</th>
+                                <th>Check-Out Time</th>
+                                <th>Working Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var record in Model.MonthlySummary.DailyAttendanceRecords)
+                            {
+                                <tr>
+                                    <td>@record.Date.ToString("dd MMM yyyy")</td>
+                                    <td>@record.CheckInTime</td>
+                                    <td>@record.CheckOutTime</td>
+                                    <td>@record.WorkingHours</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <p class="mt-3"><strong>Total Working Hours This Month:</strong> @Model.MonthlySummary.TotalWorkingHoursThisMonth</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+@section Scripts {
+    <!-- Include jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Include SweetAlert from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#checkInBtn').click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("CheckIn", "EmployeeAttendance")',
+                    type: 'POST',
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Check-in Successful',
+                            text: 'You have successfully checked in!'
+                        });
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Check-in Failed',
+                            text: 'Failed to check in: ' + xhr.responseText
+                        });
+                    }
+                });
+            });
+
+            $('#checkOutBtn').click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("CheckOut", "EmployeeAttendance")',
+                    type: 'POST',
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Check-out Successful',
+                            text: 'You have successfully checked out!'
+                        });
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Check-out Failed',
+                            text: 'Failed to check out: ' + xhr.responseText
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -67,7 +67,8 @@ namespace SparkHRMS.Controllers
 
             var today = DateTime.Today;
             var checkInRecord = _context.EmployeeAttendance
-                .FirstOrDefault(c => c.EmployeeId == user.Id && c.CheckInTime.Date == today && !c.IsCheckedOut);
+                                .Where(e => e.EmployeeId == user.Id && e.CheckInTime.Date == today && e.CheckOutTime == null)
+                                .FirstOrDefault();
 
             if (checkInRecord == null)
             {

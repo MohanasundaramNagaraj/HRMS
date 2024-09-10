@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
 
 namespace SparkHRMS.Areas.Identity.Pages.Account
@@ -33,14 +34,15 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-
+        private readonly ApplicationDbContext _context;
         public RegisterModel(
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -49,6 +51,7 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -194,11 +197,12 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
 
                     if(role == "Employee")
                     {
-                        return LocalRedirect("/Home/Index");
+                        createEmployee(user);
+                        return LocalRedirect("~/Home/Index");
                     }
                     else
                     {
-                        return LocalRedirect("/Home/Dashboard");
+                        return LocalRedirect("~/Home/Dashboard");
                     }
                 }
                 foreach (var error in result.Errors)
@@ -225,6 +229,18 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
             }
         }
 
+        private void createEmployee(ApplicationUser user)
+        {
+            _context.Employees.Add(new Employee
+            {
+                EmployeeCode = user.UserName,
+                Name = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                ApplicationUserId = user.Id,
+            });
+            _context.SaveChanges();
+        }
         private IUserEmailStore<ApplicationUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
