@@ -14,6 +14,7 @@ namespace SparkHRMS.Data
 
         }
 
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<EmployeeAttendance> EmployeeAttendance { get; set; }
 

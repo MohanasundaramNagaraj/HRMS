@@ -51,6 +51,18 @@ namespace SparkHRMS.Repositories
                 _roleManager.CreateAsync(new IdentityRole(Roles.RoleType.Admin.ToString())).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(Roles.RoleType.Employee.ToString())).GetAwaiter().GetResult();
 
+
+                //Create superadmin user.
+                _userManager.CreateAsync(new ApplicationUser
+                {
+                    UserName = _configuration["UserSettings:SuperAdmin:UserName"],
+                    Email = _configuration["UserSettings:SuperAdmin:UserName"],
+                    PhoneNumber = _configuration["UserSettings:SuperAdmin:PhoneNumber"],
+                }, _configuration["UserSettings:SuperAdmin:Password"]).GetAwaiter().GetResult();
+
+                ApplicationUser superAdmin = _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == _configuration["UserSettings:SuperAdmin:UserName"]).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(superAdmin, Roles.RoleType.SuperAdmin.ToString()).GetAwaiter().GetResult();
+
             }
         }
     }

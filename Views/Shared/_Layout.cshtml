@@ -1,9 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using SparkHRMS.Data.Entities
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <title>@Configuration["AppSettings:SiteTitle"] - @ViewData["Title"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SparkHRMS.styles.css" asp-append-version="true" />
@@ -21,7 +28,12 @@
 
 </head>
 <body>
-
+    @{
+        var user = await UserManager.GetUserAsync(User);
+        var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+        var UserImageUrl = Url.Content("~/images/default-user.png"); // Set the default user image URL
+        var UserDesignation = roles.Contains("Admin") ? "Administrator" : roles.Contains("Employee") ? "Employee" : "User";
+    }
     <!-- Page Loader -->
     <div class="page-loader-wrapper">
         <div class="loader">
@@ -44,7 +56,7 @@
                 <a href="#" onClick="return false;" class="bars"></a>
                 <a class="navbar-brand" href="../../index.html">
                     <img src="~/app/assets/images/logo.png" alt="" />
-                    <span class="logo-name">Spark HRMS</span>
+                    <span class="logo-name">@Configuration["AppSettings:SiteTitle"]</span>
                 </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse">
@@ -127,11 +139,20 @@
                                         </a>
                                     </li> *@
                                     <li>
-                                        <form asp-page="/Identity/Account/Logout" method="post" style="display:inline;">
+                                        @* <form asp-page="/Identity/Account/Logout" method="post" style="display:inline;">
                                             <a href="javascript:;" onclick="this.closest('form').submit()">
                                                 <i class="material-icons">power_settings_new</i>Logout
                                             </a>
                                             
+                                        </form> *@
+
+                                        <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                                            @* <button type="submit"> 
+                                                <i class="material-icons">power_settings_new</i>Logout
+                                            </button> *@
+                                            <a href="javascript:;" onclick="this.closest('form').submit()">
+                                                <i class="material-icons">power_settings_new</i>Logout
+                                            </a>
                                         </form>
                                     </li>
                                 </ul>
@@ -157,13 +178,13 @@
                 <ul class="list">
                     <li class="sidebar-user-panel active">
                         <div class="user-panel">
-                            <div class=" image">
-                                <img src="~/app/assets/images/usrbig.jpg" class="user-img-style" alt="User Image" />
+                            <div class="image">
+                                <img id="user-image" class="user-img-style" src="@UserImageUrl" alt="User Image" />
                             </div>
                         </div>
                         <div class="profile-usertitle">
-                            <div class="sidebar-userpic-name"> Emily Smith </div>
-                            <div class="profile-usertitle-job ">Manager </div>
+                            <div id="user-name" class="sidebar-userpic-name">@User.Identity.Name</div>
+                            <div id="user-designation" class="profile-usertitle-job">@UserDesignation</div>
                         </div>
                     </li>
                     <li class="header">-- Main</li>
@@ -380,11 +401,11 @@
         </div>
     </section>
 
-    <footer class="border-top footer text-muted">
+  @*   <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2024 - SparkHRMS
         </div>
-    </footer>
+    </footer> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

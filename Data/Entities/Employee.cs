@@ -21,6 +21,17 @@ namespace SparkHRMS.Data.Entities
         [Phone]
         public string PhoneNumber { get; set; }
 
+        public DateTime DOB { get; set; } 
+        public string Gender { get; set; }
+
+        public string Designation { get; set; }
+
+        [DataType(DataType.Upload)]
+        [Display(Name = "Image")]
+        public string? ImageUrl { get; set; }
+        public DateTime? DateOfJoining { get; set; }
+        public string? Address { get; set; }
+
         public string? ApplicationUserId { get; set; }
 
         [ForeignKey("ApplicationUserId")]

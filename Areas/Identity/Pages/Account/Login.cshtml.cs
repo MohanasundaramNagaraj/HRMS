@@ -129,17 +129,17 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
                         // Check the role and redirect accordingly
                         if (roles.Contains("Employee"))
                         {
-                            return LocalRedirect("/Home/Index");
+                            return LocalRedirect("/EmployeeAttendance/Index");
                            // return RedirectToPage("/Home/Index"); 
                         }
                         else if (roles.Contains("Admin"))
                         {
-                            return LocalRedirect("/Home/Dashboard");
+                            return LocalRedirect("/AdminAttendanceViewer/Index");
                             //return RedirectToPage("~/Home/Dashboard"); 
                         }
                         else
                         {
-                            return LocalRedirect("/Home/Dashboard");
+                            return LocalRedirect("/AdminAttendanceViewer/Index");
                            // return RedirectToPage("/"); 
                         }
                     }

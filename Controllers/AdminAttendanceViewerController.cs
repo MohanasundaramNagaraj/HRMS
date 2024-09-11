@@ -1,39 +1,27 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Data;
-using SparkHRMS.Models;
 using SparkHRMS.ViewModels;
-using System.Diagnostics;
-using System.Globalization;
-using SparkHRMS.Utilities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SparkHRMS.Controllers
 {
-    [Authorize]
-    public class HomeController : Controller
+    [Authorize(Roles = "SuperAdmin")]
+    public class AdminAttendanceViewerController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        public AdminAttendanceViewerController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _logger = logger;
             _userManager = userManager;
             _context = context;
         }
-
-        public async Task<IActionResult> IndexAsync()
-        {
-            return View();
-        }
-
-        [Authorize(Roles = "SuperAdmin")]
-        public async Task<IActionResult> Dashboard(DateTime? date = null)
+        public async Task<IActionResult> Index(DateTime? date = null)
         {
             var selectedDate = date ?? DateTime.Today;
             var attendances = await _context.EmployeeAttendance
@@ -55,12 +43,6 @@ namespace SparkHRMS.Controllers
             ViewBag.SelectedDate = selectedDate;
 
             return View(attendanceDtos);
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
