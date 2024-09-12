@@ -81,9 +81,7 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            [Required]
-            [Display(Name = "User Name")]
-            public string UserName{get;set;}
+            
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -112,11 +110,11 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            [Required]
+            
             [StringLength(12, ErrorMessage = "The {0} must be 10 digits.", MinimumLength = 10)]
             [Display(Name = "Phone Number")]
             [Phone]
-            public string PhoneNumber { get; set; }
+            public string? PhoneNumber { get; set; }
 
             [DataType(DataType.Upload)]
             [Display(Name = "Image")]
@@ -194,16 +192,16 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
                     //}
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    if(role == "Employee")
-                    {
-                        createEmployee(user);
-                        return LocalRedirect("~/Home/Index");
-                    }
-                    else
-                    {
-                        return LocalRedirect("~/Home/Dashboard");
-                    }
+                    return LocalRedirect("~/Home/Index");
+                    //if (role == "Employee")
+                    //{
+                    //    createEmployee(user);
+                    //    return LocalRedirect("~/Home/Index");
+                    //}
+                    //else
+                    //{
+                    //    return LocalRedirect("~/Home/Dashboard");
+                    //}
                 }
                 foreach (var error in result.Errors)
                 {

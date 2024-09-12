@@ -2,8 +2,8 @@
 
 var layoutType = "ltr"; // ltr or rtl
 var themeType = "light"; // light or dark
-var sidebarColor = "menu_light"; // menu_light or menu_dark
-var logoColor = "logo-black"; // logo-white or logo-black
+var sidebarColor = "menu_dark"; // menu_light or menu_dark
+var logoColor = "logo-white"; // logo-white or logo-black
 var themeColor = "theme-white"; // theme-black",theme-white",theme-purple,theme-blue,theme-cyan,theme-green,theme-orange
 
 $(function () {

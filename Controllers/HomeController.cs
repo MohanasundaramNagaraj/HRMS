@@ -13,7 +13,6 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SparkHRMS.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -27,34 +26,14 @@ namespace SparkHRMS.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> IndexAsync()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
-        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Dashboard(DateTime? date = null)
         {
-            var selectedDate = date ?? DateTime.Today;
-            var attendances = await _context.EmployeeAttendance
-                .Include(e => e.Employee) // Assuming Employee is a navigation property
-                .Where(e => e.CheckInTime.Date == selectedDate)
-                .OrderBy(e => e.CheckInTime)
-                .ToListAsync();
-
-            var attendanceDtos = attendances.Select(a => new EmployeeAttendanceDto
-            {
-                EmployeeName = a.Employee.UserName,
-                CheckInTime = a.CheckInTime,
-                CheckOutTime = a.CheckOutTime,
-                WorkingHours = a.CheckOutTime.HasValue
-                               ? string.Format("{0:%h} hours {0:%m} mins", a.CheckOutTime.Value - a.CheckInTime)
-                               : "N/A"
-            }).ToList();
-
-            ViewBag.SelectedDate = selectedDate;
-
-            return View(attendanceDtos);
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

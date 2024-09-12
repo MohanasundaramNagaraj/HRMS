@@ -1,0 +1,85 @@
+﻿@model IEnumerable<SparkHRMS.Data.Entities.Employee>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<link href="~/app/assets/css/bundles/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title">All Employees</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="../../index.html">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </li>
+    <li class="breadcrumb-item bcrumb-2">
+        <a href="#" onClick="return false;">Employee</a>
+    </li>
+    <li class="breadcrumb-item active">All Employees</li>
+</ul>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+           
+            <div class="body">
+                <div class="table-responsive">
+                    <table id="basicTable"
+                           class="table table-hover table-checkable order-column contact_list">
+                        <thead>
+                            <tr>
+                                <th class="center">#</th>
+                                <th class="center"> Code </th>
+                                <th class="center"> Name </th>
+                                <th class="center"> Designation </th>
+                                <th class="center"> Mobile </th>
+                                <th class="center"> Email </th>
+                                <th class="center">Joining Date</th>
+                                <th class="center"> Action </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr class="odd gradeX">
+                                    <td class="table-img center">
+                                        <img src="@Html.DisplayFor(modelItem => item.ImageUrl)" alt="">
+                                    </td>
+                                    <td class="center"> @Html.DisplayFor(modelItem => item.EmployeeCode)</td>
+                                    <td class="center"> @Html.DisplayFor(modelItem => item.Name)</td>
+                                    <td class="center"> @Html.DisplayFor(modelItem => item.Designation)</td>
+                                    <td class="center"> @Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                                    <td class="center"> @Html.DisplayFor(modelItem => item.Email)</td>
+                                    <td class="center"> @Html.DisplayFor(modelItem => item.DateOfJoining)</td>
+
+                                    <td class="center">
+                                        <a asp-action="Edit" asp-route-id="@item.EmployeeId" class="btn btn-tbl-edit">
+                                            <i class="material-icons">create</i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.EmployeeId" class="btn btn-tbl-view">
+                                            <i class="material-icons">eye</i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.EmployeeId" class="btn btn-tbl-delete">
+                                            <i class="material-icons">delete_forever</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                           
+                        </tbody>
+                       
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/app/assets/js/table.min.js"></script>
+
+<script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>

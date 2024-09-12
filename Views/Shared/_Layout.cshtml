@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SparkHRMS.styles.css" asp-append-version="true" />
 
-
     <link rel="icon" href="~/app/assets/images/favicon.ico" type="image/x-icon">
     <!-- Plugins Core Css -->
     <link href="~/app/assets/css/app.min.css" rel="stylesheet">
@@ -93,7 +92,7 @@
                             <li class="header">NOTIFICATIONS</li>
                             <li class="body">
                                 <ul class="menu">
-                                    <li>
+                                   @*  <li>
                                         <a href="#" onClick="return false;">
                                             <span class="table-img msg-user">
                                                 <img src="~/app/assets/images/user/user1.jpg" alt="">
@@ -106,12 +105,12 @@
                                                 <span class="menu-desc">Please check your email.</span>
                                             </span>
                                         </a>
-                                    </li>
+                                    </li> *@
 
                                 </ul>
                             </li>
                             <li class="footer">
-                                <a href="#" onClick="return false;">View All Notifications</a>
+                                @* <a href="#" onClick="return false;">View All Notifications</a> *@
                             </li>
                         </ul>
                     </li>
@@ -128,28 +127,23 @@
                                             <i class="material-icons">person</i>Profile
                                         </a>
                                     </li>
+                                    <li>
+                                        <form asp-area="Identity" asp-page="/Account/ForgotPassword" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                                            
+                                            <a href="javascript:;" onclick="this.closest('form').submit()">
+                                                <i class="material-icons">help</i>Reset Password
+                                            </a>
+                                        </form>
+                                    </li>
                                    @*  <li>
                                         <a href="#" onClick="return false;">
                                             <i class="material-icons">feedback</i>Feedback
                                         </a>
                                     </li>
+                                   *@
                                     <li>
-                                        <a href="#" onClick="return false;">
-                                            <i class="material-icons">help</i>Help
-                                        </a>
-                                    </li> *@
-                                    <li>
-                                        @* <form asp-page="/Identity/Account/Logout" method="post" style="display:inline;">
-                                            <a href="javascript:;" onclick="this.closest('form').submit()">
-                                                <i class="material-icons">power_settings_new</i>Logout
-                                            </a>
-                                            
-                                        </form> *@
-
+                                        
                                         <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                                            @* <button type="submit"> 
-                                                <i class="material-icons">power_settings_new</i>Logout
-                                            </button> *@
                                             <a href="javascript:;" onclick="this.closest('form').submit()">
                                                 <i class="material-icons">power_settings_new</i>Logout
                                             </a>
@@ -187,21 +181,51 @@
                             <div id="user-designation" class="profile-usertitle-job">@UserDesignation</div>
                         </div>
                     </li>
-                    <li class="header">-- Main</li>
-                    <li class="active">
-                        <a href="#" onClick="return false;" class="menu-toggle">
-                            <i data-feather="monitor"></i>
-                            <span>Home</span>
-                        </a>
-                        <ul class="ml-menu">
-                            <li>
-                                <a href="../../index.html">Dashboard 1</a>
-                            </li>
-                            <li class="active">
-                                <a href="../../pages/dashboard/dashboard2.html">Dashboard 2</a>
-                            </li>
-                        </ul>
-                    </li>
+
+                    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                    {
+                        <li class="header">Main</li>
+                        <li>
+                            <a href="#" onClick="return false;" class="menu-toggle">
+                                <i data-feather="monitor"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <ul class="ml-menu">
+                            </ul>
+                        </li>
+                        <li class="active">
+                            <a href="#" onClick="return false;" class="menu-toggle">
+                                <i data-feather="monitor"></i>
+                                <span>Employee</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li >
+                                    <a href="/Employee/Index">List</a>
+                                </li>
+                                <li>
+                                    <a href="/Employee/Create">Add</a>
+                                </li>
+                                <li class="active">
+                                    <a href="/AdminAttendanceViewer/Index">Attendance</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="header">Main</li>
+                        <li>
+                            <a href="#" onClick="return false;" class="menu-toggle">
+                                <i data-feather="monitor"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/EmployeeAttendance/Index">Attendance</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
                 </ul>
             </div>
             <!-- #Menu -->

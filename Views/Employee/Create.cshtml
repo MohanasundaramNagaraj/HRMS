@@ -1,0 +1,225 @@
+﻿@model SparkHRMS.Data.Entities.Employee
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<link href="~/app/assets/css/form.min.css" rel="stylesheet">
+
+<link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title">Employees</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="../../index.html">
+            <i class="fas fa-home"></i> Home
+        </a>
+    </li>
+    <li class="breadcrumb-item bcrumb-2">
+        <a href="#" onClick="return false;">Employees</a>
+    </li>
+    <li class="breadcrumb-item active">Add Employee</li>
+</ul>
+<hr />
+<div class="card">
+   
+    <div class="body">
+        <div class="row clearfix">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <div class="form-line">
+                        <input type="text" class="form-control" placeholder="Employee Code" asp-for="EmployeeCode" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <div class="form-line">
+                        <input type="text" class="form-control" placeholder="Name" asp-for="Name" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-sm-6">
+                <div class="form-group form-float">
+                    <div class="form-line">
+                        <select class="col-12 m-t-20 p-l-0" asp-for="ApplicationUserId">
+                            <option disabled selected>User</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <div class="form-line">
+                        <input id="email" type="email" class="validate form-control" asp-for="Email"
+                               placeholder="Email">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="row clearfix">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <div class="form-line">
+                        <input type="text" class="form-control" placeholder="Designation" asp-for="Designation" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group form-float">
+                    <div class="form-line">
+                        <select asp-for="ApplicationUserId" class="col-12 m-t-20 p-l-0" asp-items="ViewBag.ApplicationUserId">
+
+                        </select>
+                        @* <select class="col-12 m-t-20 p-l-0" asp-for="Gender">
+                            <option disabled selected>Gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select> *@
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <div class="form-line">
+                        <input type="text" class="form-control" placeholder="Telephone" asp-for="PhoneNumber" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <input type="text" class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
+                           name="date2" id="date2">
+                </div>
+            </div>
+        </div>
+        <div class="row clearfix">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <div class="form-line">
+                        <textarea rows="4" class="form-control no-resize" asp-for="Address"
+                                  placeholder="Address"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <input type="text" class="form-control datetimepicker" asp-for="DateOfJoining"
+                           placeholder="Joining Date" name="date1" id="date1">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <label class="control-label col-md-3">Upload Your Profile Photo</label>
+                <form action="/" id="frmFileUpload" class="dropzone" method="post"
+                      enctype="multipart/form-data">
+                    <div class="dz-message">
+                        <div class="drag-icon-cph">
+                            <i class="material-icons">touch_app</i>
+                        </div>
+                        <h3>Drop files here or click to upload.</h3>
+                        <em>
+                            (This is just a demo dropzone. Selected files are
+                            <strong>not</strong>
+                            actually uploaded.)
+                        </em>
+                    </div>
+                    <div class="fallback">
+                        <input name="file" asp-for="ImageUrl" type="file" multiple />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-12 p-t-20 text-center">
+            <button  type="submit" value="Create" class="btn btn-primary waves-effect m-r-15">Submit</button>
+            <button type="button" class="btn btn-danger waves-effect">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="EmployeeCode" class="control-label"></label>
+                <input asp-for="EmployeeCode" class="form-control" />
+                <span asp-validation-for="EmployeeCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DOB" class="control-label"></label>
+                <input asp-for="DOB" class="form-control" />
+                <span asp-validation-for="DOB" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Gender" class="control-label"></label>
+                <input asp-for="Gender" class="form-control" />
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Designation" class="control-label"></label>
+                <input asp-for="Designation" class="form-control" />
+                <span asp-validation-for="Designation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageUrl" class="control-label"></label>
+                <input asp-for="ImageUrl" class="form-control" />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateOfJoining" class="control-label"></label>
+                <input asp-for="DateOfJoining" class="form-control" />
+                <span asp-validation-for="DateOfJoining" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ApplicationUserId" class="control-label"></label>
+                <select asp-for="ApplicationUserId" class ="form-control" asp-items="ViewBag.ApplicationUserId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+<script src="~/app/assets/js/bundles/dropzone.js"></script>
+<script src="~/app/assets/js/bundles/flatpicker/flatpicker.min.js"></script>
+
+<script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
+<script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
+<script src="~/app/assets/js/pages/forms/dropzone-data.js"></script>
