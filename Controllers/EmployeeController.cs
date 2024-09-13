@@ -2,21 +2,30 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
+using SparkHRMS.Utilities;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SparkHRMS.Controllers
 {
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public EmployeeController(ApplicationDbContext context)
+        public EmployeeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _context = context;
+            _userManager = userManager;
+            _configuration = configuration;
         }
 
         // GET: Employee
@@ -48,24 +57,79 @@ namespace SparkHRMS.Controllers
         // GET: Employee/Create
         public IActionResult Create()
         {
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View();
         }
 
         // POST: Employee/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId")] Employee employee)
+        public async Task<IActionResult> Create([Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address")] Employee employee)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var applicationUser = new ApplicationUser
+                {
+                    UserName = employee.Email,
+                    Email = employee.Email,
+                    IsActive = true,
+                    PhoneNumber = employee.PhoneNumber,
+                };
+                var defaultPassword = _configuration["AppSettings:DefaultUserPassword"];
+                var result = await _userManager.CreateAsync(applicationUser, defaultPassword); 
+
+                if (result.Succeeded)
+                {
+                    var roleResult = await _userManager.AddToRoleAsync(applicationUser, Roles.RoleType.Employee.ToString());
+
+                    if (!roleResult.Succeeded)
+                    {
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+
+                        await _userManager.DeleteAsync(applicationUser);
+                        return View(employee);
+                    }
+
+                    try
+                    {
+                        employee.ApplicationUserId = applicationUser.Id;
+                        employee.ImageUrl = _configuration["AppSettings:ImagePath"] + "/" + employee.EmployeeCode + ".jpg";
+
+                        _context.Add(employee);
+                        await _context.SaveChangesAsync();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError(string.Empty, "An error occurred while saving the employee. Please try again.");
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.ApplicationUserId);
+            else
+            {
+                foreach (var key in ModelState.Keys)
+                {
+                    if (ModelState[key].Errors.Count > 0)
+                    {
+                        ModelState.AddModelError(string.Empty, $"{key} is required.");
+                    }
+                }
+
+                ModelState.AddModelError(string.Empty, "Please fill all required fields.");
+            }
+            
             return View(employee);
         }
 
@@ -87,8 +151,7 @@ namespace SparkHRMS.Controllers
         }
 
         // POST: Employee/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+     
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId")] Employee employee)

@@ -8,7 +8,7 @@ using SparkHRMS.ViewModels;
 
 namespace SparkHRMS.Controllers
 {
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public class AdminAttendanceViewerController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -32,7 +32,7 @@ namespace SparkHRMS.Controllers
 
             var attendanceDtos = attendances.Select(a => new EmployeeAttendanceDto
             {
-                EmployeeName = a.Employee.UserName,
+                EmployeeName = a.Employee.Name,
                 CheckInTime = a.CheckInTime,
                 CheckOutTime = a.CheckOutTime,
                 WorkingHours = a.CheckOutTime.HasValue

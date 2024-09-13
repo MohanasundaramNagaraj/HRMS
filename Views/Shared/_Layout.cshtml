@@ -18,7 +18,7 @@
     <link rel="icon" href="~/app/assets/images/favicon.ico" type="image/x-icon">
     <!-- Plugins Core Css -->
     <link href="~/app/assets/css/app.min.css" rel="stylesheet">
-
+    <link href="~/app/assets/css/common.min.css" rel="stylesheet">
     <!-- Custom Css -->
     <link href="~/app/assets/css/style.css" rel="stylesheet" />
 
@@ -26,6 +26,11 @@
     <link href="~/app/assets/css/styles/all-themes.css" rel="stylesheet" />
 
 </head>
+
+<!--
+    Add below class to body tag for dark theme
+    class="dark menu_dark logo-black theme-black ltr side-closed-hover"
+-->
 <body>
     @{
         var user = await UserManager.GetUserAsync(User);
@@ -74,47 +79,53 @@
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <!-- Full Screen Button -->
-                    <li class="fullscreen">
-                        <a href="javascript:;" class="fullscreen-btn">
-                            <i class="fas fa-expand"></i>
-                        </a>
-                    </li>
+                    @*  <li class="fullscreen">
+                    <a href="javascript:;" class="fullscreen-btn">
+                    <i class="fas fa-expand"></i>
+                    </a>
+                    </li> *@
                     <!-- #END# Full Screen Button -->
                     <!-- #START# Notifications-->
-                    <li class="dropdown">
-                        <a href="#" onClick="return false;" class="dropdown-toggle" data-bs-toggle="dropdown"
-                           role="button">
-                            <i class="far fa-bell"></i>
-                            <span class="notify"></span>
-                            <span class="heartbeat"></span>
-                        </a>
-                        <ul class="dropdown-menu pullDown">
-                            <li class="header">NOTIFICATIONS</li>
-                            <li class="body">
-                                <ul class="menu">
-                                   @*  <li>
-                                        <a href="#" onClick="return false;">
-                                            <span class="table-img msg-user">
-                                                <img src="~/app/assets/images/user/user1.jpg" alt="">
-                                            </span>
-                                            <span class="menu-info">
-                                                <span class="menu-title">Sarah Smith</span>
-                                                <span class="menu-desc">
-                                                    <i class="material-icons">access_time</i> 14 mins ago
-                                                </span>
-                                                <span class="menu-desc">Please check your email.</span>
-                                            </span>
-                                        </a>
-                                    </li> *@
-
-                                </ul>
-                            </li>
-                            <li class="footer">
-                                @* <a href="#" onClick="return false;">View All Notifications</a> *@
-                            </li>
-                        </ul>
+                    @*  <li class="dropdown">
+                    <a href="#" onClick="return false;" class="dropdown-toggle" data-bs-toggle="dropdown"
+                    role="button">
+                    <i class="far fa-bell"></i>
+                    <span class="notify"></span>
+                    <span class="heartbeat"></span>
+                    </a>
+                    <ul class="dropdown-menu pullDown">
+                    <li class="header">NOTIFICATIONS</li>
+                    <li class="body">
+                    <ul class="menu">
+                    <li>
+                    <a href="#" onClick="return false;">
+                    <span class="table-img msg-user">
+                    <img src="~/app/assets/images/user/user1.jpg" alt="">
+                    </span>
+                    <span class="menu-info">
+                    <span class="menu-title">Sarah Smith</span>
+                    <span class="menu-desc">
+                    <i class="material-icons">access_time</i> 14 mins ago
+                    </span>
+                    <span class="menu-desc">Please check your email.</span>
+                    </span>
+                    </a>
                     </li>
+
+                    </ul>
+                    </li>
+                    <li class="footer">
+                    <a href="#" onClick="return false;">View All Notifications</a>
+                    </li>
+                    </ul>
+                    </li> *@
                     <!-- #END# Notifications-->
+                    <li>
+                        <button id="checkInBtn" class="btn btn-primary me-2">Check In</button>
+                    </li>
+                    <li>
+                        <button id="checkOutBtn" class="btn btn-danger">Check Out</button>
+                    </li>
                     <li class="dropdown user_profile">
                         <div class="dropdown-toggle" data-bs-toggle="dropdown">
                             <img src="~/app/assets/images/user.jpg" alt="user">
@@ -122,27 +133,27 @@
                         <ul class="dropdown-menu pullDown">
                             <li class="body">
                                 <ul class="user_dw_menu">
-                                    <li>
-                                        <a href="#" onClick="return false;">
-                                            <i class="material-icons">person</i>Profile
-                                        </a>
-                                    </li>
+                                    @*  <li>
+                                    <a href="#" onClick="return false;">
+                                    <i class="material-icons">person</i>Profile
+                                    </a>
+                                    </li> *@
                                     <li>
                                         <form asp-area="Identity" asp-page="/Account/ForgotPassword" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                                            
+
                                             <a href="javascript:;" onclick="this.closest('form').submit()">
                                                 <i class="material-icons">help</i>Reset Password
                                             </a>
                                         </form>
                                     </li>
-                                   @*  <li>
-                                        <a href="#" onClick="return false;">
-                                            <i class="material-icons">feedback</i>Feedback
-                                        </a>
+                                    @*  <li>
+                                    <a href="#" onClick="return false;">
+                                    <i class="material-icons">feedback</i>Feedback
+                                    </a>
                                     </li>
-                                   *@
+                                    *@
                                     <li>
-                                        
+
                                         <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
                                             <a href="javascript:;" onclick="this.closest('form').submit()">
                                                 <i class="material-icons">power_settings_new</i>Logout
@@ -153,12 +164,15 @@
                             </li>
                         </ul>
                     </li>
-                    <!-- #END# Tasks -->
                     <li class="float-end">
-                        <a href="#" onClick="return false;" class="js-right-sidebar" data-close="true">
-                            <i class="fas fa-cog"></i>
-                        </a>
+
                     </li>
+                    <!-- #END# Tasks -->
+                    @*  <li class="float-end">
+                    <a href="#" onClick="return false;" class="js-right-sidebar" data-close="true">
+                    <i class="fas fa-cog"></i>
+                    </a>
+                    </li> *@
                 </ul>
             </div>
         </div>
@@ -171,11 +185,11 @@
             <div class="menu">
                 <ul class="list">
                     <li class="sidebar-user-panel active">
-                        <div class="user-panel">
-                            <div class="image">
-                                <img id="user-image" class="user-img-style" src="@UserImageUrl" alt="User Image" />
-                            </div>
+                        @*  <div class="user-panel">
+                        <div class="image">
+                        <img id="user-image" class="user-img-style" src="@UserImageUrl" alt="User Image" />
                         </div>
+                        </div> *@
                         <div class="profile-usertitle">
                             <div id="user-name" class="sidebar-userpic-name">@User.Identity.Name</div>
                             <div id="user-designation" class="profile-usertitle-job">@UserDesignation</div>
@@ -199,7 +213,7 @@
                                 <span>Employee</span>
                             </a>
                             <ul class="ml-menu">
-                                <li >
+                                <li>
                                     <a href="/Employee/Index">List</a>
                                 </li>
                                 <li>
@@ -218,6 +232,14 @@
                             <a href="#" onClick="return false;" class="menu-toggle">
                                 <i data-feather="monitor"></i>
                                 <span>Dashboard</span>
+                            </a>
+                            <ul class="ml-menu">
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" onClick="return false;" class="menu-toggle">
+                                <i data-feather="monitor"></i>
+                                <span>Employee</span>
                             </a>
                             <ul class="ml-menu">
                                 <li>
@@ -425,10 +447,10 @@
         </div>
     </section>
 
-  @*   <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - SparkHRMS
-        </div>
+    @*   <footer class="border-top footer text-muted">
+    <div class="container">
+    &copy; 2024 - SparkHRMS
+    </div>
     </footer> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -436,6 +458,7 @@
     <script src="~/js/utility/utility.js"></script>
 
     <script src="~/app/assets/js/admin.js"></script>
+    @* <script src="~/app/assets/js/common.min.js"></script> *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

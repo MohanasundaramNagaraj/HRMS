@@ -31,7 +31,7 @@ builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 //builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 // Authentication and authorization
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(/*options => options.SignIn.RequireConfirmedAccount = true*/)
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(/*options => options.SignIn.RequireConfirmedAccount = true*/)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager<SignInManager<ApplicationUser>>()
     .AddDefaultTokenProviders();

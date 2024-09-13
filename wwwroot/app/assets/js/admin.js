@@ -6,6 +6,56 @@ var sidebarColor = "menu_dark"; // menu_light or menu_dark
 var logoColor = "logo-white"; // logo-white or logo-black
 var themeColor = "theme-white"; // theme-black",theme-white",theme-purple,theme-blue,theme-cyan,theme-green,theme-orange
 
+$(document).ready(function () {
+
+    $('#checkInBtn').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: "/EmployeeAttendance/CheckIn",
+           // url: '@Url.Action("CheckIn", "EmployeeAttendance")',
+            type: 'POST',
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Check-in Successful',
+                    text: 'You have successfully checked in!'
+                });
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Check-in Failed',
+                    text: 'Failed to check in: ' + xhr.responseText
+                });
+            }
+        });
+    });
+
+    $('#checkOutBtn').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            //url: '@Url.Action("CheckOut", "EmployeeAttendance")',
+            url:"/EmployeeAttendance/CheckOut",
+            type: 'POST',
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Check-out Successful',
+                    text: 'You have successfully checked out!'
+                });
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Check-out Failed',
+                    text: 'Failed to check out: ' + xhr.responseText
+                });
+            }
+        });
+    });
+});
+
+
 $(function () {
   $.MyAdmin.browser.activate();
   $.MyAdmin.leftSideBar.activate();

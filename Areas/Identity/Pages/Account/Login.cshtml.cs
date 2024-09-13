@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using SparkHRMS.Data.Entities;
+using SparkHRMS.Utilities;
 
 namespace SparkHRMS.Areas.Identity.Pages.Account
 {
@@ -123,24 +124,19 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
 
                     if (user != null)
                     {
-                        // Get the roles assigned to the user
                         var roles = await _userManager.GetRolesAsync(user);
 
-                        // Check the role and redirect accordingly
-                        if (roles.Contains("Employee"))
+                        if (roles.Contains(Roles.RoleType.Employee.ToString()))
                         {
                             return LocalRedirect("/EmployeeAttendance/Index");
-                           // return RedirectToPage("/Home/Index"); 
                         }
-                        else if (roles.Contains("Admin"))
+                        else if (roles.Contains(Roles.RoleType.SuperAdmin.ToString()) || roles.Contains(Roles.RoleType.Admin.ToString()))
                         {
                             return LocalRedirect("/AdminAttendanceViewer/Index");
-                            //return RedirectToPage("~/Home/Dashboard"); 
                         }
                         else
                         {
                             return LocalRedirect("/AdminAttendanceViewer/Index");
-                           // return RedirectToPage("/"); 
                         }
                     }
 

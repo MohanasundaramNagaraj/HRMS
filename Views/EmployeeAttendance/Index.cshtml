@@ -44,7 +44,7 @@
                         <div class="card">
                             <div class="chat">
                                 <div class="chat-header clearfix">
-                                    <img src="@Model.EmployeeDetails.ImageUrl" alt="avatar">
+                                    @* <img src="@Model.EmployeeDetails.ImageUrl" alt="avatar"> *@
                                     <div class="row">
                                         <div class="col-lg-3 col-sm-6">
                                             <div class="chat-about">
@@ -89,8 +89,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-end mb-3 col-lg-9 col-sm-9">
-                                        <button id="checkInBtn" class="btn btn-primary me-2">Check In</button>
-                                        <button id="checkOutBtn" class="btn btn-danger">Check Out</button>
+                                       @*  <button id="checkInBtn" class="btn btn-primary me-2">Check In</button>
+                                        <button id="checkOutBtn" class="btn btn-danger">Check Out</button> *@
                                     </div>
                                 </div>
 
@@ -110,7 +110,7 @@
                                                 <th class="center"> Check Out </th>
                                                 <th class="center"> Working Hours </th>
                                                 <th class="center"> Status </th>
-                                                <th class="center"> Action </th>
+                                                @* <th class="center"> Action </th> *@
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -128,14 +128,14 @@
                                                         <div class="badge col-red">Leave</div>
                                                         <div class="badge col-cyan">Weekend</div> *@
                                                     </td>
-                                                    <td class="center">
+                                                   @*  <td class="center">
                                                         <button class="btn tblActnBtn">
                                                             <i class="material-icons">mode_edit</i>
                                                         </button>
                                                         <button class="btn tblActnBtn">
                                                             <i class="material-icons">delete</i>
                                                         </button>
-                                                    </td>
+                                                    </td> *@
                                                 </tr>
                                             }
 
@@ -191,51 +191,6 @@
     <script src="~/app/assets/js/pages/attendance/attendance-data.js"></script>
 
     <script>
-        $(document).ready(function () {
-
-            $('#checkInBtn').click(function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: '@Url.Action("CheckIn", "EmployeeAttendance")',
-                    type: 'POST',
-                    success: function (response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Check-in Successful',
-                            text: 'You have successfully checked in!'
-                        });
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Check-in Failed',
-                            text: 'Failed to check in: ' + xhr.responseText
-                        });
-                    }
-                });
-            });
-
-            $('#checkOutBtn').click(function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: '@Url.Action("CheckOut", "EmployeeAttendance")',
-                    type: 'POST',
-                    success: function (response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Check-out Successful',
-                            text: 'You have successfully checked out!'
-                        });
-                    },
-                    error: function (xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Check-out Failed',
-                            text: 'Failed to check out: ' + xhr.responseText
-                        });
-                    }
-                });
-            });
-        });
+       
     </script>
 }

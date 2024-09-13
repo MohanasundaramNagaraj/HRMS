@@ -10,10 +10,10 @@ namespace SparkHRMS.Data.Entities
         public int Id { get; set; }
 
         [Required]
-        public string EmployeeId { get; set; }
+        public int EmployeeId { get; set; }
 
         [ForeignKey("EmployeeId")]
-        public ApplicationUser Employee { get; set; }
+        public Employee Employee { get; set; }
 
         public DateTime CheckInTime { get; set; }
 

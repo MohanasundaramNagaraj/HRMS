@@ -32,7 +32,7 @@ namespace SparkHRMS.Data.Entities
         public DateTime? DateOfJoining { get; set; }
         public string? Address { get; set; }
 
-        public string? ApplicationUserId { get; set; }
+        public int ApplicationUserId { get; set; }
 
         [ForeignKey("ApplicationUserId")]
         [ValidateNever]

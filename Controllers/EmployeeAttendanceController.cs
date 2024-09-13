@@ -29,17 +29,18 @@ namespace SparkHRMS.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return NotFound();
 
+            var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
             // Fetch Employee Details
             var employeeDetails = new EmployeeDetailsDto
             {
-                Name = user.UserName,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email,
-                //ImageUrl = user.ImageUrl,
-                //DateOfJoining = user.DateOfJoining,
-                //Address = user.Address,
-                //Designation = "Software Developer",
-                //EmpCode = "SPK-001"
+                Name = emp.Name,
+                PhoneNumber = emp.PhoneNumber,
+                Email = emp.Email,
+                ImageUrl = emp.ImageUrl,
+                DateOfJoining = emp.DateOfJoining,
+                Address = emp.Address,
+                Designation = emp.Designation,
+                EmpCode = emp.EmployeeCode
             };
 
             // Fetch This Month's Check-in/Check-out Summary
@@ -47,7 +48,7 @@ namespace SparkHRMS.Controllers
             var startOfMonth = new DateTime(today.Year, today.Month, 1);
 
             var attendanceRecords = await _context.EmployeeAttendance
-                .Where(e => e.EmployeeId == user.Id && e.CheckInTime.Date >= startOfMonth)
+                .Where(e => e.EmployeeId == emp.EmployeeId && e.CheckInTime.Date >= startOfMonth)
                 .OrderBy(e => e.CheckInTime)
                 .ToListAsync();
 
@@ -98,8 +99,9 @@ namespace SparkHRMS.Controllers
             }
 
             var today = DateTime.Today;
+            var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
             var existingCheckIn = _context.EmployeeAttendance
-                .FirstOrDefault(c => c.EmployeeId == user.Id && c.CheckInTime.Date == today);
+                .FirstOrDefault(c => c.EmployeeId == emp.EmployeeId && c.CheckInTime.Date == today);
 
             if (existingCheckIn != null)
             {
@@ -108,8 +110,9 @@ namespace SparkHRMS.Controllers
 
             var checkIn = new EmployeeAttendance
             {
-                EmployeeId = user.Id,
-                CheckInTime = DateTime.Now
+                EmployeeId = emp.EmployeeId,
+                CheckInTime = DateTime.Now,
+                CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString()
             };
 
             _context.EmployeeAttendance.Add(checkIn);
@@ -127,10 +130,11 @@ namespace SparkHRMS.Controllers
             {
                 return Unauthorized();
             }
+            var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
 
             var today = DateTime.Today;
             var checkInRecord = _context.EmployeeAttendance
-                                .Where(e => e.EmployeeId == user.Id && e.CheckInTime.Date == today && e.CheckOutTime == null)
+                                .Where(e => e.EmployeeId == emp.EmployeeId && e.CheckInTime.Date == today && e.CheckOutTime == null)
                                 .FirstOrDefault();
 
             if (checkInRecord == null)
