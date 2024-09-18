@@ -179,8 +179,8 @@ $.MyAdmin.leftSideBar = {
     });
 
     //Set Waves
-    Waves.attach(".menu .list a", ["waves-block"]);
-    Waves.init();
+    //Waves.attach(".menu .list a", ["waves-block"]);
+    //Waves.init();
   },
   setMenuHeight: function (isFirstTime) {
     if (typeof $.fn.slimScroll != "undefined") {
@@ -470,7 +470,9 @@ function skinChanger() {
 }
 //Full screen window
 function callFullScreen() {
-  $(document).on("click", ".fullscreen-btn", function (e) {
+    debugger;
+    //$(document).on("click", ".fullscreen-btn", function (e) {
+    //    debugger;
     if (
       !document.fullscreenElement && // alternative standard method
       !document.mozFullScreenElement &&
@@ -500,7 +502,7 @@ function callFullScreen() {
         document.webkitExitFullscreen();
       }
     }
-  });
+ // });
 }
 function setSkinListHeightAndScroll(isFirstTime) {
   var height =
@@ -547,14 +549,14 @@ function setSettingListHeightAndScroll(isFirstTime) {
 
 //Activate notification and task dropdown on top right menu
 function activateNotificationAndTasksScroll() {
-  $(".navbar-right .dropdown-menu .body .menu").slimscroll({
-    height: "254px",
-    color: "rgba(0,0,0,0.5)",
-    size: "4px",
-    alwaysVisible: false,
-    borderRadius: "0",
-    railBorderRadius: "0",
-  });
+  //$(".navbar-right .dropdown-menu .body .menu").slimscroll({
+  //  height: "254px",
+  //  color: "rgba(0,0,0,0.5)",
+  //  size: "4px",
+  //  alwaysVisible: false,
+  //  borderRadius: "0",
+  //  railBorderRadius: "0",
+  //});
 }
 
 //Dark Light Sidebar ======================================================================================

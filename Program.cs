@@ -12,6 +12,13 @@ using SparkHRMS.Data.Entities;
 using SparkHRMS.Utilities;
 using SparkHRMS.Interfaces;
 using SparkHRMS.Repositories;
+using Hangfire;
+using Hangfire.SqlServer;
+//using ElmahCore.Mvc;
+using SparkHRMS.Filters;
+using SparkHRMS.Services;
+using Newtonsoft.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +46,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(/*options => opti
 
 //Services configuration
 builder.Services.AddScoped<ApplicationUser>();
-builder.Services.AddSingleton<IEmailSender, EmailSender>();
+builder.Services.AddTransient<SparkHRMS.Interfaces.IEmailSender,  EmailSender>();
 
 // Session cache
 builder.Services.AddDistributedMemoryCache();
@@ -86,6 +93,37 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 
+
+string hangfireConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseFilter(new AutomaticRetryAttribute { Attempts = 0 }) // Retry attempts filter added by vigneshwaran 
+    .UseStorage(
+        new SqlServerStorage(
+            hangfireConnectionString,
+
+            new SqlServerStorageOptions
+            {
+                QueuePollInterval = TimeSpan.FromSeconds(10),
+                JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                PrepareSchemaIfNecessary = true,
+                DashboardJobListLimit = 25000,
+                TransactionTimeout = TimeSpan.FromMinutes(1),
+                SchemaName = "HRHangfire",
+            }
+)
+    ));
+
+
+//// Add the processing server as IHostedService
+//builder.Services.AddHangfireServer(options => options.WorkerCount = Environment.ProcessorCount * 5);
+
+builder.Services.AddSignalR(options =>
+options.EnableDetailedErrors = true);
+
 // Getting rid of code that mapped one object to another.
 ////builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -95,6 +133,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+});
 
 var app = builder.Build();
 
@@ -117,6 +160,15 @@ SeedDatabase();
 app.UseAuthentication();
 app.UseAuthorization();
 
+//app.UseElmah();
+
+app.UseHangfireDashboard();
+app.UseHangfireServer();
+
+var configuration = app.Services.GetRequiredService<IConfiguration>();
+var scheduler = new EmailScheduler(configuration);
+scheduler.ScheduleEmailJob();
+
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
@@ -131,11 +183,21 @@ app.UseEndpoints(endpoints =>
     });
     endpoints.MapRazorPages();
 
+    endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = new[] { new HangfireAuthorizationFilter(app.Services) },
+        IgnoreAntiforgeryToken = true
+    });
+
 });
 
 app.MapControllerRoute(
     name: "default",
      pattern: "{controller=Home}/{action=Index}/{id?}");
+
+//app.UseSwagger();
+
+app.UseHttpsRedirection();
 
 app.Run();
 

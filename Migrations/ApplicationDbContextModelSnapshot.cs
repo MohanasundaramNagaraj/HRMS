@@ -277,7 +277,7 @@ namespace SparkHRMS.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("MST_Employee");
+                    b.ToTable("MST_Employee", (string)null);
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.EmployeeAttendance", b =>
@@ -304,7 +304,7 @@ namespace SparkHRMS.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeeAttendance");
+                    b.ToTable("EmployeeAttendance", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

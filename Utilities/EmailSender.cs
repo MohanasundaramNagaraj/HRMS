@@ -1,59 +1,76 @@
 ﻿
+using Humanizer;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MimeKit;
+using SparkHRMS.ViewModels;
+using SparkHRMS.Interfaces;
+using System.Net;
 using System.Net.Mail;
-using SmtpClient = MailKit.Net.Smtp.SmtpClient;
+using IEmailSender = SparkHRMS.Interfaces.IEmailSender;
 
 namespace SparkHRMS.Utilities
 {
     public class EmailSender : IEmailSender
     {
+        private readonly SmtpSettings _smtpSettings;
         private IConfiguration Configuration { get; }
         private readonly ILogger<EmailSender> _logger;
-        public EmailSender(ILogger<EmailSender> logger, IConfiguration configuration)
+        public EmailSender(ILogger<EmailSender> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
         {
             Configuration = configuration;
             _logger = logger;
+            _smtpSettings = smtpSettings.Value;
         }
 
-        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
+            string dateTimeForCheckinCheckoutSubject = "";
+            if (subject == "CheckIn" || subject == "CheckOut")
+            {
+                dateTimeForCheckinCheckoutSubject = DateTime.Now.ToString("dd MMM yyyy");
+            }
+            subject = Configuration["EmailSenderSettings:Subject:" + subject] + dateTimeForCheckinCheckoutSubject;
+
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(MailboxAddress.Parse(Configuration["EmailSenderSettings:From"]));
             emailMessage.To.Add(MailboxAddress.Parse(email));
             emailMessage.Subject = subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlMessage };
 
-            Send(emailMessage);
+            var smtpClient = new System.Net.Mail.SmtpClient(Configuration["EmailSenderSettings:SmtpServer"])
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:Password"]),
+                EnableSsl = true,
+            };
 
-            return Task.CompletedTask;
-        }
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
+                Subject = subject,
+                Body = htmlMessage,
+                IsBodyHtml = true,
+            };
 
-        private void Send(MimeMessage mailMessage)
-        {
-            using var client = new SmtpClient();
+            mailMessage.To.Add(email);
+
             try
             {
-                client.Connect(Configuration["EmailSenderSettings:SmtpServer"], int.Parse(Configuration["EmailSenderSettings:Port"]), true);
-                client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(Configuration["EmailSenderSettings:Username"], Configuration["EmailSenderSettings:Password"]);
-                client.Send(mailMessage);
+                await smtpClient.SendMailAsync(mailMessage);
+                await Task.Delay(500); // Delay in milliseconds
             }
-            catch
+            catch (Exception ex)
             {
-                //log an error message or throw an exception or both.
-                _logger.LogError("Error loading external login information during confirmation.");
+                // log an error message or throw an exception or both.
+                _logger.LogError(ex.Message);
                 throw;
             }
-            finally
-            {
-                client.Disconnect(true);
-                client.Dispose();
-            }
         }
+
     }
 
 }

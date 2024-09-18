@@ -1,20 +1,33 @@
 ﻿@using SparkHRMS.ViewModels;
 @using System.Globalization
-
-@model List<EmployeeAttendanceDto>
 @{
     ViewData["Title"] = "Employee Attendance";
     var selectedDate = ViewBag.SelectedDate.ToString("yyyy-MM-dd");
+    var employeeName = ViewBag.EmployeeName ?? "";
 }
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title"> Attendance</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#">
+            <i class="fas fa-add"></i> Employee Attendance
+        </a>
+    </li>
+ 
+</ul>
+<hr />
 
 <div class="container mt-4">
     <div class="row">
         <!-- Date Filter -->
         <div class="col-md-12 mb-3">
             <form method="get" asp-action="Index" asp-controller="AdminAttendanceViewer">
-                <div class="input-group">
-                    <input type="date" name="date" value="@selectedDate" class="form-control" />
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                <div class="row">
+                    <input type="date" name="date" value="@selectedDate" class="form-control" style="width:35%;margin-right:10px;" />
+                    <input type="text" name="employeeName" value="@employeeName" class="form-control" placeholder="Filter by employee name" style="width:45%;margin-right:10px;" />
+                    <button type="submit" class="btn btn-primary" style="width:10%;margin-right:10px;">Filter</button>
                 </div>
             </form>
         </div>
@@ -33,16 +46,37 @@
                                 <th>Check-In Time</th>
                                 <th>Check-Out Time</th>
                                 <th>Working Hours</th>
+                                <th>Check In Made System IP</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var record in Model)
                             {
+                                var checkInTime = "";
+                                if (record.CheckInTime != null)
+                                {
+                                    checkInTime = record.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture);
+                                }
+                                var checkOutTime = "";
+                                if (record.CheckOutTime != null)
+                                {
+                                    checkOutTime = record.CheckOutTime.ToString("hh:mm tt", CultureInfo.InvariantCulture);
+                                }
+
                                 <tr>
-                                    <td>@record.EmployeeName</td>
-                                    <td>@record.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture)</td>
-                                    <td>@(record.CheckOutTime.HasValue ? record.CheckOutTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture) : "Not Checked Out")</td>
-                                    <td>@record.WorkingHours</td>
+                                    <td>@(record.EmployeeName ?? "N/A")</td>
+                                    <td>@(checkInTime)</td>
+                                    <td>@(checkOutTime)</td>
+                                    <td>@(record.WorkingHours ?? "N/A")</td>
+                                    <td>@record.IP</td>
+                                    <td>
+                                        @if (record.CheckInTime != null)
+                                        {
+                                            <a href="@Url.Action("Edit", new { id = record.Id })" class="btn btn-warning btn-sm">Edit</a>
+                                        }
+                                        @* <a href="@Url.Action("Delete", new { id = record.Id })" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a> *@
+                                    </td>
                                 </tr>
                             }
                         </tbody>

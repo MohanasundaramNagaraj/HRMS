@@ -40,7 +40,7 @@
                             {
                                 <tr>
                                     <td>@record.EmployeeName</td>
-                                    <td>@record.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture)</td>
+                                    <td>@record.CheckInTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)</td>
                                     <td>@(record.CheckOutTime.HasValue ? record.CheckOutTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture) : "Not Checked Out")</td>
                                     <td>@record.WorkingHours</td>
                                 </tr>

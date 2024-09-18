@@ -33,9 +33,11 @@ namespace SparkHRMS.ViewModels
 
     public class EmployeeAttendanceDto
     {
+        public int Id { get; set; }
         public string EmployeeName { get; set; }
-        public DateTime CheckInTime { get; set; }
+        public DateTime? CheckInTime { get; set; }
         public DateTime? CheckOutTime { get; set; }
         public string WorkingHours { get; set; } // e.g., "8 hours 15 mins"
+        public string IP { get; set; }
     }
 }
