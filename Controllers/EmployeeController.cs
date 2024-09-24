@@ -163,6 +163,7 @@ namespace SparkHRMS.Controllers
 
             if (ModelState.IsValid)
             {
+                employee.ApplicationUserId = _context.Employees.Where(x => x.EmployeeId == employee.EmployeeId).Select(x => x.ApplicationUserId).FirstOrDefault();
                 try
                 {
                     _context.Update(employee);

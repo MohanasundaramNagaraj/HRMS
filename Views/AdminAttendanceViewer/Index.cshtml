@@ -25,8 +25,21 @@
         <div class="col-md-12 mb-3">
             <form method="get" asp-action="Index" asp-controller="AdminAttendanceViewer">
                 <div class="row">
+                   @*  <div style="width:35%;">
+                        <label>Filter By</label>
+                        <input type="radio" name="filterby" value="Date" selected/> Date
+                        <input type="radio" name="filterby" value="Employee" /> Employee
+                    </div> *@
+                   
+
                     <input type="date" name="date" value="@selectedDate" class="form-control" style="width:35%;margin-right:10px;" />
-                    <input type="text" name="employeeName" value="@employeeName" class="form-control" placeholder="Filter by employee name" style="width:45%;margin-right:10px;" />
+@*                     <select style="width:35%;margin-right:10px;" onchange="document.getElementById('admin_attendance_emp').value = this.value">
+                        @foreach (var record in Model)
+                        {
+                            <option value="@record.EmployeeName">@record.EmployeeName</option>
+                        }
+                    </select> *@
+                    <input type="text" id="admin_attendance_emp" name="employeeName" value="@employeeName" class="form-control" placeholder="Filter by employee name" style="width:35%;margin-right:10px;" />
                     <button type="submit" class="btn btn-primary" style="width:10%;margin-right:10px;">Filter</button>
                 </div>
             </form>
@@ -71,9 +84,14 @@
                                     <td>@(record.WorkingHours ?? "N/A")</td>
                                     <td>@record.IP</td>
                                     <td>
+
                                         @if (record.CheckInTime != null)
                                         {
                                             <a href="@Url.Action("Edit", new { id = record.Id })" class="btn btn-warning btn-sm">Edit</a>
+                                        }
+                                        else
+                                        {
+                                            <a href="@Url.Action("Add", new { EmployeeId = record.EmployeeId, date = ViewBag.SelectedDate })" class="btn btn-warning btn-sm">Add</a>
                                         }
                                         @* <a href="@Url.Action("Delete", new { id = record.Id })" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a> *@
                                     </td>

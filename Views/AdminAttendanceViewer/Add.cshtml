@@ -1,0 +1,113 @@
+﻿@model SparkHRMS.Data.Entities.Employee
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<link href="~/app/assets/css/form.min.css" rel="stylesheet">
+
+<link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title"> Employee Attendance</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#">
+            <i class="fas fa-add"></i> Add
+        </a>
+    </li>
+</ul>
+<hr />
+<div class="card">
+    <form>
+        <div class="body">
+            <div class="row clearfix">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            @Html.DisplayFor(model => model.EmployeeCode)
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            @Html.DisplayFor(model => model.Name)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row clearfix">
+                <div class="col-sm-6">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input id="check_in_time" type="datetime" class="validate form-control" placeholder="Check In Time">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input id="check_out_time" type="datetime" class="validate form-control" placeholder="Check Out Time">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+           
+            <div class="col-lg-12 p-t-20 text-center">
+                <div class="form-group">
+                    <input value="Create" class="btn btn-primary waves-effect m-r-15" onclick="addEmployeeCheckInDetais();"/>
+                    <a asp-action="Index" type="button" class="btn btn-danger waves-effect">Cancel</a>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    function addEmployeeCheckInDetais(){
+        let obj = {
+            EmployeeId:@ViewBag.EmployeeId,
+            CheckInTime: $('#check_in_time').val(),
+            CheckOutTime: $('#check_out_time').val()
+
+        }
+        $.ajax({
+            url: "/AdminAttendanceViewer/Add",
+            data:obj,
+            type: 'POST',
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added Successful',
+                    text: 'Data Added Successfully!'
+                });
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Added Failed',
+                    text: 'Failed to Add: ' + xhr.responseText
+                });
+            }
+        });
+    }
+</script>
+
+<!-- Include jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Include SweetAlert from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script src="~/app/assets/js/bundles/dropzone.js"></script>
+<script src="~/app/assets/js/bundles/flatpicker/flatpicker.min.js"></script>
+
+<script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
+<script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
+<script src="~/app/assets/js/pages/forms/dropzone-data.js"></script>

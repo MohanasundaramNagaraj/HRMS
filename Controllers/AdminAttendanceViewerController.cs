@@ -26,10 +26,11 @@ namespace SparkHRMS.Controllers
             var selectedDate = date ?? DateTime.Today;
 
             var query = from e in _context.Employees
+                        join user in _context.Users on e.ApplicationUserId equals user.Id 
                         join a in _context.EmployeeAttendance
                         on e.EmployeeId equals a.EmployeeId into attendanceGroup
                         from a in attendanceGroup
-                        .Where(a => a.CheckInTime.Date == selectedDate)
+                        .Where(a => a.CheckInTime.Date == selectedDate && user.IsActive)
                         .DefaultIfEmpty()
                         select new
                         {
@@ -49,6 +50,7 @@ namespace SparkHRMS.Controllers
             var attendanceDtos = results.Select(x => new EmployeeAttendanceDto
             {
                 Id = x.Attendance?.Id ?? 0,
+                EmployeeId = x.Employee.EmployeeId,
                 EmployeeName = x.Employee.Name,
                 CheckInTime = x.Attendance?.CheckInTime, // Nullable DateTime
                 CheckOutTime = x.Attendance?.CheckOutTime, // Nullable DateTime
@@ -70,6 +72,38 @@ namespace SparkHRMS.Controllers
             }
             return "N/A";
         }
+        [HttpGet]
+        public IActionResult Add(int EmployeeID, DateTime Date)
+        {
+            ViewBag.EmployeeID = EmployeeID;
+            ViewBag.Date = Date;
+            var emp = _context.Employees.Where(x => x.EmployeeId == EmployeeID).FirstOrDefault();
+            return View(emp);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Add(EmployeeAttendance attendance)
+        {
+            var existingCheckIn = _context.EmployeeAttendance
+                .FirstOrDefault(c => c.EmployeeId == attendance.EmployeeId && c.CheckInTime.Date == attendance.CheckInTime.Date);
+
+            if (existingCheckIn != null)
+            {
+                return BadRequest("The Employee Already checked in for selected Date.");
+            }
+
+            var checkIn = new EmployeeAttendance
+            {
+                EmployeeId = attendance.EmployeeId,
+                CheckInTime = attendance.CheckInTime,
+                CheckOutTime = attendance.CheckOutTime,
+                CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString()
+            };
+
+            _context.EmployeeAttendance.Add(checkIn);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
         public IActionResult Edit(int id)
         {
             // Retrieve the attendance record by Id and pass it to the view
