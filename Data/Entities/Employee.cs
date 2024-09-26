@@ -38,5 +38,7 @@ namespace SparkHRMS.Data.Entities
         [ValidateNever]
         public ApplicationUser? ApplicationUser { get; set; }
 
+        public int ReportingHeadUserID { get; set; }
+
     }
 }

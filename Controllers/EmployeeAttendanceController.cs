@@ -90,7 +90,7 @@ namespace SparkHRMS.Controllers
         }
         // POST: Attendance/CheckIn
         [HttpPost]
-        public async Task<IActionResult> CheckIn()
+        public async Task<IActionResult> CheckIn(string CheckInPosition)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -112,7 +112,8 @@ namespace SparkHRMS.Controllers
             {
                 EmployeeId = emp.EmployeeId,
                 CheckInTime = DateTime.Now,
-                CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString()
+                CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                CheckInPosition = CheckInPosition
             };
 
             _context.EmployeeAttendance.Add(checkIn);
@@ -123,7 +124,7 @@ namespace SparkHRMS.Controllers
 
         // POST: Attendance/CheckOut
         [HttpPost]
-        public async Task<IActionResult> CheckOut()
+        public async Task<IActionResult> CheckOut(string CheckOutPosition)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -143,6 +144,7 @@ namespace SparkHRMS.Controllers
             }
 
             checkInRecord.CheckOutTime = DateTime.Now;
+            checkInRecord.CheckOutPosition = CheckOutPosition;
             await _context.SaveChangesAsync();
 
             return Ok("Check-out successful.");

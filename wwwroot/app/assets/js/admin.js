@@ -7,51 +7,92 @@ var logoColor = "logo-white"; // logo-white or logo-black
 var themeColor = "theme-white"; // theme-black",theme-white",theme-purple,theme-blue,theme-cyan,theme-green,theme-orange
 
 $(document).ready(function () {
-
+   
     $('#checkInBtn').click(function (e) {
         e.preventDefault();
-        $.ajax({
-            url: "/EmployeeAttendance/CheckIn",
-           // url: '@Url.Action("CheckIn", "EmployeeAttendance")',
-            type: 'POST',
-            success: function (response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Check-in Successful',
-                    text: 'You have successfully checked in!'
+        let lat, lng = '';
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                lat = position.coords.latitude;
+                lng = position.coords.longitude;
+
+                let _position = {
+                    lat: lat,
+                    lng:lng
+                }
+                $.ajax({
+                    url: "/EmployeeAttendance/CheckIn",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        CheckInPosition: JSON.stringify(_position)
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Check-in Successful',
+                            text: 'You have successfully checked in!'
+                        });
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Check-in Failed',
+                            text: 'Failed to check in: ' + xhr.responseText
+                        });
+                    }
                 });
-            },
-            error: function (xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Check-in Failed',
-                    text: 'Failed to check in: ' + xhr.responseText
-                });
-            }
-        });
+            });
+            
+           
+            
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+       
     });
 
     $('#checkOutBtn').click(function (e) {
         e.preventDefault();
-        $.ajax({
-            //url: '@Url.Action("CheckOut", "EmployeeAttendance")',
-            url:"/EmployeeAttendance/CheckOut",
-            type: 'POST',
-            success: function (response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Check-out Successful',
-                    text: 'You have successfully checked out!'
+        let lat, lng = '';
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                lat = position.coords.latitude;
+                lng = position.coords.longitude;
+                let _position = {
+                    lat: lat,
+                    lng: lng
+                }
+
+                $.ajax({
+                    url: "/EmployeeAttendance/CheckOut",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        CheckOutPosition: JSON.stringify(_position)
+                    },
+                    success: function (response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Check-out Successful',
+                            text: 'You have successfully checked out!'
+                        });
+                    },
+                    error: function (xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Check-out Failed',
+                            text: 'Failed to check out: ' + xhr.responseText
+                        });
+                    }
                 });
-            },
-            error: function (xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Check-out Failed',
-                    text: 'Failed to check out: ' + xhr.responseText
-                });
-            }
-        });
+            });
+
+            
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+       
     });
 });
 
