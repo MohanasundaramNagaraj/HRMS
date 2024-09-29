@@ -1,5 +1,7 @@
 ﻿@page
 @model RegisterModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 @{
     ViewData["Title"] = "Register";
     Layout = null;
@@ -7,7 +9,7 @@
 
 <html>
     <head>
-    <title>Login</title>
+    <title>Register</title>
 
     <!-- Plugins Core Css -->
     <link href="~/app/assets/css/app.min.css" rel="stylesheet">
@@ -31,6 +33,9 @@
         <div class="container-login100">
             <div class="wrap-login100">
                 <form class="login100-form validate-form" id="account" method="post">
+                    <span class="login100-form-title p-b-20">
+                       @Configuration["AppSettings:SiteTitle"]
+                    </span>
                     <span class="login100-form-title p-b-45">
                         Register
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
@@ -44,21 +49,21 @@
                         <span asp-validation-for="Input.UserName" class="text-danger"></span>
 					</div> *@
 					<div class="wrap-input100 validate-input" data-validate="Enter valid email address">
-						 <input asp-for="Input.Email" class="input100" autocomplete="username" aria-required="true"  />
+						 <input asp-for="Input.Email" class="input100" autocomplete="username" aria-required="true" placeholder="Email" />
                         <span class="focus-input100"></span>
-						<span class="label-input100">Email</span>
+						
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
 					</div>
                     <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <input asp-for="Input.Password" class="input100" autocomplete="new-password" aria-required="true"  />
+                        <input asp-for="Input.Password" class="input100" autocomplete="new-password" aria-required="true" placeholder="Password" />
                         <span class="focus-input100"></span>
-						<span class="label-input100">Password</span>
+						
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
 					</div>
 					<div class="wrap-input100 validate-input" data-validate="Password is required">
-						 <input asp-for="Input.ConfirmPassword" class="input100" autocomplete="new-password" aria-required="true" />
+						 <input asp-for="Input.ConfirmPassword" class="input100" autocomplete="new-password" aria-required="true" placeholder="Confirm Password" />
                         <span class="focus-input100"></span>
-						<span class="label-input100">Confirm Password</span>
+						
                         <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
 					</div>
 					<div class="flex-sb-m w-full p-t-15 p-b-20">

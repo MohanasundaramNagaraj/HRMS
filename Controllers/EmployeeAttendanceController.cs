@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
+using SparkHRMS.Utilities;
 using SparkHRMS.ViewModels;
 using System;
 using System.Globalization;
@@ -18,21 +19,36 @@ namespace SparkHRMS.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public EmployeeAttendanceController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public EmployeeAttendanceController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
+            _configuration = configuration;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? EmployeeID = null, int? Month = null)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null) return NotFound();
+            var emp = new Employee();
+            if (EmployeeID == null)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return NotFound();
+                emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+                if (emp == null)
+                {
+                    emp = _context.Employees.FirstOrDefault();
+                }
+            }
+            else
+            {
+                emp = _context.Employees.Where(x => x.EmployeeId == EmployeeID).FirstOrDefault();
+            }
 
-            var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
             // Fetch Employee Details
             var employeeDetails = new EmployeeDetailsDto
             {
+                EmployeeId = emp.EmployeeId,
                 Name = emp.Name,
                 PhoneNumber = emp.PhoneNumber,
                 Email = emp.Email,
@@ -45,35 +61,106 @@ namespace SparkHRMS.Controllers
 
             // Fetch This Month's Check-in/Check-out Summary
             var today = DateTime.Today;
-            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var year = today.Year;
+            if (Month.HasValue)
+            {
+                year = Month.Value == 1 ? year - 1 : year; // For January, go to the previous year (if needed)
+            }
+
+            var startOfMonth = Month.HasValue ? new DateTime(year, Month.Value, 1) : new DateTime(today.Year, today.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); // Get the last day of the month
 
             var attendanceRecords = await _context.EmployeeAttendance
                 .Where(e => e.EmployeeId == emp.EmployeeId && e.CheckInTime.Date >= startOfMonth)
                 .OrderBy(e => e.CheckInTime)
                 .ToListAsync();
 
-            var dailyAttendanceRecords = new List<DailyAttendanceDto>();
+            var dailyAttendanceRecords = new List<EmployeeAttendanceDto>();
             TimeSpan totalWorkingTime = TimeSpan.Zero;
 
-            foreach (var record in attendanceRecords)
+            var allDatesInMonth = Enumerable.Range(0, DateTime.DaysInMonth(today.Year, today.Month))
+                                   .Select(day => new DateTime(today.Year, today.Month, day + 1))
+                                   .ToList();
+
+            // Fetch holidays from the database or your holidays table
+            var holidays = await _context.Holiday
+                                .Where(h => h.Date >= startOfMonth && h.Date <= today)
+                                .Select(h => h.Date.Date)
+                                .ToListAsync();
+
+            foreach (var date in allDatesInMonth)
             {
+                var attendanceRecord = attendanceRecords.FirstOrDefault(a => a.CheckInTime.Date == date);
                 TimeSpan? workingTime = null;
-                if (record.CheckOutTime.HasValue)
+
+                AttendanceStatus status = AttendanceStatus.Absent; // Default status
+                if (holidays.Contains(date))
                 {
-                    workingTime = record.CheckOutTime.Value - record.CheckInTime;
-                    totalWorkingTime += workingTime.Value;
+                    status = AttendanceStatus.Holiday; // If the date is a holiday
+                }
+                else if (date.DayOfWeek == DayOfWeek.Sunday)
+                {
+                    status = AttendanceStatus.Weekend; // If the date is a Sunday
+                }
+                else if (attendanceRecord != null)
+                {
+                    if (attendanceRecord.CheckOutTime.HasValue)
+                    {
+                        workingTime = attendanceRecord.CheckOutTime.Value - attendanceRecord.CheckInTime;
+                        totalWorkingTime += workingTime.Value;
+
+                        if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:FullDayThreshold"]))
+                        {
+                            status = AttendanceStatus.Present; // Full Day Present
+                        }
+                        else if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:HalfDayThreshold"])
+                            && workingTime.Value.TotalHours <= Convert.ToInt32(_configuration["AttendanceSettings:PermissionNeededThreshold"]))
+                        {
+                            status = AttendanceStatus.PermissionNeeded; // Permission Needed
+                        }
+                        else if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:HalfDayThreshold"]))
+                        {
+                            status = AttendanceStatus.HalfDay; // Half Day Present
+                        }
+                        else
+                        {
+                            status = AttendanceStatus.Absent;
+                        }
+                    }
+                    else
+                    {
+                        // If checked in but not checked out
+                        status = AttendanceStatus.PendingCheckOut; // Present (Pending Checkout)
+                    }
                 }
 
-                dailyAttendanceRecords.Add(new DailyAttendanceDto
+                // Add attendance record with status
+                dailyAttendanceRecords.Add(new EmployeeAttendanceDto
                 {
-                    Date = record.CheckInTime.Date,
-                    CheckInTime = record.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture),
-                    CheckOutTime = record.CheckOutTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "Not Checked Out",
+                    Id = attendanceRecord?.Id ?? 0,
+                    EmployeeId = emp.EmployeeId,
+                    EmployeeName = emp.Name,
+                    CheckInDateTime = attendanceRecord?.CheckInTime,
+                    CheckOutDateTime = attendanceRecord?.CheckOutTime,
+                    IP = attendanceRecord?.CheckinMadeSystemIP,
+                    CheckInPosition = attendanceRecord?.CheckInPosition,
+                    CheckOutPosition = attendanceRecord?.CheckOutPosition,
+                    Date = date,
+                    CheckInTimeInString = attendanceRecord?.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "Not Checked In",
+                    CheckOutTimeInString = attendanceRecord?.CheckOutTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "Not Checked Out",
                     WorkingHours = workingTime.HasValue
                                    ? string.Format("{0:%h} hours {0:%m} mins", workingTime.Value)
-                                   : "N/A"
+                                   : string.Empty,
+                    Status = status 
                 });
             }
+
+            // Get check-in/check-out locations
+            foreach (var attendance in dailyAttendanceRecords)
+            {
+                attendance.CheckInLocation = await Utility.GetLocationFromCoordinates(attendance.CheckInPosition);
+                attendance.CheckOutLocation = await Utility.GetLocationFromCoordinates(attendance.CheckOutPosition);
+            };
 
             var monthlySummary = new EmployeeMonthlySummary
             {
@@ -86,8 +173,12 @@ namespace SparkHRMS.Controllers
                 EmployeeDetails = employeeDetails,
                 MonthlySummary = monthlySummary
             };
+
+            ViewBag.EmployeeList = _context.Employees.ToList();
+            ViewBag.SelectedEmployeeID = employeeDetails.EmployeeId;
             return View(response);
         }
+
         // POST: Attendance/CheckIn
         [HttpPost]
         public async Task<IActionResult> CheckIn(string CheckInPosition)

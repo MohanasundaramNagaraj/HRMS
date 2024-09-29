@@ -17,6 +17,8 @@ namespace SparkHRMS.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<EmployeeAttendance> EmployeeAttendance { get; set; }
+        public DbSet<EmailLogs> EmailLogs { get; set; }
+        public DbSet<Holiday> Holiday { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

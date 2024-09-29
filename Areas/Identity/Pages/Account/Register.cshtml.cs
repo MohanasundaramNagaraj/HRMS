@@ -27,21 +27,21 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserStore<ApplicationUser> _userStore;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly Interfaces.IEmailSender _emailSender;
         private readonly ApplicationDbContext _context;
         public RegisterModel(
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<ApplicationRole> roleManager,
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender,
+            Interfaces.IEmailSender emailSender,
             ApplicationDbContext context)
         {
             _roleManager = roleManager;
@@ -126,7 +126,7 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
 
             [ForeignKey("Role")]
             public string? RoleId { get; set; }
-            public virtual IdentityRole Role { get; set; }
+            public virtual ApplicationRole Role { get; set; }
         }
 
 
@@ -138,7 +138,7 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
             // Load roles
             Roles = _roleManager.Roles.Select(role => new SelectListItem
             {
-                Value = role.Id,
+                Value = Convert.ToString(role.Id),
                 Text = role.Name
             }).ToList();
         }
@@ -162,7 +162,7 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
                     // Assign role
                     if (!string.IsNullOrEmpty(Input.RoleId))
                     {
-                        role = _roleManager.Roles.FirstOrDefault(r => r.Id == Input.RoleId)?.Name;
+                        role = _roleManager.Roles.FirstOrDefault(r => Convert.ToString(r.Id) == Input.RoleId)?.Name;
                         if (role != null)
                         {
                             await _userManager.AddToRoleAsync(user, role);

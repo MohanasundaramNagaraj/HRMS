@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Data;
 using SparkHRMS.ViewModels;
+using SparkHRMS.Utilities;
+using Humanizer;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SparkHRMS.Controllers
 {
@@ -21,7 +24,7 @@ namespace SparkHRMS.Controllers
             _userManager = userManager;
             _context = context;
         }
-        public async Task<IActionResult> Index(DateTime? date = null, string employeeName = null)
+        public async Task<IActionResult> Index(DateTime? date = null)
         {
             var selectedDate = date ?? DateTime.Today;
 
@@ -38,47 +41,61 @@ namespace SparkHRMS.Controllers
                             Attendance = a,
                         };
 
-            if (!string.IsNullOrEmpty(employeeName))
-            {
-                query = query.Where(x => x.Employee.Name.Contains(employeeName));
-            }
-
             var results = await query
                 .OrderBy(x => x.Attendance.CheckInTime)
                 .ToListAsync();
 
-            var attendanceDtos = results.Select(x => new EmployeeAttendanceDto
+            var attendances= results.Select(x => new EmployeeAttendanceDto
             {
                 Id = x.Attendance?.Id ?? 0,
                 EmployeeId = x.Employee.EmployeeId,
                 EmployeeName = x.Employee.Name,
-                CheckInTime = x.Attendance?.CheckInTime, // Nullable DateTime
-                CheckOutTime = x.Attendance?.CheckOutTime, // Nullable DateTime
-                WorkingHours = CalculateWorkingHours(x.Attendance?.CheckInTime, x.Attendance?.CheckOutTime),
-                IP = x.Attendance?.CheckinMadeSystemIP
+                CheckInDateTime = x.Attendance?.CheckInTime, // Nullable DateTime
+                CheckOutDateTime = x.Attendance?.CheckOutTime, // Nullable DateTime
+                IP = x.Attendance?.CheckinMadeSystemIP,
+                CheckInPosition  = x.Attendance?.CheckInPosition,
+                CheckOutPosition  = x.Attendance?.CheckOutPosition,
             }).ToList();
 
-            ViewBag.SelectedDate = selectedDate;
-            ViewBag.EmployeeName = employeeName; // For retaining filter value
-
-            return View(attendanceDtos);
-        }
-        private string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
-        {
-            if (checkInTime.HasValue && checkOutTime.HasValue)
+            foreach(var attendance in attendances)
             {
-                var duration = checkOutTime.Value - checkInTime.Value;
-                return string.Format("{0:%h} hours {0:%m} mins", duration);
-            }
-            return "N/A";
+                attendance.WorkingHours = Utility.CalculateWorkingHours(attendance.CheckInDateTime, attendance.CheckOutDateTime);
+                attendance.CheckInLocation = await Utility.GetLocationFromCoordinates(attendance.CheckInPosition);
+                attendance.CheckOutLocation = await Utility.GetLocationFromCoordinates(attendance.CheckOutPosition);
+            };
+
+            ViewBag.SelectedDate = selectedDate;
+
+            return View(attendances);
         }
+        
         [HttpGet]
         public IActionResult Add(int EmployeeID, DateTime Date)
         {
             ViewBag.EmployeeID = EmployeeID;
             ViewBag.Date = Date;
             var emp = _context.Employees.Where(x => x.EmployeeId == EmployeeID).FirstOrDefault();
-            return View(emp);
+            var attendance = _context.EmployeeAttendance
+                .Include(e => e.Employee)
+                .SingleOrDefault(e => e.EmployeeId == EmployeeID && e.CheckInTime.Date == Date.Date);
+
+            var employeeAttendance = new EmployeeAttendanceDto
+            {
+                Id = attendance == null ? 0 :attendance.Id ,
+                EmployeeName = emp.Name,
+                CheckInDateTime = attendance == null ? null : attendance.CheckInTime,
+                CheckOutDateTime = attendance == null ? null : attendance.CheckOutTime,
+                WorkingHours = attendance == null ? string.Empty :  attendance.CheckOutTime.HasValue
+                              ? string.Format("{0:%h} hours {0:%m} mins", attendance.CheckOutTime.Value - attendance.CheckInTime)
+                              : string.Empty
+            };
+
+            if(employeeAttendance.CheckInDateTime != null)
+            {
+                employeeAttendance.CheckInTime = TimeOnly.FromDateTime((DateTime)(attendance?.CheckInTime));
+                employeeAttendance.CheckOutTime = TimeOnly.FromDateTime((DateTime)(attendance?.CheckOutTime));
+            }
+            return View(employeeAttendance);
         }
         [HttpPost]
         public async Task<IActionResult> Add(EmployeeAttendance attendance)
@@ -88,24 +105,32 @@ namespace SparkHRMS.Controllers
 
             if (existingCheckIn != null)
             {
-                return BadRequest("The Employee Already checked in for selected Date.");
+                existingCheckIn.CheckInTime = attendance.CheckInTime;
+                existingCheckIn.CheckOutTime = attendance.CheckOutTime;
+                existingCheckIn.CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                _context.Update(existingCheckIn);
+                // return BadRequest("The Employee Already checked in for selected Date.");
             }
-
-            var checkIn = new EmployeeAttendance
+            else
             {
-                EmployeeId = attendance.EmployeeId,
-                CheckInTime = attendance.CheckInTime,
-                CheckOutTime = attendance.CheckOutTime,
-                CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString()
-            };
+                var checkIn = new EmployeeAttendance
+                {
+                    EmployeeId = attendance.EmployeeId,
+                    CheckInTime = attendance.CheckInTime,
+                    CheckOutTime = attendance.CheckOutTime,
+                    CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString()
+                };
 
-            _context.EmployeeAttendance.Add(checkIn);
+                _context.EmployeeAttendance.Add(checkIn);
+            }
+            
             await _context.SaveChangesAsync();
             return Ok();
         }
 
         public IActionResult Edit(int id)
         {
+            
             // Retrieve the attendance record by Id and pass it to the view
             var attendance = _context.EmployeeAttendance
                 .Include(e => e.Employee)
@@ -120,8 +145,8 @@ namespace SparkHRMS.Controllers
             {
                 Id = attendance.Id,
                 EmployeeName = attendance.Employee.Name,
-                CheckInTime = attendance.CheckInTime,
-                CheckOutTime = attendance.CheckOutTime,
+                CheckInDateTime = attendance.CheckInTime,
+                CheckOutDateTime = attendance.CheckOutTime,
                 WorkingHours = attendance.CheckOutTime.HasValue
                                ? string.Format("{0:%h} hours {0:%m} mins", attendance.CheckOutTime.Value - attendance.CheckInTime)
                                : "N/A"
@@ -140,8 +165,8 @@ namespace SparkHRMS.Controllers
                 return NotFound();
             }
 
-            attendance.CheckInTime = (DateTime)dto.CheckInTime;
-            attendance.CheckOutTime = dto.CheckOutTime;
+            attendance.CheckInTime = (DateTime)dto.CheckInDateTime;
+            attendance.CheckOutTime = dto.CheckOutDateTime;
 
             _context.Update(attendance);
             await _context.SaveChangesAsync();

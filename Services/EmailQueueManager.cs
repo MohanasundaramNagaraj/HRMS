@@ -51,8 +51,8 @@ namespace SparkHRMS.Services
             {
                 Id = x.Attendance?.Id ?? 0,
                 EmployeeName = x.Employee.Name,
-                CheckInTime = x.Attendance?.CheckInTime, // Nullable DateTime
-                CheckOutTime = x.Attendance?.CheckOutTime, // Nullable DateTime
+                CheckInDateTime = x.Attendance?.CheckInTime, // Nullable DateTime
+                CheckOutDateTime = x.Attendance?.CheckOutTime, // Nullable DateTime
                 WorkingHours = CalculateWorkingHours(x.Attendance?.CheckInTime, x.Attendance?.CheckOutTime),
                 IP = x.Attendance?.CheckinMadeSystemIP
             }).ToList();
@@ -79,8 +79,8 @@ namespace SparkHRMS.Services
 
             foreach (var record in attendanceDtos)
             {
-                var checkInTime = record.CheckInTime != null ? ((DateTime)record.CheckInTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "N/A";
-                var checkOutTime = record.CheckOutTime != null ? ((DateTime)record.CheckOutTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "N/A";
+                var checkInTime = record.CheckInDateTime != null ? ((DateTime)record.CheckInDateTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "N/A";
+                var checkOutTime = record.CheckOutDateTime != null ? ((DateTime)record.CheckOutDateTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "N/A";
                 var workingHours = record.WorkingHours ?? "N/A";
                 var employeeName = record.EmployeeName ?? "N/A";
                 var systemIP = record.IP ?? "N/A";

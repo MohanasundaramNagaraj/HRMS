@@ -1,5 +1,15 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using SparkHRMS.Data.Entities
+@using SparkHRMS.Utilities
+@using SparkHRMS.ViewModels
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
     ViewData["Title"] = "Employee Home";
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+
+
 }
 
 <link href="~/app/assets/css/bundles/dataTables.bootstrap5.min.css" rel="stylesheet">
@@ -10,38 +20,65 @@
     </li>
     <li class="breadcrumb-item bcrumb-1">
         <a href="#">
-             List
+            List
         </a>
     </li>
-@*     <li class="breadcrumb-item bcrumb-1">
-        <a href="../../index.html">
-            <i class="fas fa-home"></i> Home
-        </a>
-    </li>
-    <li class="breadcrumb-item bcrumb-2">
-        <a href="#" onClick="return false;">Attendance</a>
-    </li>
-    <li class="breadcrumb-item active">Emp Attendance</li> *@
 </ul>
 
-<!-- Your content goes here  -->
 <div class="row clearfix">
-    <div class="col-lg-12 col-md-12">
-        <div class="card">
-            <div class="profile-tab-box">
-                <div class="p-l-20">
-                    <ul class="nav ">
-                        <li class="nav-item tab-all">
-                            <a class="nav-link active show" href="#project"
-                               data-bs-toggle="tab">Attendance</a>
-                        </li>
-                        <li class="nav-item tab-all p-l-20">
-                            <a class="nav-link" href="#usersettings" data-bs-toggle="tab">Report</a>
-                        </li>
-                    </ul>
+    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+    {
+        <div class="col-md-12 mb-3">
+            <form>
+                <div class="">
+                    <select id="monthSelector" style="width:35%;margin-right:10px;display:block">
+                        <option value="">Select Month</option>
+                        @for (int month = 1; month <= 12; month++)
+                        {
+                            <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                        }
+                    </select>
+                    <select style="width:35%;margin-right:10px;display:block" id="empSelector">
+                        @{
+                            var employeeList = ViewBag.EmployeeList;
+                        }
+
+                        @foreach (var record in employeeList)
+                        {
+                            if (ViewBag.SelectedEmployeeID == record.EmployeeId)
+                            {
+                                <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
+                            }
+                        }
+                    </select>
+                    <button onclick="getData()">
+                        Filter
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
+    }
+
+    <div class="col-lg-12 col-md-12">
+        @*  <div class="card">
+        <div class="profile-tab-box">
+        <div class="p-l-20">
+        <ul class="nav ">
+        <li class="nav-item tab-all">
+        <a class="nav-link active show" href="#project"
+        data-bs-toggle="tab">Attendance</a>
+        </li>
+        <li class="nav-item tab-all p-l-20">
+        <a class="nav-link" href="#usersettings" data-bs-toggle="tab">Report</a>
+        </li>
+        </ul>
+        </div>
+        </div>
+        </div> *@
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="project" aria-expanded="true">
                 <div class="row clearfix">
@@ -61,6 +98,7 @@
                                             <div class="chat-about">
                                                 <div class="chat-with">Employee ID</div>
                                                 <div class="chat-num-messages">@Model.EmployeeDetails.EmpCode</div>
+                                                <div style="display:none;">@Model.EmployeeDetails.EmployeeId</div>
                                             </div>
                                         </div>
                                         <div class="col-lg-3 col-sm-6">
@@ -83,7 +121,6 @@
                     <div class="col-lg-12 col-md-12 col-sm-12">
                         <div class="card project_widget">
                             <div class="header">
-                               
                             </div>
                             <div class="body">
                                 <div class="row">
@@ -94,18 +131,16 @@
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-end mb-3 col-lg-9 col-sm-9">
-                                       @*  <button id="checkInBtn" class="btn btn-primary me-2">Check In</button>
-                                        <button id="checkOutBtn" class="btn btn-danger">Check Out</button> *@
                                     </div>
                                 </div>
 
-                               @*<div class="row">
-                                    <div class="col-lg-3 col-sm-6">
-                                        <div class="text-center m-b-20">
-                                            <h3 class="m-b-10 col-green">08:00</h3>
-                                            <div class="text font-15 m-b-5">Average Working Hours</div>
-                                        </div>
-                                    </div>*@
+                                @*<div class="row">
+                                <div class="col-lg-3 col-sm-6">
+                                <div class="text-center m-b-20">
+                                <h3 class="m-b-10 col-green">08:00</h3>
+                                <div class="text font-15 m-b-5">Average Working Hours</div>
+                                </div>
+                                </div>*@
                                 <div class="table-responsive">
                                     <table class="table table-hover js-basic-example contact_list">
                                         <thead>
@@ -114,8 +149,13 @@
                                                 <th class="center"> Check In </th>
                                                 <th class="center"> Check Out </th>
                                                 <th class="center"> Working Hours </th>
+                                                <th class="center"> IP </th>
                                                 <th class="center"> Status </th>
-                                                @* <th class="center"> Action </th> *@
+                                                @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                {
+                                                    <th class="center"> Action </th>
+                                                }
+
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -124,28 +164,59 @@
                                             {
                                                 <tr class="odd gradeX">
                                                     <td class="center">@record.Date.ToString("dd MMM yyyy")</td>
-                                                    <td class ="center">@record.CheckInTime</td>
-                                                    <td class="center">@record.CheckOutTime</td>
-                                                    <td class="center">@record.WorkingHours</td>
                                                     <td class="center">
-                                                        <div class="badge col-green">Present</div>
-                                                       @*  <div class="badge col-green">Present</div>
-                                                        <div class="badge col-red">Leave</div>
-                                                        <div class="badge col-cyan">Weekend</div> *@
+                                                        @record.CheckInTimeInString
+                                                        <br />
+                                                        @record.CheckInLocation
                                                     </td>
-                                                   @*  <td class="center">
-                                                        <button class="btn tblActnBtn">
-                                                            <i class="material-icons">mode_edit</i>
-                                                        </button>
-                                                        <button class="btn tblActnBtn">
-                                                            <i class="material-icons">delete</i>
-                                                        </button>
-                                                    </td> *@
+                                                    <td class="center">
+                                                        @record.CheckOutTimeInString
+                                                        <br />
+                                                        @record.CheckOutLocation
+                                                    </td>
+                                                    <td class="center">@record.WorkingHours</td>
+                                                    <td class="center">@record.IP</td>
+                                                    <td class="center">
+
+                                                        @{
+                                                            if (record.Status == AttendanceStatus.Present)
+                                                            {
+                                                                <div class="badge col-green">Present</div>
+                                                            }
+                                                            else if (record.Status == AttendanceStatus.Absent)
+                                                            {
+                                                                <div class="badge col-red">Absent</div>
+                                                            }
+                                                            else if (record.Status == AttendanceStatus.Holiday)
+                                                            {
+                                                                <div class="badge col-cyan">Holiday</div>
+                                                            }
+                                                            else if (record.Status == AttendanceStatus.PermissionNeeded)
+                                                            {
+                                                                <div class="badge col-green">Taken Permission</div>
+                                                            }
+                                                            else if (record.Status == AttendanceStatus.Weekend)
+                                                            {
+                                                                <div class="badge col-cyan">Holiday</div>
+                                                            }
+                                                        }
+                                                    </td>
+                                                    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                    {
+                                                        <td>
+                                                            <a href="@Url.Action("Add","AdminAttendanceViewer", new { EmployeeId = @Model.EmployeeDetails.EmployeeId,
+                                                            date = @record.Date
+                                                        })
+                                                                    " class="btn btn-warning btn-sm p-t-10">
+                                                                <i class="material-icons">create</i>
+                                                            </a>
+                                                        </td>
+                                                    }
                                                 </tr>
                                             }
 
                                         </tbody>
-                                        
+
                                     </table>
                                 </div>
                             </div>
@@ -186,7 +257,7 @@
     <!-- Include SweetAlert from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-   @*  <script src="~/app/assets/js/common.min.js"></script> *@
+    @*  <script src="~/app/assets/js/common.min.js"></script> *@
     <script src="~/app/assets/js/table.min.js"></script>
 
     <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
@@ -196,6 +267,16 @@
     <script src="~/app/assets/js/pages/attendance/attendance-data.js"></script>
 
     <script>
-       
+        function getData(obj) {
+
+            var emp = $("#empSelector").val();
+            var month = $("#monthSelector").val();
+            var frm = $("<form hidden action='/EmployeeAttendance/Index' method='get'> </form>");
+            $(frm).append("<input type=hidden name=EmployeeID value='" + emp + "' id=EmployeeID>");
+            $(frm).append("<input type='hidden' name='Month' value='" + month + "' id='Month'>");
+
+            $(document).find("body").append(frm);
+            $(frm).submit();
+        }
     </script>
 }

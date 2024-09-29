@@ -1,28 +1,115 @@
-﻿@using SparkHRMS.ViewModels;
-@model EmployeeAttendanceDto
+﻿@model SparkHRMS.ViewModels.EmployeeAttendanceDto
 
 @{
-    ViewData["Title"] = "Edit Attendance";
+    ViewData["Title"] = "Edit";
 }
 
-<h2>Edit Attendance</h2>
+<link href="~/app/assets/css/form.min.css" rel="stylesheet">
 
-<form asp-action="Edit">
-    <input type="hidden" asp-for="Id" />
+<link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
 
-    <div class="form-group">
-        <label asp-for="CheckInTime" class="control-label"></label>
-        <input asp-for="CheckInTime" class="form-control" />
-        <span asp-validation-for="CheckInTime" class="text-danger"></span>
-    </div>
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title"> Employee Attendance</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <h4 class="page-title">
+            <i data-feather="user"></i> @Html.DisplayFor(model => model.EmployeeName) |
+        </h4>
+        <h4 class="page-title">
+            <i data-feather="calendar"></i> @ViewBag.Date.ToString("dd-MM-yyyy")
+        </h4>
+    </li>
+</ul>
+<hr />
+<div class="card">
+    <form>
+        <div class="body">
+           @*  <div class="row clearfix">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            @Html.DisplayFor(model => model.EmployeeCode)
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            @Html.DisplayFor(model => model.Name)
+                        </div>
+                    </div>
+                </div>
+            </div> *@
+            <div class="row clearfix">
+                <div class="col-sm-6">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input id="check_in_time" asp-for="CheckInTime" type="time" class="validate form-control" placeholder="Check In Time">
+                            <span asp-validation-for="CheckInTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input id="check_out_time" type="time" asp-for="CheckOutTime" class="validate form-control" placeholder="Check Out Time">
+                            <span asp-validation-for="CheckInTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="form-group">
-        <label asp-for="CheckOutTime" class="control-label"></label>
-        <input asp-for="CheckOutTime" class="form-control" />
-        <span asp-validation-for="CheckOutTime" class="text-danger"></span>
-    </div>
+            </div>
+            <div class="col-lg-12 p-t-20 text-center">
+                <button type="button" class="btn btn-primary waves-effect m-r-15" fdprocessedid="y228pc" onclick="addEmployeeCheckInDetais();">Submit</button>
+                <a type="button" asp-action="Index" class="btn btn-danger waves-effect" fdprocessedid="3tfajj">Cancel</a>
+            </div>
+           
 
-    <div class="form-group">
-        <input type="submit" value="Save" class="btn btn-primary" />
-    </div>
-</form>
+        </div>
+    </form>
+</div>
+
+<script>
+    function addEmployeeCheckInDetais(){
+        let obj = {
+            EmployeeId:@ViewBag.EmployeeId,
+            CheckInTime: $('#check_in_time').val(),
+            CheckOutTime: $('#check_out_time').val()
+
+        }
+        $.ajax({
+            url: "/AdminAttendanceViewer/Add",
+            data:obj,
+            type: 'POST',
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Added Successful',
+                    text: 'Data Added Successfully!'
+                });
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Added Failed',
+                    text: 'Failed to Add: ' + xhr.responseText
+                });
+            }
+        });
+    }
+</script>
+
+<!-- Include jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- Include SweetAlert from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script src="~/app/assets/js/bundles/dropzone.js"></script>
+<script src="~/app/assets/js/bundles/flatpicker/flatpicker.min.js"></script>
+
+<script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
+<script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
+<script src="~/app/assets/js/pages/forms/dropzone-data.js"></script>

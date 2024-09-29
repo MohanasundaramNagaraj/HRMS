@@ -81,9 +81,10 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <input  class="form-control datetimepicker" asp-for="DateOfJoining"
-                               placeholder="Joining Date" name="date1" id="date1">
-                        
+                     @*    <input  class="form-control datetimepicker" asp-for="DateOfJoining"
+                               placeholder="Joining Date" name="date1" id="date1"> *@
+                        <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DateOfJoining"
+                               value="" placeholder="Joining Date" name="date1" id="date1" fdprocessedid="ivq72r">
                     </div>
                 </div>
             </div>
@@ -98,9 +99,10 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <input  class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
-                               name="date2" id="date2">
-                       
+                        @* <input  class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
+                               name="date2" id="date2"> *@
+                        <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DOB"
+                               value="" placeholder="JBirth Date" name="date2" id="date2" fdprocessedid="ivq72r">
                     </div>
                 </div>
             </div>
