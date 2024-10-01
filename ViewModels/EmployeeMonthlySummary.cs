@@ -3,6 +3,23 @@ using SparkHRMS.Utilities;
 
 namespace SparkHRMS.ViewModels
 {
+    public class EmployeeMonthlySummaryWithStatusCount
+    {
+        public EmployeeDetailsDto EmployeeDetails { get; set; }
+        public EmployeeAttendanceStatusCounts EmployeeAttendanceStatusCounts { get; set; }
+    }
+    public class EmployeeAttendanceStatusCounts
+    {
+        public int? EmployeePresentCountOnMonth { get; set; }
+        public int? EmployeeHalfDayCountOnMonth { get; set; }
+        public int? EmployeeLeaveCountOnMonth { get; set; }
+        public int? EmployeeAbsentCountOnMonth { get; set; }
+        public int? EmployeeWeekendCountOnMonth { get; set; }
+        public int? EmployeeHolidayCountOnMonth { get; set; }
+        public int? EmployeePermissionNeededCountOnMonth { get; set; }
+        public int? EmployeePendingCheckOutNeededCountOnMonth { get; set; } 
+    }
+
     public class EmployeeAttendanceResponseDto
     {
         public EmployeeDetailsDto EmployeeDetails { get; set; }
@@ -58,7 +75,6 @@ namespace SparkHRMS.ViewModels
     {
         Present,
         HalfDay,
-        Leave,
         Absent,
         Weekend,
         Holiday,

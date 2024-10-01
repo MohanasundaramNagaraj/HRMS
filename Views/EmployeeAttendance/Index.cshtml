@@ -5,7 +5,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @{
-    ViewData["Title"] = "Employee Home";
+    ViewData["Title"] = "Employee Attendance";
     var user = await UserManager.GetUserAsync(User);
     var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
 
@@ -29,16 +29,23 @@
     @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
     {
         <div class="col-md-12 mb-3">
-            <form>
+            <div>
                 <div class="">
-                    <select id="monthSelector" style="width:35%;margin-right:10px;display:block">
+                    <select id="monthSelector" style="width:35%;margin-right:10px;display:inline-block">
                         <option value="">Select Month</option>
                         @for (int month = 1; month <= 12; month++)
                         {
-                            <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                            if (month == ViewBag.SelectedMonth)
+                            {
+                                <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                            }
+                            else
+                            {
+                                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                            }
                         }
                     </select>
-                    <select style="width:35%;margin-right:10px;display:block" id="empSelector">
+                    <select style="width:35%;margin-right:10px;display:inline-block" id="empSelector">
                         @{
                             var employeeList = ViewBag.EmployeeList;
                         }
@@ -55,11 +62,11 @@
                             }
                         }
                     </select>
-                    <button onclick="getData()">
+                    <button onclick="getData()" class="btn btn-info">
                         Filter
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     }
 
@@ -164,13 +171,34 @@
                                             {
                                                 <tr class="odd gradeX">
                                                     <td class="center">@record.Date.ToString("dd MMM yyyy")</td>
-                                                    <td class="center">
-                                                        @record.CheckInTimeInString
+                                                    <td class="center" style="width: 200px !important;
+                                                                      max-width: 300px !important;
+                                                                      min-width: 200px !important;
+                                                                      word-wrap: anywhere;">
+                                                        @if (record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday)
+                                                        {
+                                                            <span>-</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @record.CheckInTimeInString
+                                                        }
                                                         <br />
                                                         @record.CheckInLocation
                                                     </td>
-                                                    <td class="center">
-                                                        @record.CheckOutTimeInString
+                                                    <td class="center" style="width: 200px !important;
+                                                                      max-width: 300px !important;
+                                                                      min-width: 200px !important;
+                                                                      word-wrap: anywhere;">
+                                                        @if (record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday)
+                                                        {
+                                                            <span>-</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @record.CheckOutTimeInString
+                                                        }
+                                                       
                                                         <br />
                                                         @record.CheckOutLocation
                                                     </td>
@@ -207,7 +235,7 @@
                                                             <a href="@Url.Action("Add","AdminAttendanceViewer", new { EmployeeId = @Model.EmployeeDetails.EmployeeId,
                                                             date = @record.Date
                                                         })
-                                                                    " class="btn btn-warning btn-sm p-t-10">
+                                                                            " class="btn btn-warning btn-sm p-t-10">
                                                                 <i class="material-icons">create</i>
                                                             </a>
                                                         </td>
@@ -268,15 +296,16 @@
 
     <script>
         function getData(obj) {
+            debugger;
 
-            var emp = $("#empSelector").val();
-            var month = $("#monthSelector").val();
             var frm = $("<form hidden action='/EmployeeAttendance/Index' method='get'> </form>");
-            $(frm).append("<input type=hidden name=EmployeeID value='" + emp + "' id=EmployeeID>");
-            $(frm).append("<input type='hidden' name='Month' value='" + month + "' id='Month'>");
-
+            $(frm).append("<input type=hidden name=EmployeeID value=" + parseInt($("#empSelector").val()) + " id=EmployeeID>");
+            $(frm).append("<input type='hidden' name='Month' value=" + parseInt($("#monthSelector").val()) + " id='Month'>");
             $(document).find("body").append(frm);
-            $(frm).submit();
+            setTimeout(function () {
+                $(frm).submit();
+            }, 100);
+
         }
     </script>
 }

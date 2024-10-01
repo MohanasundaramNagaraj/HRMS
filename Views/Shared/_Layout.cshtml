@@ -208,14 +208,14 @@
                     @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
                     {
                         <li class="header">Main</li>
-                        <li class="active">
-                            <a href="#" onclick="return false;" class="menu-toggle toggled">
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-monitor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                                 <span>Dashboard</span>
                             </a>
-                            <ul class="ml-menu" style="display: block;">
-                                <li class="active">
-                                    <a href=../app/index.html" class="toggled">Dashboard 1</a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="../app/index.html" class="toggled">Dashboard 1</a>
                                 </li>
                             </ul>
                         </li>
@@ -234,7 +234,7 @@
 
                             </ul>
                         </li>
-                        <li class="">
+                        <li>
                             <a href="#" onClick="return false;" class="menu-toggle">
                                 <i data-feather="briefcase"></i>
                                 <span>Attendance</span>
@@ -245,12 +245,15 @@
                                 </li>
                                 <li class="">
                                     <a href="/EmployeeAttendance/Index">Employee Wise</a>
+                                </li> 
+                                <li class="">
+                                    <a href="/AdminAttendanceViewer/EmployeeMonthlySummary">Monthly Summary</a>
                                 </li>
                             </ul>
                         </li>
 
                         <li>
-                            <a href="#" onclick="return false;" class="menu-toggle toggled">
+                            <a href="#" onclick="return false;" class="menu-toggle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                      stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard">
@@ -261,7 +264,7 @@
                                 </svg>
                                 <span>Leave Management</span>
                             </a>
-                            <ul class="ml-menu" style="display: block;">
+                            <ul class="ml-menu">
                                 <li>
                                     <a href="../app/pages/leave/all-leave.html">All Leave Request</a>
                                 </li>
@@ -281,22 +284,22 @@
 
                         </li>
                         <li>
-                            <a href="#" onclick="return false;" class="menu-toggle toggled">
-                                <i data-feather="briefcase"></i>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i data-feather="headphones"></i>
                                 <span>Holidays</span>
                             </a>
-                            <ul class="ml-menu" style="display: block;">
+                            <ul class="ml-menu">
                                 <li>
                                     <a href="/Holidays/Index">List</a>
                                 </li>
                             </ul>
                         </li>
                         <li>
-                            <a href="#" onclick="return false;" class="menu-toggle toggled">
-                                <i data-feather="briefcase"></i>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i data-feather="mail"></i>
                                 <span>Emails</span>
                             </a>
-                            <ul class="ml-menu" style="display: block;">
+                            <ul class="ml-menu">
                                 <li>
                                     <a href="/EmailLogs/Index">List</a>
                                 </li>
@@ -319,27 +322,17 @@
                             </ul>
                         </li>
                         <li>
-                            <a href="#" onclick="return false;" class="menu-toggle toggled">
+                            <a href="#" onclick="return false;" class="menu-toggle">
                                 <i data-feather="briefcase"></i>
                                 <span>Holidays</span>
                             </a>
-                            <ul class="ml-menu" style="display: block;">
+                            <ul class="ml-menu">
                                 <li>
                                     <a href="/Holidays/Index">List</a>
                                 </li>
                             </ul>
                         </li>
-                        <li>
-                            <a href="#" onclick="return false;" class="menu-toggle toggled">
-                                <i data-feather="briefcase"></i>
-                                <span>Emails</span>
-                            </a>
-                            <ul class="ml-menu" style="display: block;">
-                                <li>
-                                    <a href="/EmailLogs/Index">List</a>
-                                </li>
-                            </ul>
-                        </li>
+                      
                     }
 
                 </ul>

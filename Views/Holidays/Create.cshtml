@@ -13,18 +13,19 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label"></label> *
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control" />
+                <input asp-for="Date" class="form-control" type="date"/> *
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsRecurring" /> @Html.DisplayNameFor(model => model.IsRecurring)
+                    <input class="form-check-input" type="checkbox"
+                    asp-for="IsRecurring" /> @Html.DisplayNameFor(model => model.IsRecurring)
                 </label>
             </div>
             <div class="form-group">
@@ -32,7 +33,7 @@
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
+           @*  <div class="form-group">
                 <label asp-for="CreatedAt" class="control-label"></label>
                 <input asp-for="CreatedAt" class="form-control" />
                 <span asp-validation-for="CreatedAt" class="text-danger"></span>
@@ -41,7 +42,7 @@
                 <label asp-for="CreatedUserID" class="control-label"></label>
                 <input asp-for="CreatedUserID" class="form-control" />
                 <span asp-validation-for="CreatedUserID" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>

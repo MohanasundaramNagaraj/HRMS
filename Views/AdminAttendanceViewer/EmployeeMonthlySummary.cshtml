@@ -1,0 +1,146 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SparkHRMS.Data.Entities
+@using SparkHRMS.Utilities
+@using SparkHRMS.ViewModels
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Employee Monthly Summary";
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+}
+
+<link href="~/app/assets/css/bundles/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title">Attendance</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#">
+            Monthly Summary 
+        </a>
+    </li>
+</ul>
+
+<div class="row clearfix">
+    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+    {
+        <div class="col-md-12 mb-3">
+            <div>
+                <div class="">
+                    <select id="monthSelector" style="width:35%;margin-right:10px;display:inline-block">
+                        <option value="">Select Month</option>
+                        @for (int month = 1; month <= 12; month++)
+                        {
+                            if (month == ViewBag.SelectedMonth)
+                            {
+                                <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                            }
+                            else
+                            {
+                                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                            }
+                        }
+                    </select>
+
+                    <button onclick="getData()" class="btn btn-info">
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="col-lg-12 col-md-12">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="project" aria-expanded="true">
+                <div class="row clearfix">
+
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="card project_widget">
+                            <div class="header">
+                               
+                            </div>
+                            <div class="body">
+                                <div class="row">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover js-basic-example contact_list">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center"> # </th>
+                                                    <th class="center"> Employee Code </th>
+                                                    <th class="center"> Employee Name </th>
+                                                    <th class="center"> Present Count </th>
+                                                    <th class="center"> Half Day Count </th>
+                                                    <th class="center"> Absent Count </th>
+                                                    <th class="center"> Holiday Count </th>
+                                                    <th class="center"> Weekend Count </th>
+                                                    <th class="center"> Permission Count </th>
+                                                    <th class="center"> Pending Check out Count </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    int count = 0;
+                                                }
+                                                @foreach (var record in Model)
+                                                {
+                                                    count = count + 1;
+                                                    <tr class="odd gradeX">
+                                                        <td>@count</td>
+                                                        <td>@record.EmployeeDetails.EmpCode</td>
+                                                        <td>@record.EmployeeDetails.Name</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeAbsentCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeHolidayCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeWeekendCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeePermissionNeededCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeePendingCheckOutNeededCountOnMonth</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <!-- Include jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Include SweetAlert from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @*  <script src="~/app/assets/js/common.min.js"></script> *@
+    <script src="~/app/assets/js/table.min.js"></script>
+
+    <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
+    <script src="~/app/assets/js/bundles/amcharts5/index.js"></script>
+    <script src="~/app/assets/js/bundles/amcharts5/percent.js"></script>
+    <script src="~/app/assets/js/bundles/amcharts5/Animated.js"></script>
+    <script src="~/app/assets/js/pages/attendance/attendance-data.js"></script>
+
+    <script>
+        function getData(obj) {
+            var frm = $("<form hidden action='/AdminAttendanceViewer/EmployeeMonthlySummary' method='get'> </form>");
+            $(frm).append("<input type='hidden' name='Month' value=" + parseInt($("#monthSelector").val()) + " id='Month'>");
+            $(document).find("body").append(frm);
+            setTimeout(function () {
+                $(frm).submit();
+            }, 100);
+
+        }
+    </script>
+}

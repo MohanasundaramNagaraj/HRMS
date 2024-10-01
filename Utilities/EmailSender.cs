@@ -11,16 +11,23 @@ using SparkHRMS.Interfaces;
 using System.Net;
 using System.Net.Mail;
 using IEmailSender = SparkHRMS.Interfaces.IEmailSender;
+using SparkHRMS.Data.Entities;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using SparkHRMS.Data;
+using Microsoft.EntityFrameworkCore;
+using Hangfire.Logging;
 
 namespace SparkHRMS.Utilities
 {
     public class EmailSender : IEmailSender
     {
+        private readonly ApplicationDbContext _context;
         private readonly SmtpSettings _smtpSettings;
         private IConfiguration Configuration { get; }
         private readonly ILogger<EmailSender> _logger;
-        public EmailSender(ILogger<EmailSender> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
+        public EmailSender(ApplicationDbContext context, ILogger<EmailSender> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
         {
+            _context = context;
             Configuration = configuration;
             _logger = logger;
             _smtpSettings = smtpSettings.Value;
@@ -58,13 +65,40 @@ namespace SparkHRMS.Utilities
 
             mailMessage.To.Add(email);
 
+            var emailLogs = new EmailLogs
+            {
+                Recipient = email,
+                Cc = string.Empty,                          //Code Later if want
+                Subject = subject,
+                Body = htmlMessage,
+                SentDate = DateTime.Now,
+                IsSuccessful = false,
+                ErrorMessage = string.Empty
+            };
+
+            _context.EmailLogs.Add(emailLogs);
+            _context.SaveChanges();
+
+            int logId = emailLogs.Id;
             try
             {
                 await smtpClient.SendMailAsync(mailMessage);
                 await Task.Delay(500); // Delay in milliseconds
+
+                var log = _context.EmailLogs.Where(x=>x.Id == logId).FirstOrDefault();
+
+                log.IsSuccessful = true;
+                _context.Entry(log).State = EntityState.Modified;
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
+                var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
+
+                log.IsSuccessful = false;
+                log.ErrorMessage = ex.ToString();
+                _context.Entry(log).State = EntityState.Modified;
+                _context.SaveChanges();
                 // log an error message or throw an exception or both.
                 _logger.LogError(ex.Message);
                 throw;

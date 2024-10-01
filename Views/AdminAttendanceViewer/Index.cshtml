@@ -29,7 +29,7 @@
             <form method="get" asp-action="Index" asp-controller="AdminAttendanceViewer">
                 <div class="row">
                     <input type="date" name="date" value="@selectedDate" class="form-control" style="width:35%;margin-right:10px;" />
-                    <button type="submit" class="btn btn-primary" style="width:10%;margin-right:10px;">Filter</button>
+                    <button type="submit" class="btn btn-info" style="width:10%;margin-right:10px;">Filter</button>
                 </div>
             </form>
         </div>
@@ -49,8 +49,6 @@
                                 <th>Check-Out Time</th>
                                 <th>Working Hours</th>
                                 <th>Check In Made System IP</th>
-                                <th>Check In Made Position</th>
-                                <th>Check Out Made Position</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -70,12 +68,28 @@
 
                                 <tr>
                                     <td>@(record.EmployeeName ?? "N/A")</td>
-                                    <td>@(checkInTime)</td>
-                                    <td>@(checkOutTime)</td>
+                                    <td class="center" style="width: 200px !important;
+                                                                      max-width: 300px !important;
+                                                                      min-width: 200px !important;
+                                                                      word-wrap: anywhere;">
+                                        <span style=" text-align: center !important;
+                                                        display: block;">
+                                                        @checkInTime</span>
+                                      
+                                        <br />
+                                        @record.CheckInLocation
+                                    </td>
+                                    <td class="center" style="width: 200px !important;
+                                                                      max-width: 300px !important;
+                                                                      min-width: 200px !important;
+                                                                      word-wrap: anywhere;">
+                                        <span style=" text-align: center !important;
+                                                    display: block;">@checkOutTime</span>
+                                        <br />
+                                        @record.CheckOutLocation
+                                    </td>
                                     <td>@(record.WorkingHours ?? "N/A")</td>
                                     <td>@record.IP</td>
-                                    <td>@record.CheckInLocation</td>
-                                    <td>@record.CheckOutLocation</td>
                                     <td>
                                         <a href="@Url.Action("Add", new { EmployeeId = record.EmployeeId, date = ViewBag.SelectedDate })" class="btn btn-warning btn-sm p-t-10">
                                             <i class="material-icons">create</i>

@@ -37,35 +37,44 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Recipient)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cc)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subject)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Body)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SentDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsSuccessful)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ErrorMessage)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Recipient)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Cc)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Subject)
+                </td>
+                <td style="width: 200px !important;
+                  max-width: 300px !important;
+                  min-width: 200px !important;
+                  text-align: inherit;
+                  word-wrap: anywhere;">
+                    @Html.DisplayFor(modelItem => item.Body)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SentDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsSuccessful)
+                </td>
+                <td style="width: 200px !important;
+                  max-width: 300px !important;
+                  min-width: 200px !important;
+                  text-align: inherit;
+                  word-wrap: anywhere;">
+                    @Html.DisplayFor(modelItem => item.ErrorMessage)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

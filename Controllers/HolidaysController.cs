@@ -54,8 +54,10 @@ namespace SparkHRMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Date,IsRecurring,Description,CreatedAt,CreatedUserID")] Holiday holiday)
+        public async Task<IActionResult> Create([Bind("Id,Name,Date,IsRecurring,Description")] Holiday holiday)
         {
+            holiday.CreatedAt = DateTime.Now;
+            holiday.CreatedUserID = 2;
             if (ModelState.IsValid)
             {
                 _context.Add(holiday);
@@ -86,13 +88,14 @@ namespace SparkHRMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Date,IsRecurring,Description,CreatedAt,CreatedUserID")] Holiday holiday)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Date,IsRecurring,DescriptionD")] Holiday holiday)
         {
             if (id != holiday.Id)
             {
                 return NotFound();
             }
-
+            holiday.CreatedAt = DateTime.Now;
+            holiday.CreatedUserID = 2;
             if (ModelState.IsValid)
             {
                 try

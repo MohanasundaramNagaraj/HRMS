@@ -27,7 +27,7 @@ namespace SparkHRMS.Controllers
             _userManager = userManager;
             _configuration = configuration;
         }
-        public async Task<IActionResult> Index(int? EmployeeID = null, int? Month = null)
+        public async Task<IActionResult> Index(int? EmployeeID, int? Month)
         {
             var emp = new Employee();
             if (EmployeeID == null)
@@ -62,11 +62,7 @@ namespace SparkHRMS.Controllers
             // Fetch This Month's Check-in/Check-out Summary
             var today = DateTime.Today;
             var year = today.Year;
-            if (Month.HasValue)
-            {
-                year = Month.Value == 1 ? year - 1 : year; // For January, go to the previous year (if needed)
-            }
-
+           
             var startOfMonth = Month.HasValue ? new DateTime(year, Month.Value, 1) : new DateTime(today.Year, today.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); // Get the last day of the month
 
@@ -78,13 +74,13 @@ namespace SparkHRMS.Controllers
             var dailyAttendanceRecords = new List<EmployeeAttendanceDto>();
             TimeSpan totalWorkingTime = TimeSpan.Zero;
 
-            var allDatesInMonth = Enumerable.Range(0, DateTime.DaysInMonth(today.Year, today.Month))
-                                   .Select(day => new DateTime(today.Year, today.Month, day + 1))
+            var allDatesInMonth = Enumerable.Range(0, DateTime.DaysInMonth(today.Year, Month.HasValue ? Month.Value : today.Month))
+                                   .Select(day => new DateTime(today.Year, Month.HasValue ? Month.Value : today.Month, day + 1))
                                    .ToList();
 
             // Fetch holidays from the database or your holidays table
             var holidays = await _context.Holiday
-                                .Where(h => h.Date >= startOfMonth && h.Date <= today)
+                                .Where(h => h.Date >= startOfMonth && h.Date <= endOfMonth)
                                 .Select(h => h.Date.Date)
                                 .ToListAsync();
 
@@ -113,15 +109,16 @@ namespace SparkHRMS.Controllers
                         {
                             status = AttendanceStatus.Present; // Full Day Present
                         }
+                        else if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:HalfDayThreshold"]))
+                        {
+                            status = AttendanceStatus.HalfDay; // Half Day Present
+                        }
                         else if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:HalfDayThreshold"])
                             && workingTime.Value.TotalHours <= Convert.ToInt32(_configuration["AttendanceSettings:PermissionNeededThreshold"]))
                         {
                             status = AttendanceStatus.PermissionNeeded; // Permission Needed
                         }
-                        else if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:HalfDayThreshold"]))
-                        {
-                            status = AttendanceStatus.HalfDay; // Half Day Present
-                        }
+                        
                         else
                         {
                             status = AttendanceStatus.Absent;
@@ -176,6 +173,7 @@ namespace SparkHRMS.Controllers
 
             ViewBag.EmployeeList = _context.Employees.ToList();
             ViewBag.SelectedEmployeeID = employeeDetails.EmployeeId;
+            ViewBag.SelectedMonth = startOfMonth.Month;
             return View(response);
         }
 
