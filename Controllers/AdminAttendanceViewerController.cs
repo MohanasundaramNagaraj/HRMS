@@ -81,11 +81,11 @@ namespace SparkHRMS.Controllers
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); // Get the last day of the month
 
             List<EmployeeMonthlySummaryWithStatusCount> EmployeeMonthlySummaryWithStatusCounts = new List<EmployeeMonthlySummaryWithStatusCount>();
-            
+
             foreach (var emp in _context.Employees.ToList())
             {
                 var attendanceRecords = await _context.EmployeeAttendance
-                      .Where(e => e.EmployeeId == emp.EmployeeId &&  e.CheckInTime.Date >= startOfMonth && e.CheckInTime.Date <= endOfMonth)
+                      .Where(e => e.EmployeeId == emp.EmployeeId && e.CheckInTime.Date >= startOfMonth && e.CheckInTime.Date <= endOfMonth)
                       .OrderBy(e => e.CheckInTime)
                       .ToListAsync();
 
@@ -108,14 +108,14 @@ namespace SparkHRMS.Controllers
                     var attendanceRecord = attendanceRecords.FirstOrDefault(a => a.CheckInTime.Date == date);
                     TimeSpan? workingTime = null;
 
-                    AttendanceStatus status = AttendanceStatus.Absent; 
+                    AttendanceStatus status = AttendanceStatus.Absent;
                     if (holidays.Contains(date))
                     {
-                        status = AttendanceStatus.Holiday; 
+                        status = AttendanceStatus.Holiday;
                     }
                     else if (date.DayOfWeek == DayOfWeek.Sunday)
                     {
-                        status = AttendanceStatus.Weekend; 
+                        status = AttendanceStatus.Weekend;
                     }
                     else if (attendanceRecord != null)
                     {
@@ -169,13 +169,13 @@ namespace SparkHRMS.Controllers
 
                 EmployeeAttendanceStatusCounts EmployeeAttendanceStatusCounts = new EmployeeAttendanceStatusCounts();
 
-                EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth = statuses.Where(x=>x == AttendanceStatus.Present).Count();
-                EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth = statuses.Where(x=>x == AttendanceStatus.HalfDay).Count();
-                EmployeeAttendanceStatusCounts.EmployeeAbsentCountOnMonth = statuses.Where(x=>x == AttendanceStatus.Absent).Count();
-                EmployeeAttendanceStatusCounts.EmployeeHolidayCountOnMonth = statuses.Where(x=>x == AttendanceStatus.Holiday).Count();
-                EmployeeAttendanceStatusCounts.EmployeeWeekendCountOnMonth = statuses.Where(x=>x == AttendanceStatus.Weekend).Count();
-                EmployeeAttendanceStatusCounts.EmployeePermissionNeededCountOnMonth = statuses.Where(x=>x == AttendanceStatus.PermissionNeeded).Count();
-                EmployeeAttendanceStatusCounts.EmployeePendingCheckOutNeededCountOnMonth = statuses.Where(x=>x == AttendanceStatus.PendingCheckOut).Count();
+                EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth = statuses.Where(x => x == AttendanceStatus.Present).Count();
+                EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth = statuses.Where(x => x == AttendanceStatus.HalfDay).Count();
+                EmployeeAttendanceStatusCounts.EmployeeAbsentCountOnMonth = statuses.Where(x => x == AttendanceStatus.Absent).Count();
+                EmployeeAttendanceStatusCounts.EmployeeHolidayCountOnMonth = statuses.Where(x => x == AttendanceStatus.Holiday).Count();
+                EmployeeAttendanceStatusCounts.EmployeeWeekendCountOnMonth = statuses.Where(x => x == AttendanceStatus.Weekend).Count();
+                EmployeeAttendanceStatusCounts.EmployeePermissionNeededCountOnMonth = statuses.Where(x => x == AttendanceStatus.PermissionNeeded).Count();
+                EmployeeAttendanceStatusCounts.EmployeePendingCheckOutNeededCountOnMonth = statuses.Where(x => x == AttendanceStatus.PendingCheckOut).Count();
 
                 EmployeeMonthlySummaryWithStatusCount.EmployeeDetails = employeeDetails;
                 EmployeeMonthlySummaryWithStatusCount.EmployeeAttendanceStatusCounts = EmployeeAttendanceStatusCounts;
@@ -211,11 +211,15 @@ namespace SparkHRMS.Controllers
                               : string.Empty
             };
 
-            if (employeeAttendance.CheckInDateTime != null)
+            if (attendance?.CheckInTime != null || employeeAttendance.CheckInDateTime != null)
             {
                 employeeAttendance.CheckInTime = TimeOnly.FromDateTime((DateTime)(attendance?.CheckInTime));
+            }
+            if (attendance?.CheckOutTime != null)
+            {
                 employeeAttendance.CheckOutTime = TimeOnly.FromDateTime((DateTime)(attendance?.CheckOutTime));
             }
+
             return View(employeeAttendance);
         }
         [HttpPost]
@@ -224,6 +228,19 @@ namespace SparkHRMS.Controllers
             var existingCheckIn = _context.EmployeeAttendance
                 .FirstOrDefault(c => c.EmployeeId == attendance.EmployeeId && c.CheckInTime.Date == attendance.CheckInTime.Date);
 
+            var checkoutDateTime = Convert.ToDateTime(attendance.CheckOutTime);
+            bool isMidnight = checkoutDateTime.Hour == 0 && checkoutDateTime.Minute == 0 && checkoutDateTime.Second == 0;
+            if (isMidnight)
+            {
+                attendance.CheckOutTime = null;
+            }
+
+            var checkInDateTime = Convert.ToDateTime(attendance.CheckInTime);
+            isMidnight = checkInDateTime.Hour == 0 && checkInDateTime.Minute == 0 && checkInDateTime.Second == 0;
+            if (isMidnight)
+            {
+                return BadRequest("Please enter the Check In Details");
+            }
             if (existingCheckIn != null)
             {
                 existingCheckIn.CheckInTime = attendance.CheckInTime;

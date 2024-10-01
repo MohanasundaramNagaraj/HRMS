@@ -62,7 +62,7 @@ namespace SparkHRMS.Controllers
             // Fetch This Month's Check-in/Check-out Summary
             var today = DateTime.Today;
             var year = today.Year;
-           
+
             var startOfMonth = Month.HasValue ? new DateTime(year, Month.Value, 1) : new DateTime(today.Year, today.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); // Get the last day of the month
 
@@ -118,7 +118,7 @@ namespace SparkHRMS.Controllers
                         {
                             status = AttendanceStatus.PermissionNeeded; // Permission Needed
                         }
-                        
+
                         else
                         {
                             status = AttendanceStatus.Absent;
@@ -148,7 +148,7 @@ namespace SparkHRMS.Controllers
                     WorkingHours = workingTime.HasValue
                                    ? string.Format("{0:%h} hours {0:%m} mins", workingTime.Value)
                                    : string.Empty,
-                    Status = status 
+                    Status = status
                 });
             }
 
@@ -207,8 +207,14 @@ namespace SparkHRMS.Controllers
 
             _context.EmployeeAttendance.Add(checkIn);
             await _context.SaveChangesAsync();
-
-            return Ok("Check-in successful.");
+            try
+            {
+                return Ok("Check-in successful.");
+            }
+            catch (Exception ex)
+            {
+                return Ok(ex.ToString());
+            }
         }
 
         // POST: Attendance/CheckOut
@@ -236,7 +242,14 @@ namespace SparkHRMS.Controllers
             checkInRecord.CheckOutPosition = CheckOutPosition;
             await _context.SaveChangesAsync();
 
-            return Ok("Check-out successful.");
+            try
+            {
+                return Ok("Check-out successful.");
+            }
+            catch (Exception ex)
+            {
+                return Ok(ex.ToString());
+            }
         }
 
     }

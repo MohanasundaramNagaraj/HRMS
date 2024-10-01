@@ -23,15 +23,20 @@ $(document).ready(function () {
                 $.ajax({
                     url: "/EmployeeAttendance/CheckIn",
                     type: 'POST',
-                    dataType: 'json',
+                  
                     data: {
                         CheckInPosition: JSON.stringify(_position)
                     },
                     success: function (response) {
+
                         Swal.fire({
                             icon: 'success',
                             title: 'Check-in Successful',
                             text: 'You have successfully checked in!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
                         });
                     },
                     error: function (xhr) {
@@ -39,7 +44,11 @@ $(document).ready(function () {
                             icon: 'error',
                             title: 'Check-in Failed',
                             text: 'Failed to check in: ' + xhr.responseText
-                        });
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });;
                     }
                 });
             });
@@ -67,7 +76,7 @@ $(document).ready(function () {
                 $.ajax({
                     url: "/EmployeeAttendance/CheckOut",
                     type: 'POST',
-                    dataType: 'json',
+                    
                     data: {
                         CheckOutPosition: JSON.stringify(_position)
                     },
@@ -76,6 +85,10 @@ $(document).ready(function () {
                             icon: 'success',
                             title: 'Check-out Successful',
                             text: 'You have successfully checked out!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
                         });
                     },
                     error: function (xhr) {
@@ -83,6 +96,10 @@ $(document).ready(function () {
                             icon: 'error',
                             title: 'Check-out Failed',
                             text: 'Failed to check out: ' + xhr.responseText
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
                         });
                     }
                 });
