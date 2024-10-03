@@ -36,6 +36,7 @@ namespace SparkHRMS.ViewModels
         public string? Address { get; set; }
         public string? Designation { get; set; }
         public string? EmpCode { get; set; }
+        public string? ReportingHeadMailID { get; set; }
     }
     public class EmployeeMonthlySummary
     {
@@ -65,6 +66,7 @@ namespace SparkHRMS.ViewModels
         public string WorkingHours { get; set; } // e.g., "8 hours 15 mins"
         public AttendanceStatus Status { get; set; }
         public string IP { get; set; }
+        public string CheckOutMadeSystemIP { get; set; }
         public string CheckInPosition { get; set; }
         public string CheckOutPosition { get; set; }
         public string CheckInLocation { get; set; }

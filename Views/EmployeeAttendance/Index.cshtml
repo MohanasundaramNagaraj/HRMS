@@ -93,7 +93,15 @@
                         <div class="card">
                             <div class="chat">
                                 <div class="chat-header clearfix">
-                                    @* <img src="@Model.EmployeeDetails.ImageUrl" alt="avatar"> *@
+                                    @{
+                                        var UserImageUrl = "";
+                                        int lastSlashIndex = @Model.EmployeeDetails.ImageUrl.LastIndexOf('/');
+                                        if (lastSlashIndex >= 0)
+                                        {
+                                             UserImageUrl = Url.Content("~/uploads/" + Model.EmployeeDetails.ImageUrl.Substring(lastSlashIndex + 1));
+                                        }           
+                                    }
+                                    <img src="@UserImageUrl" alt="avatar">
                                     <div class="row">
                                         <div class="col-lg-3 col-sm-6">
                                             <div class="chat-about">
@@ -156,7 +164,11 @@
                                                 <th class="center"> Check In </th>
                                                 <th class="center"> Check Out </th>
                                                 <th class="center"> Working Hours </th>
-                                                <th class="center"> IP </th>
+                                                 @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                {
+                                                    <th class="center"> Check In IP </th>
+                                                    <th class="center"> Check Out IP </th>
+                                                }
                                                 <th class="center"> Status </th>
                                                 @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
                                                 {
@@ -175,7 +187,7 @@
                                                                       max-width: 300px !important;
                                                                       min-width: 200px !important;
                                                                       word-wrap: anywhere;">
-                                                        @if (record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday)
+                                                        @if (record.CheckInTimeInString == "Not Checked In" && (record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday || record.Status == AttendanceStatus.Weekend))
                                                         {
                                                             <span>-</span>
                                                         }
@@ -190,7 +202,7 @@
                                                                       max-width: 300px !important;
                                                                       min-width: 200px !important;
                                                                       word-wrap: anywhere;">
-                                                        @if (record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday)
+                                                        @if (record.CheckOutTimeInString == "Not Checked Out" && record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday || record.Status == AttendanceStatus.Weekend)
                                                         {
                                                             <span>-</span>
                                                         }
@@ -203,7 +215,11 @@
                                                         @record.CheckOutLocation
                                                     </td>
                                                     <td class="center">@record.WorkingHours</td>
-                                                    <td class="center">@record.IP</td>
+                                                    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                    {
+                                                        <td class="center">@record.IP</td>
+                                                        <td class="center">@record.CheckOutMadeSystemIP</td>
+                                                    }
                                                     <td class="center">
 
                                                         @{
@@ -233,9 +249,8 @@
                                                     {
                                                         <td>
                                                             <a href="@Url.Action("Add","AdminAttendanceViewer", new { EmployeeId = @Model.EmployeeDetails.EmployeeId,
-                                                            date = @record.Date
-                                                        })
-                                                                            " class="btn btn-warning btn-sm p-t-10">
+                                                                date = @record.Date
+                                                            })" class="btn btn-warning btn-sm p-t-10">
                                                                 <i class="material-icons">create</i>
                                                             </a>
                                                         </td>

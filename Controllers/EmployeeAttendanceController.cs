@@ -140,6 +140,7 @@ namespace SparkHRMS.Controllers
                     CheckInDateTime = attendanceRecord?.CheckInTime,
                     CheckOutDateTime = attendanceRecord?.CheckOutTime,
                     IP = attendanceRecord?.CheckinMadeSystemIP,
+                    CheckOutMadeSystemIP = attendanceRecord?.CheckOutMadeSystemIP,
                     CheckInPosition = attendanceRecord?.CheckInPosition,
                     CheckOutPosition = attendanceRecord?.CheckOutPosition,
                     Date = date,
@@ -202,6 +203,7 @@ namespace SparkHRMS.Controllers
                 EmployeeId = emp.EmployeeId,
                 CheckInTime = DateTime.Now,
                 CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                CheckOutMadeSystemIP = null,
                 CheckInPosition = CheckInPosition
             };
 
@@ -240,6 +242,7 @@ namespace SparkHRMS.Controllers
 
             checkInRecord.CheckOutTime = DateTime.Now;
             checkInRecord.CheckOutPosition = CheckOutPosition;
+            checkInRecord.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
             await _context.SaveChangesAsync();
 
             try

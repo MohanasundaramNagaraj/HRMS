@@ -18,12 +18,12 @@
         </a>
     </li>
     @* <li class="breadcrumb-item bcrumb-1">
-        <a href="../../index.html">
-            <i class="fas fa-home"></i> Home
-        </a>
+    <a href="../../index.html">
+    <i class="fas fa-home"></i> Home
+    </a>
     </li>
     <li class="breadcrumb-item bcrumb-2">
-        <a href="#" onClick="return false;">Employees</a>
+    <a href="#" onClick="return false;">Employees</a>
     </li>
     <li class="breadcrumb-item active">Add Employee</li> *@
 </ul>
@@ -56,7 +56,7 @@
                     <div class="form-group form-float">
                         <div class="form-line">
                             <input type="text" class="form-control" name="Gender" asp-for="Gender" placeholder="Gender" />
-                            
+
                         </div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                         <div class="form-line">
                             <input id="email" type="email" class="validate form-control" asp-for="Email"
                                    placeholder="Email">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -76,14 +76,14 @@
                     <div class="form-group">
                         <div class="form-line">
                             <input type="text" class="form-control" placeholder="Designation" asp-for="Designation" />
-                            
+
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <input  class="form-control datetimepicker" asp-for="DateOfJoining" placeholder="Joining Date" name="date1" id="date1">
-                        
+                        <input class="form-control datetimepicker" asp-for="DateOfJoining" placeholder="Joining Date" name="date1" id="date1">
+
                     </div>
                 </div>
             </div>
@@ -92,15 +92,15 @@
                     <div class="form-group">
                         <div class="form-line">
                             <input type="text" class="form-control" placeholder="Telephone" asp-for="PhoneNumber" />
-                           
+
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <input  class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
+                        <input class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
                                name="date2" id="date2">
-                       
+
                     </div>
                 </div>
             </div>
@@ -110,33 +110,39 @@
                         <div class="form-line">
                             <textarea rows="4" class="form-control no-resize" asp-for="Address"
                                       placeholder="Address"></textarea>
-                           
+
                         </div>
                     </div>
                 </div>
-
-            </div>
-@*             <div class="row">
-                <div class="col-sm-12">
-                    <label class="control-label col-md-3">Upload Your Profile Photo</label>
-                    <form action="/" id="frmFileUpload" class="dropzone" method="post"
-                          enctype="multipart/form-data">
-                        <div class="dz-message">
-                            <div class="drag-icon-cph">
-                                <i class="material-icons">touch_app</i>
-                            </div>
-                            <h3>Drop files here or click to upload.</h3>
-                            <em>
-                                (This is just a demo dropzone. Selected files are
-                                <strong>not</strong>
-                                actually uploaded.)
-                            </em>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input type="text" id="reportingHead" class="form-control" asp-for="ReportingHeadMailID"/>
                         </div>
-                        <div class="fallback">
-                            <input name="file" asp-for="ImageUrl" type="file" multiple />
-                        </div>
-                    </form>
+                    </div>
                 </div>
+            </div>
+            @*             <div class="row">
+            <div class="col-sm-12">
+            <label class="control-label col-md-3">Upload Your Profile Photo</label>
+            <form action="/" id="frmFileUpload" class="dropzone" method="post"
+            enctype="multipart/form-data">
+            <div class="dz-message">
+            <div class="drag-icon-cph">
+            <i class="material-icons">touch_app</i>
+            </div>
+            <h3>Drop files here or click to upload.</h3>
+            <em>
+            (This is just a demo dropzone. Selected files are
+            <strong>not</strong>
+            actually uploaded.)
+            </em>
+            </div>
+            <div class="fallback">
+            <input name="file" asp-for="ImageUrl" type="file" multiple />
+            </div>
+            </form>
+            </div>
             </div> *@
             <div class="col-lg-12 p-t-20 text-center">
                 <div class="form-group">

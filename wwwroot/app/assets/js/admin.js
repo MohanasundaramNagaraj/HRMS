@@ -11,10 +11,10 @@ $(document).ready(function () {
     $('#checkInBtn').click(function (e) {
         e.preventDefault();
         let lat, lng = '';
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                lat = position.coords.latitude;
-                lng = position.coords.longitude;
+        //if (navigator.geolocation) {
+        //    navigator.geolocation.getCurrentPosition(function (position) {
+                //lat = position.coords.latitude;
+                //lng = position.coords.longitude;
 
                 let _position = {
                     lat: lat,
@@ -25,7 +25,8 @@ $(document).ready(function () {
                     type: 'POST',
                   
                     data: {
-                        CheckInPosition: JSON.stringify(_position)
+                        //CheckInPosition: JSON.stringify(_position)
+                        CheckInPosition: ''
                     },
                     success: function (response) {
 
@@ -51,23 +52,23 @@ $(document).ready(function () {
                         });;
                     }
                 });
-            });
+           // });
             
            
             
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
+        //} else {
+        //    alert("Geolocation is not supported by this browser.");
+        //}
        
     });
 
     $('#checkOutBtn').click(function (e) {
         e.preventDefault();
         let lat, lng = '';
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                lat = position.coords.latitude;
-                lng = position.coords.longitude;
+        //if (navigator.geolocation) {
+        //    navigator.geolocation.getCurrentPosition(function (position) {
+                //lat = position.coords.latitude;
+                //lng = position.coords.longitude;
                 let _position = {
                     lat: lat,
                     lng: lng
@@ -78,7 +79,8 @@ $(document).ready(function () {
                     type: 'POST',
                     
                     data: {
-                        CheckOutPosition: JSON.stringify(_position)
+                        //CheckOutPosition: JSON.stringify(_position)
+                        CheckOutPosition: ''
                     },
                     success: function (response) {
                         Swal.fire({
@@ -106,11 +108,11 @@ $(document).ready(function () {
             });
 
             
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
+    //    } else {
+    //        alert("Geolocation is not supported by this browser.");
+    //    }
        
-    });
+    //});
 });
 
 

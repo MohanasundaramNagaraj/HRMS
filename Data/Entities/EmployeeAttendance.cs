@@ -20,6 +20,7 @@ namespace SparkHRMS.Data.Entities
         public DateTime? CheckOutTime { get; set; }
 
         public string? CheckinMadeSystemIP { get; set; }
+        public string? CheckOutMadeSystemIP { get; set; }
         public bool IsCheckedOut => CheckOutTime.HasValue;
 
         public string? CheckInPosition { get; set; }

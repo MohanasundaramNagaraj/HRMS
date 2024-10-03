@@ -1,9 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using SparkHRMS.Data
 @using SparkHRMS.Data.Entities
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext _context
 
 <!DOCTYPE html>
 <html lang="en">
@@ -35,8 +37,24 @@
 <body>
     @{
         var user = await UserManager.GetUserAsync(User);
+
         var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
-        var UserImageUrl = Url.Content("~/images/default-user.png"); // Set the default user image URL
+        var UserImageUrl = "";
+        var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+        
+        if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+        {
+            UserImageUrl = Url.Content("~/uploads/" + user.UserName + ".jpg");
+        }
+        else
+        {
+            int lastSlashIndex = emp.ImageUrl.LastIndexOf('/');
+            if (lastSlashIndex >= 0)
+            {
+                 UserImageUrl = Url.Content("~/uploads/" + emp.ImageUrl.Substring(lastSlashIndex + 1));
+            }
+        }
+        // var UserImageUrl = Url.Content("~/images/default-user.png"); // Set the default user image URL
         var UserDesignation = (roles.Contains("Admin") || roles.Contains("SuperAdmin")) ? "Administrator" : roles.Contains("Employee") ? "Employee" : "User";
     }
     <!-- Page Loader -->
@@ -59,8 +77,9 @@
                 <a href="#" onClick="return false;" class="navbar-toggle collapsed" data-bs-toggle="collapse"
                    data-bs-target="#navbar-collapse" aria-expanded="false"></a>
                 <a href="#" onClick="return false;" class="bars"></a>
-                <a class="navbar-brand" href="../../index.html">
-                    <img src="~/app/assets/images/logo.png" alt="" />
+                <a class="navbar-brand" href="#">
+                    <img src="~/uploads/logo.png" alt="" style="height:100%;"/>
+                    @*  <img src="~/app/assets/images/logo.png" alt="" /> *@
                     <span class="logo-name">@Configuration["AppSettings:SiteTitle"]</span>
                 </a>
             </div>
@@ -137,7 +156,8 @@
 
                     <li class="dropdown user_profile">
                         <div class="dropdown-toggle" data-bs-toggle="dropdown">
-                            <img src="~/app/assets/images/user.jpg" alt="user">
+                            @* <img src="~/app/assets/images/user.jpg" alt="user"> *@
+                            <img src="@UserImageUrl" alt="user" style="height:45px;width:45px;">
                         </div>
                         <ul class="dropdown-menu pullDown">
                             <li class="body">
@@ -194,11 +214,11 @@
             <div class="menu">
                 <ul class="list">
                     <li class="sidebar-user-panel active">
-                        @*  <div class="user-panel">
-                        <div class="image">
-                        <img id="user-image" class="user-img-style" src="@UserImageUrl" alt="User Image" />
+                        <div class="user-panel">
+                            <div class="image">
+                                <img id="user-image" class="user-img-style" src="@UserImageUrl" alt="User Image" style="height:100%;" />
+                            </div>
                         </div>
-                        </div> *@
                         <div class="profile-usertitle">
                             <div id="user-name" class="sidebar-userpic-name">@User.Identity.Name</div>
                             <div id="user-designation" class="profile-usertitle-job">@UserDesignation</div>
@@ -245,7 +265,7 @@
                                 </li>
                                 <li class="">
                                     <a href="/EmployeeAttendance/Index">Employee Wise</a>
-                                </li> 
+                                </li>
                                 <li class="">
                                     <a href="/AdminAttendanceViewer/EmployeeMonthlySummary">Monthly Summary</a>
                                 </li>
@@ -332,7 +352,7 @@
                                 </li>
                             </ul>
                         </li>
-                      
+
                     }
 
                 </ul>
