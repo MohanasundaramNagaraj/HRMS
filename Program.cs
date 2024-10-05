@@ -18,6 +18,8 @@ using Hangfire.SqlServer;
 using SparkHRMS.Filters;
 using SparkHRMS.Services;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -99,7 +101,7 @@ builder.Services.AddHangfire(configuration => configuration
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    .UseFilter(new AutomaticRetryAttribute { Attempts = 0 }) // Retry attempts filter added by vigneshwaran 
+    .UseFilter(new AutomaticRetryAttribute { Attempts = 0 }) 
     .UseStorage(
         new SqlServerStorage(
             hangfireConnectionString,
@@ -151,6 +153,14 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Serve static files from the directory defined in appsettings.json
+var externalFolderPath = builder.Configuration["AppSettings:UploadDirectory"];
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(externalFolderPath),
+    RequestPath = "/uploads"
+});
 
 app.UseRouting();
 

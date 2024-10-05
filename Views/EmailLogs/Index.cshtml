@@ -3,12 +3,45 @@
 @{
     ViewData["Title"] = "Index";
 }
+<style>
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 100000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0); /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    }
 
-<h1>Index</h1>
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border: 1px solid #888;
+        margin: 5% 25%;
+        width: 50%;
+    }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+    .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+</style>
+<h1>Email Logs</h1>
+
 <table class="table">
     <thead>
         <tr>
@@ -54,7 +87,17 @@
                   min-width: 200px !important;
                   text-align: inherit;
                   word-wrap: anywhere;">
-                    @Html.DisplayFor(modelItem => item.Body)
+                    <span class="truncated-text">
+                        @if (item.Body.Length > 200)
+                        {
+                            <span>@item.Body.Substring(0, 200) + "..."</span>
+                            <button class="show-more" id="htmlBody" data-fulltext="@item.Body">Show More</button>
+                        }
+                        else
+                        {
+                            @Html.Raw(item.Body)
+                        }
+                    </span>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.SentDate)
@@ -67,14 +110,63 @@
                   min-width: 200px !important;
                   text-align: inherit;
                   word-wrap: anywhere;">
-                    @Html.DisplayFor(modelItem => item.ErrorMessage)
+                    <span class="truncated-text">
+                        @if (item.ErrorMessage.Length > 200)
+                        {
+                            <span>@item.ErrorMessage.Substring(0, 200) + "..."</span>
+                            <button class="show-more" data-fulltext="@Html.Raw(item.ErrorMessage)">Show More</button>
+                        }
+                        else
+                        {
+                            @Html.Raw(item.ErrorMessage)
+                        }
+                    </span>
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<div id="fullTextModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <p id="full-text-content"></p>
+    </div>
+</div>
+
+
+<script>
+    // Get modal element
+    var modal = document.getElementById("fullTextModal");
+    var closeButton = document.getElementsByClassName("close-button")[0];
+
+    // Show modal with full text
+    document.querySelectorAll(".show-more").forEach(button => {
+        button.addEventListener("click", function () {
+            var fullText = this.getAttribute("data-fulltext");
+            var isBodyContent = this.getAttribute("id");
+            if (isBodyContent == 'htmlBody'){
+                document.getElementById("full-text-content").innerHTML = fullText;
+            }else{
+                document.getElementById("full-text-content").innerText = fullText;
+
+            }
+            modal.style.display = "block";
+        });
+    });
+
+    // Close modal when clicking on the close button
+    closeButton.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    // Close modal when clicking anywhere outside of the modal
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>

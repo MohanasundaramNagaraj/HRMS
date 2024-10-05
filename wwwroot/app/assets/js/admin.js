@@ -25,7 +25,8 @@ $(document).ready(function () {
                     type: 'POST',
                   
                     data: {
-                        CheckInPosition: JSON.stringify(_position)
+                        //CheckInPosition: JSON.stringify(_position)
+                        CheckInPosition: ''
                     },
                     success: function (response) {
 
@@ -78,7 +79,8 @@ $(document).ready(function () {
                     type: 'POST',
                     
                     data: {
-                        CheckOutPosition: JSON.stringify(_position)
+                        //CheckOutPosition: JSON.stringify(_position)
+                        CheckOutPosition: ''
                     },
                     success: function (response) {
                         Swal.fire({
@@ -110,7 +112,7 @@ $(document).ready(function () {
     //        alert("Geolocation is not supported by this browser.");
     //    }
        
-    });
+    //});
 });
 
 

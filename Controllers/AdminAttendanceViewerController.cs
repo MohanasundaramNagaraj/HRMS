@@ -56,6 +56,7 @@ namespace SparkHRMS.Controllers
                 CheckInDateTime = x.Attendance?.CheckInTime, // Nullable DateTime
                 CheckOutDateTime = x.Attendance?.CheckOutTime, // Nullable DateTime
                 IP = x.Attendance?.CheckinMadeSystemIP,
+                CheckOutMadeSystemIP = x.Attendance?.CheckOutMadeSystemIP,
                 CheckInPosition = x.Attendance?.CheckInPosition,
                 CheckOutPosition = x.Attendance?.CheckOutPosition,
             }).ToList();
@@ -164,7 +165,8 @@ namespace SparkHRMS.Controllers
                     DateOfJoining = emp.DateOfJoining,
                     Address = emp.Address,
                     Designation = emp.Designation,
-                    EmpCode = emp.EmployeeCode
+                    EmpCode = emp.EmployeeCode,
+                    ReportingHeadMailID = emp.ReportingHeadMailID,
                 };
 
                 EmployeeAttendanceStatusCounts EmployeeAttendanceStatusCounts = new EmployeeAttendanceStatusCounts();
@@ -246,6 +248,7 @@ namespace SparkHRMS.Controllers
                 existingCheckIn.CheckInTime = attendance.CheckInTime;
                 existingCheckIn.CheckOutTime = attendance.CheckOutTime;
                 existingCheckIn.CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                existingCheckIn.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
                 _context.Update(existingCheckIn);
                 // return BadRequest("The Employee Already checked in for selected Date.");
             }
@@ -256,7 +259,8 @@ namespace SparkHRMS.Controllers
                     EmployeeId = attendance.EmployeeId,
                     CheckInTime = attendance.CheckInTime,
                     CheckOutTime = attendance.CheckOutTime,
-                    CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString()
+                    CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
                 };
 
                 _context.EmployeeAttendance.Add(checkIn);

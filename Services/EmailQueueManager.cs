@@ -54,7 +54,8 @@ namespace SparkHRMS.Services
                 CheckInDateTime = x.Attendance?.CheckInTime, // Nullable DateTime
                 CheckOutDateTime = x.Attendance?.CheckOutTime, // Nullable DateTime
                 WorkingHours = CalculateWorkingHours(x.Attendance?.CheckInTime, x.Attendance?.CheckOutTime),
-                IP = x.Attendance?.CheckinMadeSystemIP
+                IP = x.Attendance?.CheckinMadeSystemIP,
+                CheckOutMadeSystemIP = x.Attendance?.CheckOutMadeSystemIP
             }).ToList();
 
 
@@ -72,19 +73,20 @@ namespace SparkHRMS.Services
                             <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check-In Time</th>
                             <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check-Out Time</th>
                             <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Working Hours</th>
-                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">System IP</th>
+                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check In Made IP</th>
+                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check Out Made IP</th>
                         </tr>
                     </thead>
                     <tbody>";
 
             foreach (var record in attendanceDtos)
             {
-                var checkInTime = record.CheckInDateTime != null ? ((DateTime)record.CheckInDateTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "N/A";
-                var checkOutTime = record.CheckOutDateTime != null ? ((DateTime)record.CheckOutDateTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "N/A";
-                var workingHours = record.WorkingHours ?? "N/A";
-                var employeeName = record.EmployeeName ?? "N/A";
-                var systemIP = record.IP ?? "N/A";
-
+                var checkInTime = record.CheckInDateTime != null ? ((DateTime)record.CheckInDateTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "";
+                var checkOutTime = record.CheckOutDateTime != null ? ((DateTime)record.CheckOutDateTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "";
+                var workingHours = record.WorkingHours ?? "";
+                var employeeName = record.EmployeeName ?? "";
+                var systemIP = record.IP ?? "";
+                var checkOutIP = record.CheckOutMadeSystemIP ?? "";
                 html += @"
         <tr>
             <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + employeeName + @"</td>
@@ -92,6 +94,7 @@ namespace SparkHRMS.Services
             <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutTime + @"</td>
             <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + workingHours + @"</td>
             <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + systemIP + @"</td>
+            <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutIP + @"</td>
         </tr>";
             }
 
@@ -105,7 +108,6 @@ namespace SparkHRMS.Services
             var adminUsers = await GetAdminsAndSuperAdminsAsync();
             foreach (var user in adminUsers)
             {
-                //_backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync("recipient@domain.com", "Scheduled Email", "This is a test email."));
                 _backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync(user.Email, Event, html));
             }
         }

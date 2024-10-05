@@ -18,12 +18,12 @@
         </a>
     </li>
     @* <li class="breadcrumb-item bcrumb-1">
-        <a href="../../index.html">
-            <i class="fas fa-home"></i> Home
-        </a>
+    <a href="../../index.html">
+    <i class="fas fa-home"></i> Home
+    </a>
     </li>
     <li class="breadcrumb-item bcrumb-2">
-        <a href="#" onClick="return false;">Employees</a>
+    <a href="#" onClick="return false;">Employees</a>
     </li>
     <li class="breadcrumb-item active">Add Employee</li> *@
 </ul>
@@ -37,7 +37,7 @@
                     <div class="form-group">
                         <div class="form-line">
                             <input type="text" class="form-control" placeholder="Employee Code" asp-for="EmployeeCode" />
-                            
+
                         </div>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                     <div class="form-group">
                         <div class="form-line">
                             <input type="text" class="form-control" placeholder="Name" asp-for="Name" />
-                            
+
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                     <div class="form-group form-float">
                         <div class="form-line">
                             <input type="text" class="form-control" name="Gender" asp-for="Gender" placeholder="Gender" />
-                            
+
                         </div>
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                         <div class="form-line">
                             <input id="email" type="email" class="validate form-control" asp-for="Email"
                                    placeholder="Email">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -75,14 +75,14 @@
                     <div class="form-group">
                         <div class="form-line">
                             <input type="text" class="form-control" placeholder="Designation" asp-for="Designation" />
-                            
+
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                     @*    <input  class="form-control datetimepicker" asp-for="DateOfJoining"
-                               placeholder="Joining Date" name="date1" id="date1"> *@
+                        @*    <input  class="form-control datetimepicker" asp-for="DateOfJoining"
+                        placeholder="Joining Date" name="date1" id="date1"> *@
                         <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DateOfJoining"
                                value="" placeholder="Joining Date" name="date1" id="date1" fdprocessedid="ivq72r">
                     </div>
@@ -93,14 +93,14 @@
                     <div class="form-group">
                         <div class="form-line">
                             <input type="text" class="form-control" placeholder="Telephone" asp-for="PhoneNumber" />
-                           
+
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
                         @* <input  class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
-                               name="date2" id="date2"> *@
+                        name="date2" id="date2"> *@
                         <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DOB"
                                value="" placeholder="Birth Date" name="date2" id="date2" fdprocessedid="ivq72r">
                     </div>
@@ -112,13 +112,28 @@
                         <div class="form-line">
                             <textarea rows="4" class="form-control no-resize" asp-for="Address"
                                       placeholder="Address"></textarea>
-                           
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="form-line">
+                            <input type="text" id="reportingHead" class="form-control" asp-for="ReportingHeadMailID" style="display:none;" />
+                            <select id="reportingHeadSelect" style="width:35%;margin-right:10px;display:inline-block" onchange="document.getElementById('reportingHead').value = this.value">
+                                <option value="">Select Reporting Head</option>
+                                @foreach (var user in ViewBag.ActiveUsers)
+                                {
+                                    <option value="@user.Email">@user.Email</option>
+                                }
+                            </select>
                         </div>
                     </div>
                 </div>
 
             </div>
-@*             <div class="row">
+            @* <div class="row">
                 <div class="col-sm-12">
                     <label class="control-label col-md-3">Upload Your Profile Photo</label>
                     <form action="/" id="frmFileUpload" class="dropzone" method="post"

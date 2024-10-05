@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using SparkHRMS.Data.Entities;
 
 namespace SparkHRMS.Controllers
 {
+    [Authorize]
     public class EmailLogsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +24,7 @@ namespace SparkHRMS.Controllers
         // GET: EmailLogs
         public async Task<IActionResult> Index()
         {
-            return View(await _context.EmailLogs.ToListAsync());
+            return View(await _context.EmailLogs.OrderByDescending(x=>x.Id).ToListAsync());
         }
 
         // GET: EmailLogs/Details/5

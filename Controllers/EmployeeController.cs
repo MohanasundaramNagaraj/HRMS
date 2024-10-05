@@ -57,13 +57,14 @@ namespace SparkHRMS.Controllers
         // GET: Employee/Create
         public IActionResult Create()
         {
+            ViewBag.ActiveUsers = _context.Users.Where(x=>x.IsActive == true).ToList();
             return View();
         }
 
         // POST: Employee/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address")] Employee employee)
+        public async Task<IActionResult> Create([Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ReportingHeadMailID")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -129,13 +130,14 @@ namespace SparkHRMS.Controllers
 
                 ModelState.AddModelError(string.Empty, "Please fill all required fields.");
             }
-            
+            ViewBag.ActiveUsers = _context.Users.Where(x => x.IsActive == true).ToList();
             return View(employee);
         }
 
         // GET: Employee/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            ViewBag.ActiveUsers = _context.Users;
             if (id == null)
             {
                 return NotFound();
@@ -154,7 +156,7 @@ namespace SparkHRMS.Controllers
      
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId,ReportingHeadMailID")] Employee employee)
         {
             if (id != employee.EmployeeId)
             {
