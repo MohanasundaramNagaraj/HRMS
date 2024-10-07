@@ -27,7 +27,7 @@ namespace SparkHRMS.Controllers
             _userManager = userManager;
             _configuration = configuration;
         }
-        public async Task<IActionResult> Index(int? EmployeeID, int? Month)
+        public async Task<IActionResult> Index(int? EmployeeID, int? Month, int? Year)
         {
             var emp = new Employee();
             if (EmployeeID == null)
@@ -61,7 +61,7 @@ namespace SparkHRMS.Controllers
 
             // Fetch This Month's Check-in/Check-out Summary
             var today = DateTime.Today;
-            var year = today.Year;
+            var year = Year.HasValue ? (int)Year : today.Year;
 
             var startOfMonth = Month.HasValue ? new DateTime(year, Month.Value, 1) : new DateTime(today.Year, today.Month, 1);
             var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); // Get the last day of the month
@@ -141,8 +141,8 @@ namespace SparkHRMS.Controllers
                     CheckOutDateTime = attendanceRecord?.CheckOutTime,
                     IP = attendanceRecord?.CheckinMadeSystemIP,
                     CheckOutMadeSystemIP = attendanceRecord?.CheckOutMadeSystemIP,
-                    CheckInPosition = attendanceRecord?.CheckInPosition,
-                    CheckOutPosition = attendanceRecord?.CheckOutPosition,
+                   // CheckInPosition = attendanceRecord?.CheckInPosition,
+                   // CheckOutPosition = attendanceRecord?.CheckOutPosition,
                     Date = date,
                     CheckInTimeInString = attendanceRecord?.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "Not Checked In",
                     CheckOutTimeInString = attendanceRecord?.CheckOutTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "Not Checked Out",
@@ -154,11 +154,11 @@ namespace SparkHRMS.Controllers
             }
 
             // Get check-in/check-out locations
-            foreach (var attendance in dailyAttendanceRecords)
-            {
-                attendance.CheckInLocation = await Utility.GetLocationFromCoordinates(attendance.CheckInPosition);
-                attendance.CheckOutLocation = await Utility.GetLocationFromCoordinates(attendance.CheckOutPosition);
-            };
+            //foreach (var attendance in dailyAttendanceRecords)
+            //{
+            //    attendance.CheckInLocation = await Utility.GetLocationFromCoordinates(attendance.CheckInPosition);
+            //    attendance.CheckOutLocation = await Utility.GetLocationFromCoordinates(attendance.CheckOutPosition);
+            //};
 
             var monthlySummary = new EmployeeMonthlySummary
             {
@@ -175,6 +175,7 @@ namespace SparkHRMS.Controllers
             ViewBag.EmployeeList = _context.Employees.ToList();
             ViewBag.SelectedEmployeeID = employeeDetails.EmployeeId;
             ViewBag.SelectedMonth = startOfMonth.Month;
+            ViewBag.SelectedYear = startOfMonth.Year;
             return View(response);
         }
 

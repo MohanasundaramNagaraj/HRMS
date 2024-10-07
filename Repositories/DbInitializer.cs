@@ -64,12 +64,26 @@ namespace SparkHRMS.Repositories
                 {
                     UserName = _configuration["UserSettings:SuperAdmin:UserName"],
                     Email = _configuration["UserSettings:SuperAdmin:UserName"],
+                    EmailConfirmed = true,
                     PhoneNumber = _configuration["UserSettings:SuperAdmin:PhoneNumber"],
                     IsActive = true
                 }, _configuration["UserSettings:SuperAdmin:Password"]).GetAwaiter().GetResult();
 
                 ApplicationUser superAdmin = _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == _configuration["UserSettings:SuperAdmin:UserName"]).GetAwaiter().GetResult();
                 _userManager.AddToRoleAsync(superAdmin, Roles.RoleType.SuperAdmin.ToString()).GetAwaiter().GetResult();
+
+                //Create superadmin user.
+                _userManager.CreateAsync(new ApplicationUser
+                {
+                    UserName = _configuration["UserSettings:Admin:UserName"],
+                    Email = _configuration["UserSettings:Admin:UserName"],
+                    EmailConfirmed = true,
+                    PhoneNumber = _configuration["UserSettings:Admin:PhoneNumber"],
+                    IsActive = true
+                }, _configuration["UserSettings:Admin:Password"]).GetAwaiter().GetResult();
+
+                ApplicationUser Admin = _context.ApplicationUsers.FirstOrDefaultAsync(u => u.Email == _configuration["UserSettings:Admin:UserName"]).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(superAdmin, Roles.RoleType.Admin.ToString()).GetAwaiter().GetResult();
 
             }
         }
