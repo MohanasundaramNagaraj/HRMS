@@ -261,8 +261,8 @@ $.MyAdmin.leftSideBar = {
       //Scroll active menu item when page load, if option set = true
       if ($.MyAdmin.options.leftSideBar.scrollActiveItemWhenPageLoad) {
         var activeItemOffsetTop = $(".menu .list li.active")[0].offsetTop;
-        if (activeItemOffsetTop > 150)
-          $el.slimscroll({ scrollTo: activeItemOffsetTop + "px" });
+        //if (activeItemOffsetTop > 150)
+        // $el.slimscroll({ scrollTo: activeItemOffsetTop + "px" });
       }
     }
   },
@@ -571,18 +571,18 @@ function setSkinListHeightAndScroll(isFirstTime) {
   var $el = $(".right-sidebar .demo-skin");
 
   if (!isFirstTime) {
-    $el.slimScroll({ destroy: true }).height("auto");
+    //$el.slimScroll({ destroy: true }).height("auto");
     $el.parent().find(".slimScrollBar, .slimScrollRail").remove();
   }
 
-  $el.slimscroll({
-    height: height + "px",
-    color: "rgba(0,0,0,0.5)",
-    size: "6px",
-    alwaysVisible: false,
-    borderRadius: "0",
-    railBorderRadius: "0",
-  });
+  //$el.slimscroll({
+  //  height: height + "px",
+  //  color: "rgba(0,0,0,0.5)",
+  //  size: "6px",
+  //  alwaysVisible: false,
+  //  borderRadius: "0",
+  //  railBorderRadius: "0",
+  //});
 }
 
 //Setting tab content set height and show scroll
@@ -593,18 +593,18 @@ function setSettingListHeightAndScroll(isFirstTime) {
   var $el = $(".right-sidebar .demo-settings");
 
   if (!isFirstTime) {
-    $el.slimScroll({ destroy: true }).height("auto");
+    //$el.slimScroll({ destroy: true }).height("auto");
     $el.parent().find(".slimScrollBar, .slimScrollRail").remove();
   }
 
-  $el.slimscroll({
-    height: height + "px",
-    color: "rgba(0,0,0,0.5)",
-    size: "6px",
-    alwaysVisible: false,
-    borderRadius: "0",
-    railBorderRadius: "0",
-  });
+  //$el.slimscroll({
+  //  height: height + "px",
+  //  color: "rgba(0,0,0,0.5)",
+  //  size: "6px",
+  //  alwaysVisible: false,
+  //  borderRadius: "0",
+  //  railBorderRadius: "0",
+  //});
 }
 
 //Activate notification and task dropdown on top right menu

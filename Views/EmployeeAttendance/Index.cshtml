@@ -327,6 +327,91 @@
     </div>
 </div>
 
+<div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEventTitle">Add Event</h5>
+                <h5 class="modal-title" id="editEventTitle">Edit Event</h5>
+                <button type="button" class="close" data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="">
+                    <input type="hidden" id="id" name="id">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Title</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Title" name="title"
+                                           id="title">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <div class="form-group default-select">
+                                <label>Category</label>
+                                <select class="form-control" id="categorySelect">
+                                    <option value="" disabled selected>Choose your option</option>
+                                    <option id="work" value="fc-event-success">Work</option>
+                                    <option id="personal" value="fc-event-warning">Personal</option>
+                                    <option id="important" value="fc-event-primary">Important</option>
+                                    <option id="travel" value="fc-event-danger">Travel</option>
+                                    <option id="friends" value="fc-event-info">Friends</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="text" class="form-control datetimepicker flatpickr-input"
+                                       placeholder="Start Date" name="starts_at" id="starts-at">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="text" class="form-control datetimepicker flatpickr-input"
+                                       placeholder="End Date" name="ends_at" id="ends-at">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Event Details</label>
+                                <textarea id="eventDetails" name="eventDetails" placeholder="Enter Details"
+                                          class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke pr-0">
+                        <button type="button" class="btn btn-primary" id="add-event">
+                            Add
+                            Event
+                        </button>
+                        <button type="button" class="btn btn-round btn-primary" id="edit-event">
+                            Edit
+                            Event
+                        </button>
+                        <button type="button" id="close" class="btn btn-danger"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <!-- Include jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -335,14 +420,18 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @*  <script src="~/app/assets/js/common.min.js"></script> *@
-    <script src="~/app/assets/js/table.min.js"></script>
+    @* <script src="~/app/assets/js/table.min.js"></script>
 
-    <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
+    <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script> *@
     <script src="~/app/assets/js/bundles/amcharts5/index.js"></script>
     <script src="~/app/assets/js/bundles/amcharts5/percent.js"></script>
     <script src="~/app/assets/js/bundles/amcharts5/Animated.js"></script>
     <script src="~/app/assets/js/pages/attendance/attendance-data.js"></script>
 
+    @* <script src="~/app/assets/js/common.min.js"></script> *@
+    @* <script src="~/app/assets/js/bundles/flatpicker/flatpicker.min.js"></script>     *@
+    <!-- Custom Js -->
+    @* <script src="~/app/assets/js/admin.js"></script> *@
 
     <!-- calendar -->
     <script src='~/app/assets/js/bundles/fullcalendar/packages/core/main.min.js'></script>
@@ -350,7 +439,7 @@
     <script src='~/app/assets/js/bundles/fullcalendar/packages/daygrid/main.min.js'></script>
     <script src='~/app/assets/js/bundles/fullcalendar/packages/timegrid/main.min.js'></script>
     <script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
-    <script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
+    @* <script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script> *@
    
     <script src="~/js/employeeattendance.js"></script>
 }

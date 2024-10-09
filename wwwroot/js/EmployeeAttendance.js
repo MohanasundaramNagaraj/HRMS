@@ -28,22 +28,22 @@ $(document).ready(function () {
     initCalendar();
     addEvetClick();
     editEvetClick();
-    flatpickr("#starts-at", {
-        enableTime: true,
-        allowInput: true,
-        dateFormat: "Y-m-d H:i",
-        onOpen: function (selectedDates, dateStr, instance) {
-            instance.setDate(instance.input.value, false);
-        },
-    });
-    flatpickr("#ends-at", {
-        enableTime: true,
-        allowInput: true,
-        dateFormat: "Y-m-d H:i",
-        onOpen: function (selectedDates, dateStr, instance) {
-            instance.setDate(instance.input.value, false);
-        },
-    });
+    //flatpickr("#starts-at", {
+    //    enableTime: true,
+    //    allowInput: true,
+    //    dateFormat: "Y-m-d H:i",
+    //    onOpen: function (selectedDates, dateStr, instance) {
+    //        instance.setDate(instance.input.value, false);
+    //    },
+    //});
+    //flatpickr("#ends-at", {
+    //    enableTime: true,
+    //    allowInput: true,
+    //    dateFormat: "Y-m-d H:i",
+    //    onOpen: function (selectedDates, dateStr, instance) {
+    //        instance.setDate(instance.input.value, false);
+    //    },
+    //});
 });
 
 function initCalendar() {
@@ -51,19 +51,21 @@ function initCalendar() {
     calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: ["interaction", "dayGrid", "timeGrid"],
         header: {
-            left: "prev,next today",
+            left:"",
+            //left: "prev,next today",
             center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
+            //right: "dayGridMonth,timeGridWeek,timeGridDay",
+            right:""
         },
         editable: true,
-        droppable: true,
+        //droppable: true,
         navLinks: true,
         eventLimit: true,
         weekNumberCalculation: "ISO",
         displayEventEnd: true,
         lazyFetching: true,
         selectable: true,
-        initialDate: new Date(year, month, day),
+       
         eventMouseEnter: function (info) {
             $(info.el).attr("id", info.event.id);
 
@@ -93,39 +95,46 @@ function initCalendar() {
         events: events(),
 
         select: function (start, end) {
-            addEvent.style.display = "block";
-            editEvent.style.display = "none";
-            addEventTitle.style.display = "block";
-            editEventTitle.style.display = "none";
+            
+            //addEvent.style.display = "block";
+            //editEvent.style.display = "none";
+            //addEventTitle.style.display = "block";
+            //editEventTitle.style.display = "none";
 
-            clearModalForm();
-            $(".modal").modal("show");
+            //clearModalForm();
+            //$(".modal").modal("show");
         },
-        eventClick: function (info) {
-            addEvent.style.display = "none";
-            editEvent.style.display = "block";
-            addEventTitle.style.display = "none";
-            editEventTitle.style.display = "block";
+        //eventClick: function (info) {
+        //    addEvent.style.display = "none";
+        //    editEvent.style.display = "block";
+        //    addEventTitle.style.display = "none";
+        //    editEventTitle.style.display = "block";
 
-            let startDate = moment(info.event.start).format("YYYY-MM-DD HH:mm:ss");
-            let endDate = moment(info.event.end).format("YYYY-MM-DD HH:mm:ss");
+        //    let startDate = moment(info.event.start).format("YYYY-MM-DD HH:mm:ss");
+        //    let endDate = moment(info.event.end).format("YYYY-MM-DD HH:mm:ss");
 
-            // console.log(info.event.extendedProps.description);
-            $(".modal").modal("show");
-            $(".modal").find("#id").val(info.event.id);
-            $(".modal").find("#title").val(info.event.title);
-            $(".modal").find("#starts-at").val(startDate);
-            $(".modal").find("#ends-at").val(endDate);
-            $("#categorySelect").val(info.event.classNames[0]);
-            $(".modal")
-                .find("#eventDetails")
-                .val(info.event.extendedProps.description);
-        },
+        //    // console.log(info.event.extendedProps.description);
+        //    $(".modal").modal("show");
+        //    $(".modal").find("#id").val(info.event.id);
+        //    $(".modal").find("#title").val(info.event.title);
+        //    $(".modal").find("#starts-at").val(startDate);
+        //    $(".modal").find("#ends-at").val(endDate);
+        //    $("#categorySelect").val(info.event.classNames[0]);
+        //    $(".modal")
+        //        .find("#eventDetails")
+        //        .val(info.event.extendedProps.description);
+        //},
     });
 
     calendar.render();
+
+    var newDate = new Date(year, month - 1, 1); // Change this to the desired date (YYYY-MM-DD)
+    calendar.gotoDate(newDate);
     $('.fc-time').remove();
-    $('.fc-header-toolbar').remove();
+    $('#calendar').css({
+            'margin-top': '-50px'
+    })
+   // $('.fc-header-toolbar').remove();
 }
 
 function clearModalForm() {
