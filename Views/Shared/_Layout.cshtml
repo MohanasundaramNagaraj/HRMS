@@ -28,6 +28,8 @@
     <!-- Theme style. You can choose a theme from css/themes instead of get all themes -->
     <link href="~/app/assets/css/styles/all-themes.css" rel="stylesheet" />
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 </head>
 
 <!--
@@ -41,7 +43,7 @@
         var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
         var UserImageUrl = "";
         var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
-        
+
         if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
         {
             UserImageUrl = Url.Content("~/uploads/" + user.UserName + ".jpg");
@@ -51,7 +53,7 @@
             int lastSlashIndex = emp.ImageUrl.LastIndexOf('/');
             if (lastSlashIndex >= 0)
             {
-                 UserImageUrl = Url.Content("~/uploads/" + emp.ImageUrl.Substring(lastSlashIndex + 1));
+                UserImageUrl = Url.Content("~/uploads/" + emp.ImageUrl.Substring(lastSlashIndex + 1));
             }
         }
         // var UserImageUrl = Url.Content("~/images/default-user.png"); // Set the default user image URL
@@ -78,7 +80,7 @@
                    data-bs-target="#navbar-collapse" aria-expanded="false"></a>
                 <a href="#" onClick="return false;" class="bars"></a>
                 <a class="navbar-brand" href="#">
-                    <img src="~/uploads/logo.png" alt="" style="height:100%;"/>
+                    <img src="~/uploads/logo.png" alt="" style="height:100%;" />
                     @*  <img src="~/app/assets/images/logo.png" alt="" /> *@
                     <span class="logo-name">@Configuration["AppSettings:SiteTitle"]</span>
                 </a>
@@ -87,7 +89,7 @@
                 <ul class="float-start">
                     <li>
                         <a href="#" onClick="return false;" class="sidemenu-collapse">
-                            @* <i data-feather="menu"></i> *@
+                
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                  stroke-linejoin="round" class="feather feather-menu">
                                 <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -209,7 +211,7 @@
     <!-- #Top Bar -->
     <div>
         <!-- Left Sidebar -->
-        <aside id="leftsidebar" class="sidebar">
+        <aside id="leftsidebar" class="sidebar mb-5" style="max-height: 100vh; overflow-y: auto; width: auto;">
             <!-- Menu -->
             <div class="menu">
                 <ul class="list">
@@ -322,6 +324,36 @@
                             <ul class="ml-menu">
                                 <li>
                                     <a href="/EmailLogs/Index">List</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                <span>Projects</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/project/allprojectview" class="toggled">All Projects</a>
+                                </li>
+                                <li>
+                                    <a href="/project/projectcreateform" class="toggled">Add Project</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                <span>Clients</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/Client/AllClientsView" class="toggled">All Clients</a>
+                                </li>
+                                <li>
+                                    <a href="/Client/AddClient" class="toggled">Add Client</a>
                                 </li>
                             </ul>
                         </li>
@@ -474,7 +506,7 @@
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="~/app/assets/js/admin.js?v=@Configuration["AppSettings:Version"]"></script>
     <script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         feather.replace();
     </script>

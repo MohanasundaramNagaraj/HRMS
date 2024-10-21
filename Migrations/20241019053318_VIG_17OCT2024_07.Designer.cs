@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241019053318_VIG_17OCT2024_07")]
+    partial class VIG_17OCT2024_07
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -418,38 +421,6 @@ namespace SparkHRMS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Module");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "P",
-                            Name = "Project"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "S",
-                            Name = "Sprint"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Code = "PBI",
-                            Name = "Product Backlog Item"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Code = "T",
-                            Name = "Task"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Code = "B",
-                            Name = "BUG"
-                        });
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Client", b =>
@@ -505,13 +476,14 @@ namespace SparkHRMS.Migrations
                         .HasColumnType("bit")
                         .HasColumnOrder(13);
 
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnOrder(11);
-
                     b.Property<DateTime?>("ModifiedTime")
+                        .IsRequired()
                         .HasColumnType("datetime2")
                         .HasColumnOrder(12);
+
+                    b.Property<int?>("ModifiedUserBy")
+                        .HasColumnType("int")
+                        .HasColumnOrder(11);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -530,7 +502,7 @@ namespace SparkHRMS.Migrations
 
                     b.HasIndex("DeletedBy");
 
-                    b.HasIndex("ModifiedBy");
+                    b.HasIndex("ModifiedUserBy");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -895,7 +867,7 @@ namespace SparkHRMS.Migrations
 
                     b.HasOne("SparkHRMS.Data.Entities.ApplicationUser", "ModifiedUser")
                         .WithMany()
-                        .HasForeignKey("ModifiedBy");
+                        .HasForeignKey("ModifiedUserBy");
 
                     b.Navigation("CreatedUser");
 

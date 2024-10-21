@@ -1,0 +1,115 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+	ViewData["Title"] = "Add Client";
+}
+
+<ul class="breadcrumb breadcrumb-style ">
+	<li class="breadcrumb-item">
+		<h4 class="page-title"> Clients</h4>
+	</li>
+	<li class="breadcrumb-item bcrumb-1">
+		<a href="#">
+			<i class="fas fa-add"></i> Add Client
+		</a>
+	</li>
+</ul>
+<hr />
+
+<div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<strong>Add</strong> Client
+				</h2>
+				<ul class="header-dropdown m-r--5">
+					<li class="dropdown">
+						<a href="#" onclick="return false;" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							<i class="material-icons">more_vert</i>
+						</a>
+						<ul class="dropdown-menu float-end">
+							<li>
+								<a href="#" onclick="return false;">Action</a>
+							</li>
+							@* <li>
+								<a href="#" onclick="return false;">Another action</a>
+							</li>
+							<li>
+								<a href="#" onclick="return false;">Something else here</a>
+							</li> *@
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="body">
+				<form id="client-create-form" method="Post" action="/client/CreateClient">
+					<div class="row clearfix">
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<input id="client_name" error-message-element="client_name_error" name="Name" type="text" class="form-control" placeholder="Name">
+									<span id="client_name_error" class="text-danger" style="display:none">client name required</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<input id="client_email" error-message-element="client_email_error" name="Email" type="email" class="validate form-control" placeholder="Email">
+									<span id="client_email_error" class="text-danger" style="display:none">client email required</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row clearfix">
+						<div class="col-sm-6">
+							<div class="justify-content-center align-item-center mt-3">
+								<select id="client_country_phone_code" error-message-element="client_country_phone_code_error" name="CountryCode" class="h-20" style="width:100%;margin-right:10px;margin-top:2px; display:inline-block">
+									<option value="">Select Country Code</option>
+								</select>
+								<span id="client_country_phone_code_error" class="text-danger" style="display:none">Country Code and Phone Number both are should have value</span>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<input id="client_phone_number" error-message-element="client_phone_number_error" name="PhoneNumber" type="number" class="validate form-control" placeholder="Phone Number">
+									<span id="client_phone_number_error" class="text-danger" style="display:none">Country Code and Phone Number both are should have value</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row clearfix">
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<textarea id="client_description" error-message-element="client_description_error" rows="4" name="Description" class="form-control no-resize" placeholder="description"></textarea>
+									<span id="client_description_error" class="text-danger" style="display:none">description required</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group">
+								<div class="form-line">
+									<textarea id="client_address" error-message-element="client_address_error" rows="4" name="Address" class="form-control no-resize" placeholder="Address"></textarea>
+									<span id="client_address_error" class="text-danger" style="display:none">client address required</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-12 p-t-20 text-center">
+						<button type="submit" class="btn btn-primary waves-effect m-r-15">Save</button>
+						<a href="/client/AllClientsView" class="btn btn-danger waves-effect">Cancel</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script src="~/js/Client/client.js?v=@Configuration["AppSettings:Version"]"></script>

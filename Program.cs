@@ -141,6 +141,8 @@ services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
 });
 
+builder.Services.AddScoped<UserResolverService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

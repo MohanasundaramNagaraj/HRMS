@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241019062246_VIG_17OCT2024_08")]
+    partial class VIG_17OCT2024_08
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -418,38 +421,6 @@ namespace SparkHRMS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Module");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "P",
-                            Name = "Project"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "S",
-                            Name = "Sprint"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Code = "PBI",
-                            Name = "Product Backlog Item"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Code = "T",
-                            Name = "Task"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Code = "B",
-                            Name = "BUG"
-                        });
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Client", b =>

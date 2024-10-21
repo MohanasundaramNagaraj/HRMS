@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241017092535_VIG_17OCT2024_04")]
+    partial class VIG_17OCT2024_04
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -418,38 +421,6 @@ namespace SparkHRMS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Module");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "P",
-                            Name = "Project"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "S",
-                            Name = "Sprint"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Code = "PBI",
-                            Name = "Product Backlog Item"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Code = "T",
-                            Name = "Task"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Code = "B",
-                            Name = "BUG"
-                        });
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Client", b =>
@@ -471,22 +442,6 @@ namespace SparkHRMS.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnOrder(5);
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnOrder(9);
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnOrder(10);
-
-                    b.Property<int?>("DeletedBy")
-                        .HasColumnType("int")
-                        .HasColumnOrder(15);
-
-                    b.Property<DateTime>("DeletedDateTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnOrder(14);
-
                     b.Property<string>("Description")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
@@ -501,18 +456,6 @@ namespace SparkHRMS.Migrations
                         .HasColumnType("bit")
                         .HasColumnOrder(8);
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasColumnOrder(13);
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int")
-                        .HasColumnOrder(11);
-
-                    b.Property<DateTime?>("ModifiedTime")
-                        .HasColumnType("datetime2")
-                        .HasColumnOrder(12);
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -525,15 +468,6 @@ namespace SparkHRMS.Migrations
                         .HasColumnOrder(6);
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DeletedBy");
-
-                    b.HasIndex("ModifiedBy");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Client");
                 });
@@ -879,29 +813,6 @@ namespace SparkHRMS.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Client", b =>
-                {
-                    b.HasOne("SparkHRMS.Data.Entities.ApplicationUser", "CreatedUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SparkHRMS.Data.Entities.ApplicationUser", "DeletedUser")
-                        .WithMany()
-                        .HasForeignKey("DeletedBy");
-
-                    b.HasOne("SparkHRMS.Data.Entities.ApplicationUser", "ModifiedUser")
-                        .WithMany()
-                        .HasForeignKey("ModifiedBy");
-
-                    b.Navigation("CreatedUser");
-
-                    b.Navigation("DeletedUser");
-
-                    b.Navigation("ModifiedUser");
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", b =>

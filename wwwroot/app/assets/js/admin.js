@@ -530,9 +530,9 @@ function skinChanger() {
 }
 //Full screen window
 function callFullScreen() {
-    debugger;
+
     //$(document).on("click", ".fullscreen-btn", function (e) {
-    //    debugger;
+    //    
     if (
       !document.fullscreenElement && // alternative standard method
       !document.mozFullScreenElement &&
