@@ -29,8 +29,31 @@ namespace SparkHRMS.Services
         }
         public async Task SendScheduledEmail(string Event)
         {
-            var selectedDate = DateTime.Today;
+            string html = "";
+            DateTime Yesterday = DateTime.Today.Date.AddDays(-1);
+            html += await getEmailContent(Yesterday);
+            html += await getEmailContent(DateTime.Today);
 
+            var adminUsers = await GetAdminsAndSuperAdminsAsync();
+            foreach (var user in adminUsers)
+            {
+                _backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync(user.Email, Event, html));
+            }
+        }
+
+        private string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
+        {
+            if (checkInTime.HasValue && checkOutTime.HasValue)
+            {
+                var duration = checkOutTime.Value - checkInTime.Value;
+                return string.Format("{0:%h} hours {0:%m} mins", duration);
+            }
+            return "N/A";
+        }
+
+        private async Task<string> getEmailContent(DateTime selectedDate)
+        {
+           
             var query = from e in _context.Employees
                         join a in _context.EmployeeAttendance
                         on e.EmployeeId equals a.EmployeeId into attendanceGroup
@@ -88,14 +111,14 @@ namespace SparkHRMS.Services
                 var systemIP = record.IP ?? "";
                 var checkOutIP = record.CheckOutMadeSystemIP ?? "";
                 html += @"
-        <tr>
-            <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + employeeName + @"</td>
-            <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkInTime + @"</td>
-            <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutTime + @"</td>
-            <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + workingHours + @"</td>
-            <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + systemIP + @"</td>
-            <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutIP + @"</td>
-        </tr>";
+                <tr>
+                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + employeeName + @"</td>
+                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkInTime + @"</td>
+                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutTime + @"</td>
+                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + workingHours + @"</td>
+                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + systemIP + @"</td>
+                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutIP + @"</td>
+                </tr>";
             }
 
             html += @"
@@ -104,22 +127,7 @@ namespace SparkHRMS.Services
             </div>
         </div>
     </div>";
-
-            var adminUsers = await GetAdminsAndSuperAdminsAsync();
-            foreach (var user in adminUsers)
-            {
-                _backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync(user.Email, Event, html));
-            }
-        }
-
-        private string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
-        {
-            if (checkInTime.HasValue && checkOutTime.HasValue)
-            {
-                var duration = checkOutTime.Value - checkInTime.Value;
-                return string.Format("{0:%h} hours {0:%m} mins", duration);
-            }
-            return "N/A";
+            return html;
         }
 
         public async Task<List<ApplicationUser>> GetAdminsAndSuperAdminsAsync()

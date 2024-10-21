@@ -20,9 +20,9 @@ public class EmailScheduler
             checkInCron); // At 11:00 AM every day
 
         // Schedule job for 11:00 PM with a unique identifier
-        RecurringJob.AddOrUpdate<EmailQueueManager>(
-            "CheckOutJob", // Unique identifier for the "CheckOut" job
-            job => job.SendScheduledEmail("CheckOut"),
-            checkOutCron); // At 11:00 PM every da
+        //RecurringJob.AddOrUpdate<EmailQueueManager>(
+        //    "CheckOutJob", // Unique identifier for the "CheckOut" job
+        //    job => job.SendScheduledEmail("CheckOut"),
+        //    checkOutCron); // At 11:00 PM every da
     }
 }
