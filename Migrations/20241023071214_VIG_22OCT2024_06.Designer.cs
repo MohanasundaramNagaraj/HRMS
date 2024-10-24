@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241023071214_VIG_22OCT2024_06")]
+    partial class VIG_22OCT2024_06
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -745,7 +748,7 @@ namespace SparkHRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("MemberId")
                         .HasColumnType("int")
                         .HasColumnOrder(3);
 
@@ -755,7 +758,7 @@ namespace SparkHRMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("MemberId");
 
                     b.HasIndex("ProjectId");
 
@@ -1177,7 +1180,7 @@ namespace SparkHRMS.Migrations
                 {
                     b.HasOne("SparkHRMS.Data.Entities.Employee", "Member")
                         .WithMany("ProjectMembers")
-                        .HasForeignKey("EmployeeId")
+                        .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

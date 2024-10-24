@@ -22,7 +22,7 @@
                 console.error('Error fetching client names:', error);
             }
         });
-    }
+	}
 
 	await FetchAndRenderClientNames();
 

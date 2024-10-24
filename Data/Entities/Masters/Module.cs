@@ -1,12 +1,12 @@
 ﻿
 using SparkHRMS.Data.Entities.EntityBase;
-using SparkHRMS.Data.Entities.ProjectTransactions;
+using SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SparkHRMS.Data.Entities.Masters
 {
-	[Table("Module")]
+    [Table("Module")]
 	public class Module : Entity
 	{
 

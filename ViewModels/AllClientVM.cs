@@ -1,14 +1,13 @@
-﻿namespace SparkHRMS.ViewModels
+﻿using SparkHRMS.Dtos;
+
+namespace SparkHRMS.ViewModels
 {
 
-    public class AllClientVM
-    {
-        public int TotalNumberOfPage { get; set; }
-        public int CurrentPageNumber { get; set; }
-        public int PreviousPageNumber { get; set; }
-        public int NextPageNumber { get; set; }
+    public class AllClientVM : PaginationProperty
+	{
         public List<ClientVM> Clients { get; set; }
     }
+
     public class ClientVM
     {
         public int ClientId { get; set; }

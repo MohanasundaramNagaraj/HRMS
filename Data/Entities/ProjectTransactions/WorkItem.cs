@@ -1,11 +1,12 @@
 ﻿using SparkHRMS.Data.Entities.EntityBase;
 using SparkHRMS.Data.Entities.Masters;
+using SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SparkHRMS.Data.Entities.ProjectTransactions
 {
-	[Table("WorkItem")]
+    [Table("WorkItem")]
 	public class WorkItem : Entity
 	{
 
@@ -36,7 +37,7 @@ namespace SparkHRMS.Data.Entities.ProjectTransactions
 
 		[Column(Order = 7)]
 		[ForeignKey("Status")]
-		public int? StatusId { get; set; }    // Entires on WorkItemStatus Status reference Id from Lookup Table filter Based on LookUp Type
+		public int? StatusId { get; set; }    
 		public ModuleStatus Status { get; set; }
 
 

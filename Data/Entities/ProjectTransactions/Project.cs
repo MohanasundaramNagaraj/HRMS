@@ -1,5 +1,6 @@
 ﻿using SparkHRMS.Data.Entities.EntityBase;
 using SparkHRMS.Data.Entities.Masters;
+using SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -33,7 +34,7 @@ namespace SparkHRMS.Data.Entities.ProjectTransactions
 
         [Column(Order = 6)]
         [ForeignKey("Status")]
-        public int? StatusId { get; set; }    // Entires on Project Status reference Id from Lookup Table filter Based on LookUp Type
+        public int? StatusId { get; set; }    
         public ModuleStatus Status { get; set; }
 
         [Column(Order = 7)]
@@ -77,5 +78,10 @@ namespace SparkHRMS.Data.Entities.ProjectTransactions
 
         ICollection<Sprint> Sprints { get; set; }
         ICollection<WorkItem> WorkItems {  get; set; }
+
+        public ICollection<ProjectStatus> ProjectStatuses { get; set; }
+        public ICollection<SprintStatus> SprintStatuses { get; set; }
+        public ICollection<ProjectMember> ProjectMembers { get; set; }
+        public ICollection<EmployeeRole> EmployeeRoles { get; set; }
 	}
 }

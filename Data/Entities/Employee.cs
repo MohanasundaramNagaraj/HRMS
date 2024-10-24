@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using SparkHRMS.Data.Entities.ProjectTransactions;
 
 namespace SparkHRMS.Data.Entities
 {
@@ -39,6 +40,12 @@ namespace SparkHRMS.Data.Entities
         public ApplicationUser? ApplicationUser { get; set; }
 
         public string? ReportingHeadMailID { get; set; }
+
+
+        public ICollection<ProjectMember> ProjectMembers { get; set; }
+        public ICollection<EmployeeReporting> ReportingByEmployees { get; set; }
+        public ICollection<EmployeeReporting> ReportingToEmployees { get; set; }
+        public ICollection<EmployeeRole> EmployeeRoles { get; set; }
 
     }
 }

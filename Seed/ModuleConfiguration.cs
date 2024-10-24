@@ -14,13 +14,13 @@ namespace SparkHRMS.Seed
 					new Module
 					{
 						Id = 1,
-						Code = "P",
+						Code = "PRO",
 						Name = "Project"
 					},
 					new Module
 					{
 						Id = 2,
-						Code = "S",
+						Code = "SPR",
 						Name = "Sprint"
 					},
 					new Module
@@ -32,14 +32,14 @@ namespace SparkHRMS.Seed
 					new Module
 					{
 						Id = 4,
-						Code = "T",
+						Code = "TSK",
 						Name = "Task"
 					},
 					new Module
 					{
 						Id = 5,
-						Code = "B",
-						Name = "BUG"
+						Code = "BUG",
+						Name = "Bug"
 					}
 				);
 		}

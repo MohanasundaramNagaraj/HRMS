@@ -3,11 +3,11 @@ using SparkHRMS.Data.Entities.Masters;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SparkHRMS.Data.Entities.ProjectTransactions
+namespace SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction
 {
-	[Table("ModuleStatus")]
-	public class ModuleStatus : Entity
-	{
+    [Table("ModuleStatus")]
+    public class ModuleStatus : Entity
+    {
 
         [Column(Order = 2)]
         [ForeignKey("Modules")]
@@ -32,5 +32,7 @@ namespace SparkHRMS.Data.Entities.ProjectTransactions
         ICollection<Project> Projects { get; set; }
         ICollection<Sprint> Sprints { get; set; }
         ICollection<WorkItem> WorkItems { get; set; }
+        public ICollection<ProjectStatus> ProjectStatuses { get; set; }
+        public ICollection<SprintStatus> SprintStatuses { get; set; }
     }
 }

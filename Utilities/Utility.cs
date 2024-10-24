@@ -61,5 +61,14 @@ namespace SparkHRMS.Utilities
                 return string.Empty;
             }
         }
+
+        public static double GetPercentage(double part, double total)
+        {
+			double percentage = 0;
+
+			if (total != 0) percentage = (part / total) * 100;
+
+			return percentage;
+		}
     }
 }

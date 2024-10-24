@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241022120258_VIG_22OCT2024_03")]
+    partial class VIG_22OCT2024_03
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -452,52 +455,6 @@ namespace SparkHRMS.Migrations
                         });
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.Masters.ProjectUserRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnOrder(2);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProjectUserRole");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Business Analyst"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Technical Architect"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Project Manager"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Developer"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Tester"
-                        });
-                });
-
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Client", b =>
                 {
                     b.Property<int>("Id")
@@ -584,7 +541,7 @@ namespace SparkHRMS.Migrations
                     b.ToTable("Client");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.EmployeeReporting", b =>
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -593,59 +550,29 @@ namespace SparkHRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ReportingById")
-                        .HasColumnType("int")
-                        .HasColumnOrder(2);
-
-                    b.Property<int>("ReportingToId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(3);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReportingById");
-
-                    b.HasIndex("ReportingToId");
-
-                    b.ToTable("EmployeeReporting");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.EmployeeRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(3);
-
-                    b.Property<int?>("MemberId")
+                    b.Property<int>("DisplaySequence")
                         .HasColumnType("int")
                         .HasColumnOrder(4);
 
-                    b.Property<int?>("ProjectId")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnOrder(5);
+
+                    b.Property<int?>("ModuleId")
                         .HasColumnType("int")
                         .HasColumnOrder(2);
 
-                    b.Property<int?>("ProjectRoleId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(5);
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnOrder(3);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("ModuleId");
 
-                    b.HasIndex("MemberId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("ProjectRoleId");
-
-                    b.ToTable("EmployeeRole");
+                    b.ToTable("ModuleStatus");
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Project", b =>
@@ -745,7 +672,7 @@ namespace SparkHRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<int>("MemberId")
                         .HasColumnType("int")
                         .HasColumnOrder(3);
 
@@ -755,11 +682,37 @@ namespace SparkHRMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("MemberId");
 
                     b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectMember");
+                });
+
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ProjectStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ModuleStatusId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(3);
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int")
+                        .HasColumnOrder(2);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModuleStatusId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectStatus");
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Sprint", b =>
@@ -839,67 +792,7 @@ namespace SparkHRMS.Migrations
                     b.ToTable("Sprint");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DisplaySequence")
-                        .HasColumnType("int")
-                        .HasColumnOrder(4);
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit")
-                        .HasColumnOrder(5);
-
-                    b.Property<int?>("ModuleId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(2);
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnOrder(3);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModuleId");
-
-                    b.ToTable("ModuleStatus");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ProjectStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ModuleStatusId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(3);
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int")
-                        .HasColumnOrder(2);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ModuleStatusId");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("ProjectStatus");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.SprintStatus", b =>
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.SprintStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1098,50 +991,13 @@ namespace SparkHRMS.Migrations
                     b.Navigation("ModifiedUser");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.EmployeeReporting", b =>
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", b =>
                 {
-                    b.HasOne("SparkHRMS.Data.Entities.Employee", "ReportingByEmployee")
-                        .WithMany("ReportingByEmployees")
-                        .HasForeignKey("ReportingById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.HasOne("SparkHRMS.Data.Entities.Masters.Module", "Modules")
+                        .WithMany()
+                        .HasForeignKey("ModuleId");
 
-                    b.HasOne("SparkHRMS.Data.Entities.Employee", "ReportingToEmployee")
-                        .WithMany("ReportingToEmployees")
-                        .HasForeignKey("ReportingToId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ReportingByEmployee");
-
-                    b.Navigation("ReportingToEmployee");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.EmployeeRole", b =>
-                {
-                    b.HasOne("SparkHRMS.Data.Entities.Employee", "Employee")
-                        .WithMany("EmployeeRoles")
-                        .HasForeignKey("EmployeeId");
-
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.ProjectMember", "Member")
-                        .WithMany("EmployeeRoles")
-                        .HasForeignKey("MemberId");
-
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.Project", "Project")
-                        .WithMany("EmployeeRoles")
-                        .HasForeignKey("ProjectId");
-
-                    b.HasOne("SparkHRMS.Data.Entities.Masters.ProjectUserRole", "ProjectUserRole")
-                        .WithMany("EmployeeRoles")
-                        .HasForeignKey("ProjectRoleId");
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Member");
-
-                    b.Navigation("Project");
-
-                    b.Navigation("ProjectUserRole");
+                    b.Navigation("Modules");
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Project", b =>
@@ -1160,7 +1016,7 @@ namespace SparkHRMS.Migrations
                         .WithMany()
                         .HasForeignKey("DeletedBy");
 
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", "Status")
+                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId");
 
@@ -1175,9 +1031,9 @@ namespace SparkHRMS.Migrations
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ProjectMember", b =>
                 {
-                    b.HasOne("SparkHRMS.Data.Entities.Employee", "Member")
-                        .WithMany("ProjectMembers")
-                        .HasForeignKey("EmployeeId")
+                    b.HasOne("SparkHRMS.Data.Entities.ApplicationUser", "Member")
+                        .WithMany()
+                        .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1188,6 +1044,23 @@ namespace SparkHRMS.Migrations
                         .IsRequired();
 
                     b.Navigation("Member");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ProjectStatus", b =>
+                {
+                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", "ModuleStatus")
+                        .WithMany("ProjectStatuses")
+                        .HasForeignKey("ModuleStatusId");
+
+                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.Project", "Project")
+                        .WithMany("ProjectStatuses")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ModuleStatus");
 
                     b.Navigation("Project");
                 });
@@ -1208,7 +1081,7 @@ namespace SparkHRMS.Migrations
                         .WithMany()
                         .HasForeignKey("ProjectId");
 
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", "Status")
+                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId");
 
@@ -1221,35 +1094,9 @@ namespace SparkHRMS.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", b =>
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.SprintStatus", b =>
                 {
-                    b.HasOne("SparkHRMS.Data.Entities.Masters.Module", "Modules")
-                        .WithMany()
-                        .HasForeignKey("ModuleId");
-
-                    b.Navigation("Modules");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ProjectStatus", b =>
-                {
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", "ModuleStatus")
-                        .WithMany("ProjectStatuses")
-                        .HasForeignKey("ModuleStatusId");
-
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.Project", "Project")
-                        .WithMany("ProjectStatuses")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ModuleStatus");
-
-                    b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.SprintStatus", b =>
-                {
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", "ModuleStatus")
+                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", "ModuleStatus")
                         .WithMany("SprintStatuses")
                         .HasForeignKey("ModuleStatusId");
 
@@ -1290,7 +1137,7 @@ namespace SparkHRMS.Migrations
                         .WithMany()
                         .HasForeignKey("SprintId");
 
-                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", "Status")
+                    b.HasOne("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId");
 
@@ -1305,40 +1152,17 @@ namespace SparkHRMS.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.Employee", b =>
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ModuleStatus", b =>
                 {
-                    b.Navigation("EmployeeRoles");
-
-                    b.Navigation("ProjectMembers");
-
-                    b.Navigation("ReportingByEmployees");
-
-                    b.Navigation("ReportingToEmployees");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.Masters.ProjectUserRole", b =>
-                {
-                    b.Navigation("EmployeeRoles");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Project", b =>
-                {
-                    b.Navigation("EmployeeRoles");
-
-                    b.Navigation("ProjectMembers");
-
                     b.Navigation("ProjectStatuses");
 
                     b.Navigation("SprintStatuses");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.ProjectMember", b =>
+            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.Project", b =>
                 {
-                    b.Navigation("EmployeeRoles");
-                });
+                    b.Navigation("ProjectMembers");
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.ProjectTransactions.StatusTransaction.ModuleStatus", b =>
-                {
                     b.Navigation("ProjectStatuses");
 
                     b.Navigation("SprintStatuses");

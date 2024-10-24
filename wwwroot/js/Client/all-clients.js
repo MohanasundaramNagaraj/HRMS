@@ -91,38 +91,5 @@
                 }
             });
         });
-
-
-
-
-        //const paginationContainer = document.getElementById('pagination-container');
-        //paginationContainer.innerHTML = ''; 
-
-        //paginationContainer.innerHTML += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        //    <a href="#" class="page-link" data-page="1">«</a></li>`;
-
-        //paginationContainer.innerHTML += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-        //    <a href="#" class="page-link" data-page="${currentPage - 1}">‹</a></li>`;
-
-        //for (let i = 1; i <= totalPages; i++) {
-        //    paginationContainer.innerHTML += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-        //        <a href="#" class="page-link" data-page="${i}">${i}</a></li>`;
-        //}
-
-        //paginationContainer.innerHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        //    <a href="#" class="page-link" data-page="${currentPage + 1}">›</a></li>`;
-
-        //paginationContainer.innerHTML += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-        //    <a href="#" class="page-link" data-page="${totalPages}">»</a></li>`;
-
-        //document.querySelectorAll('#pagination-container a.page-link').forEach(link => {
-        //    link.addEventListener('click', function (event) {
-        //        event.preventDefault();
-        //        const selectedPage = parseInt(this.getAttribute('data-page'));
-        //        if (!isNaN(selectedPage)) {
-        //            loadClients(selectedPage, pageSize);
-        //        }
-        //    });
-        //});
     }
 });

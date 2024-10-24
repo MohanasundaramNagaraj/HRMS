@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
 	ViewData["Title"] = "All Projects";
 }
 
@@ -16,7 +18,110 @@
 <hr />
 
 
+<div class="row">
+	<div class="col-lg-12 col-md-12 col-sm-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<strong>All</strong> Projects
+				</h2>
+				<ul class="header-dropdown m-r--5">
+					<li class="dropdown">
+						<a href="javascript:void(0);" class="dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+							<i class="material-icons">more_vert</i>
+						</a>
+						<ul class="dropdown-menu float-end">
+							<li>
+								<a href="javascript:void(0);">Action</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);">Another action</a>
+							</li>
+							<li>
+								<a href="javascript:void(0);">Something else here</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="body">
+				<div class="table-responsive">
+					<div id="DataTables_Table_0_wrapper" class="dt-container dt-bootstrap5">
+						<div class="row justify-content-between">
+							<div class="col-md-auto me-auto ">
+								<div class="dt-length">
+									<select class="form-select form-select-sm" id="project_page_count">
+										<option value="5">5</option>
+										<option value="10">10</option>
+										<option value="15">15</option>
+										<option value="20">20</option>
+										<option value="25">25</option>
+										<option value="30">30</option>
+										<option value="50">50</option>
+										<option value="100">100</option>
+									</select>
+									<label for="dt-length-0"> entries per page</label>
+								</div>
+							</div>
+							<div class="col-md-auto ms-auto ">
+								<div class="dt-search">
+									<label for="project_dt_search" class="active">Search:</label>
+									<input type="search" class="form-control form-control-sm" id="project_dt_search" oninput="FetchProject()" placeholder="Project Name">
+								</div>
+							</div>
+						</div>
+						<div class="row mt-2 justify-content-md-center">
+							<div class="col-12 ">
+								<table class="table table-hover js-basic-example contact_list dataTable" id="">
+									<thead>
+										<tr role="row">
+											<th class="center">
+												<span class="dt-column-title"> Project Name </span>
+											</th>
+											<th class="center">
+												<span class="dt-column-title"> Client Name </span>
+											</th>
+											<th class="center">
+												<span class="dt-column-title"> Planned To Complete </span>
+											</th>
+											<th class="center">
+												<span class="dt-column-title"> Team Members</span>
+											</th>
+											<th class="center">
+												<span class="dt-column-title"> Status </span>
+											</th>
+											<th class="center">
+												<span class="dt-column-title"> Progress</span>
+											</th>
+											<th class="center">
+												<span class="dt-column-title"> Action </span>
+											</th>
+										</tr>
+									</thead>
+									<tbody id="project-list-container">
+										
+									</tbody>
+									
+								</table>
+							</div>
+						</div>
+						<div class="row mt-2">
+							<div class="col-12">
+								<div class="dt-paging paging_full_numbers d-flex justify-content-center align-items-center">
+									<ul class="pagination" id="project-pagination-container">
+										<!-- Pagination buttons will be rendered here dynamically -->
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 
 
-@* <script src="~/js/project/all-project.js"></script> *@
+<script src="~/js/project/all-project.js?v=@Configuration["AppSettings:Version"]"></script>
+

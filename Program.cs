@@ -2,11 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Identity.UI.Services;
-
 using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Utilities;
@@ -19,6 +14,7 @@ using SparkHRMS.Filters;
 using SparkHRMS.Services;
 using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
+using SparkHRMS.Dtos;
 
 
 
@@ -142,6 +138,9 @@ services.AddControllers().AddNewtonsoftJson(options =>
 });
 
 builder.Services.AddScoped<UserResolverService>();
+
+
+builder.Services.Configure<DefaultModuleStatus>(builder.Configuration.GetSection("DefaultModuleStatus"));
 
 var app = builder.Build();
 
