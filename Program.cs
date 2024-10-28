@@ -20,7 +20,10 @@ using SparkHRMS.Services;
 using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
 
-
+using Serilog;
+using Serilog.Events;
+using System.Configuration;
+using Serilog.Ui.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -135,12 +138,27 @@ builder.Services.AddEndpointsApiExplorer();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+//builder.Services.AddSerilog();
 
 services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
 });
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .WriteTo.Console()
+    .WriteTo.MSSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+        {
+            TableName = "Logs",
+            AutoCreateSqlTable = true
+        })
+    .CreateLogger();
 
+// Add Serilog as the logging provider
+builder.Host.UseSerilog();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -172,6 +190,9 @@ app.UseAuthorization();
 
 //app.UseElmah();
 
+
+
+
 app.UseHangfireDashboard();
 app.UseHangfireServer();
 
@@ -201,6 +222,7 @@ app.UseEndpoints(endpoints =>
 
 });
 
+//app.UseSerilogUI("/logs");
 app.MapControllerRoute(
     name: "default",
      pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -209,7 +231,21 @@ app.MapControllerRoute(
 
 app.UseHttpsRedirection();
 
-app.Run();
+//app.Run();
+
+try
+{ 
+    Log.Information("Starting up the application");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application start-up failed");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
 
 void SeedDatabase()
 {
