@@ -45,8 +45,8 @@
                         <thead>
                             <tr>
                                 <th>Employee Name</th>
-                                <th>Check-In Time</th>
-                                <th>Check-Out Time</th>
+                                <th>Working Time</th>
+                                @* <th>Check-Out Time</th> *@
                                 <th>Working Hours</th>
                                 <th>Check In Made System IP</th>
                                 <th>Actions</th>
@@ -74,12 +74,13 @@
                                                                       word-wrap: anywhere;">
                                         <span style=" text-align: center !important;
                                                         display: block;">
-                                                        @checkInTime</span>
+                                            @checkInTime - @checkOutTime
+                                        </span>
                                       
                                         <br />
                                         @record.CheckInLocation
                                     </td>
-                                    <td class="center" style="width: 200px !important;
+                                   @*  <td class="center" style="width: 200px !important;
                                                                       max-width: 300px !important;
                                                                       min-width: 200px !important;
                                                                       word-wrap: anywhere;">
@@ -87,7 +88,7 @@
                                                     display: block;">@checkOutTime</span>
                                         <br />
                                         @record.CheckOutLocation
-                                    </td>
+                                    </td> *@
                                     <td>@(record.WorkingHours ?? "N/A")</td>
                                     <td>@record.IP</td>
                                     <td>

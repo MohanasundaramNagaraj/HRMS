@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241105150319_MSN_05NOV2024_01")]
+    partial class MSN_05NOV2024_01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -349,16 +352,7 @@ namespace SparkHRMS.Migrations
                     b.Property<string>("CheckinMadeSystemIP")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DutyEndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DutyStartTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("HalfDayLeave")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsHalfDayLeave")
@@ -373,10 +367,16 @@ namespace SparkHRMS.Migrations
                     b.Property<bool>("IsPermission")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("PermissionStartTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("PermissionEndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("PermissionStartTime")
+                    b.Property<DateTime?>("DutyStartTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DutyEndTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
