@@ -26,19 +26,19 @@ namespace SparkHRMS.Data.Entities
         public string? CheckInPosition { get; set; }
         public string? CheckOutPosition { get; set; }
 
-        public bool IsPermission { get; set; }
-        public DateTime? PermissionStartTime { get; set; }
-        public DateTime? PermissionEndTime { get; set; }
-        public bool IsOnDuty { get; set; }
-        public DateTime? DutyStartTime { get; set; }
-        public DateTime? DutyEndTime { get; set; }
-        public bool IsLeave { get; set; }
-        public bool IsHalfDayLeave { get; set; }
-        public HalfDay? HalfDayLeave { get; set; }
-        public enum HalfDay
-        {
-            FirstHalf,  
-            SecondHalf  
-        }
+        //public bool IsPermission { get; set; }
+        //public DateTime? PermissionStartTime { get; set; }
+        //public DateTime? PermissionEndTime { get; set; }
+        //public bool IsOnDuty { get; set; }
+        //public DateTime? DutyStartTime { get; set; }
+        //public DateTime? DutyEndTime { get; set; }
+        //public bool IsLeave { get; set; }
+        //public bool IsHalfDayLeave { get; set; }
+        //public HalfDay? HalfDayLeave { get; set; }
+        //public enum HalfDay
+        //{
+        //    FirstHalf,  
+        //    SecondHalf  
+        //}
     }
 }
