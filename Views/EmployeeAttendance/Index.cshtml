@@ -8,8 +8,6 @@
     ViewData["Title"] = "Employee Attendance";
     var user = await UserManager.GetUserAsync(User);
     var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
-
-
 }
 
 <link href="~/app/assets/css/bundles/dataTables.bootstrap5.min.css" rel="stylesheet">
@@ -41,17 +39,19 @@
         <div class="col-md-12 mb-3">
             <div>
                 <div class="">
-                   <select id="yearSelector" style="width:20%; margin-right:10px; display:inline-block">
+                    <select id="yearSelector" style="width:20%; margin-right:10px; display:inline-block">
                         <option value="">Select Year</option>
                         @for (int year = DateTime.Now.Year; year >= DateTime.Now.Year - 10; year--)  // Loop for the last 10 years
                         {
                             if (year == ViewBag.SelectedYear)
                             {
-                                <option value="@year" selected>@year</option>  // Select the year if it matches the selected year
+                                <option value="@year" selected>@year</option>
+                                // Select the year if it matches the selected year
                             }
                             else
                             {
-                                <option value="@year">@year</option>  // Display the year as an option
+                                <option value="@year">@year</option>
+                                // Display the year as an option
                             }
                         }
                     </select>
@@ -122,8 +122,8 @@
                                         int lastSlashIndex = @Model.EmployeeDetails.ImageUrl.LastIndexOf('/');
                                         if (lastSlashIndex >= 0)
                                         {
-                                             UserImageUrl = Url.Content("~/uploads/" + Model.EmployeeDetails.ImageUrl.Substring(lastSlashIndex + 1));
-                                        }           
+                                            UserImageUrl = Url.Content("~/uploads/" + Model.EmployeeDetails.ImageUrl.Substring(lastSlashIndex + 1));
+                                        }
                                     }
                                     <img src="@UserImageUrl" alt="avatar" style="    height: 45px;">
                                     <div class="row">
@@ -162,15 +162,15 @@
                             <div class="header">
                             </div>
                             <div class="body">
-                               @*  <div class="row">
-                                    <div class="col-lg-3 col-sm-3">
-                                        <div class="text-center">
-                                            <h3 class="col-green">@Model.MonthlySummary.TotalWorkingHoursThisMonth</h3>
-                                            <div class="text font-15">Total Working Hours</div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-end mb-3 col-lg-9 col-sm-9">
-                                    </div>
+                                @*  <div class="row">
+                                <div class="col-lg-3 col-sm-3">
+                                <div class="text-center">
+                                <h3 class="col-green">@Model.MonthlySummary.TotalWorkingHoursThisMonth</h3>
+                                <div class="text font-15">Total Working Hours</div>
+                                </div>
+                                </div>
+                                <div class="d-flex justify-content-end mb-3 col-lg-9 col-sm-9">
+                                </div>
                                 </div> *@
 
                                 <div class="row">
@@ -198,7 +198,7 @@
                                                 <th class="center"> Check In </th>
                                                 <th class="center"> Check Out </th>
                                                 <th class="center"> Working Hours </th>
-                                                 @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
                                                 {
                                                     <th class="center"> Check In IP </th>
                                                     <th class="center"> Check Out IP </th>
@@ -244,7 +244,7 @@
                                                         {
                                                             @record.CheckOutTimeInString
                                                         }
-                                                       
+
                                                         <br />
                                                         @record.CheckOutLocation
                                                     </td>
@@ -331,8 +331,8 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addEventTitle">Add Event</h5>
-                <h5 class="modal-title" id="editEventTitle">Edit Event</h5>
+                <h5 class="modal-title" id="addEventTitle">Add Request</h5>
+                <h5 class="modal-title" id="editEventTitle">View Request</h5>
                 <button type="button" class="close" data-bs-dismiss="modal"
                         aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -341,65 +341,66 @@
             <div class="modal-body">
                 <form class="">
                     <input type="hidden" id="id" name="id">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Title</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Title" name="title"
-                                           id="title">
-                                </div>
-                            </div>
-                        </div>
+                    @*  <div class="row">
+                    <div class="col-md-12">
+                    <div class="form-group">
+                    <label>Title</label>
+                    <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Title" name="title"
+                    id="title">
                     </div>
+                    </div>
+                    </div>
+                    </div> *@
                     <div class="row">
                         <div class="col-md-12 mb-4">
                             <div class="form-group default-select">
-                                <label>Category</label>
-                                <select class="form-control" id="categorySelect">
+                                <label>Request Type</label>
+                                <select class="form-control" id="entrytype">
                                     <option value="" disabled selected>Choose your option</option>
-                                    <option id="work" value="fc-event-success">Work</option>
-                                    <option id="personal" value="fc-event-warning">Personal</option>
-                                    <option id="important" value="fc-event-primary">Important</option>
-                                    <option id="travel" value="fc-event-danger">Travel</option>
-                                    <option id="friends" value="fc-event-info">Friends</option>
+                                    <option value="@Constants.EntryTypes.Permission">@Constants.EntryTypes.Permission</option>
+                                    <option value="@Constants.EntryTypes.OnDuty">@Constants.EntryTypes.OnDuty</option>
+                                    <option value="@Constants.EntryTypes.Leave">@Constants.EntryTypes.Leave</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>Start Date</label>
-                                <input type="text" class="form-control datetimepicker flatpickr-input"
-                                       placeholder="Start Date" name="starts_at" id="starts-at">
+                        <div class="col-sm-6" id="fromTimeDiv">
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    <label>From Time</label>
+                                    <input id="from_time" type="time" class="validate form-control" placeholder="From Time">
+
+                                </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label>End Date</label>
-                                <input type="text" class="form-control datetimepicker flatpickr-input"
-                                       placeholder="End Date" name="ends_at" id="ends-at">
+
+                        <div class="col-sm-6" id="toTimeDiv">
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    <label>To Time</label>
+                                    <input id="to_time" type="time" class="validate form-control" placeholder="To Time">
+
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Event Details</label>
-                                <textarea id="eventDetails" name="eventDetails" placeholder="Enter Details"
-                                          class="form-control"></textarea>
-                            </div>
+                    <div>
+                        <div class="form-group">
+                            <label>Descreption</label>
+                            <textarea id="eventDetails" name="eventDetails" placeholder="Enter Details"
+                                      class="form-control"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer bg-whitesmoke pr-0">
                         <button type="button" class="btn btn-primary" id="add-event">
                             Add
-                            Event
+                            Request
                         </button>
                         <button type="button" class="btn btn-round btn-primary" id="edit-event">
                             Edit
-                            Event
+                            Request
                         </button>
                         <button type="button" id="close" class="btn btn-danger"
                                 data-bs-dismiss="modal">
@@ -440,6 +441,6 @@
     <script src='~/app/assets/js/bundles/fullcalendar/packages/timegrid/main.min.js'></script>
     <script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
     @* <script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script> *@
-   
+
     <script src="~/js/employeeattendance.js"></script>
 }
