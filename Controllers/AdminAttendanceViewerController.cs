@@ -331,5 +331,101 @@ namespace SparkHRMS.Controllers
             return RedirectToAction("Index", new { date = ViewBag.SelectedDate, employeeName = ViewBag.EmployeeName });
         }
 
+        public async Task<IActionResult> EmployeeRequests(int? EmployeeID, int? Month, int? Year)
+        {
+            var emp = new Employee();
+            if (EmployeeID == null)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return NotFound();
+                emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+                if (emp == null)
+                {
+                    emp = _context.Employees.FirstOrDefault();
+                }
+            }
+            else
+            {
+                emp = _context.Employees.Where(x => x.EmployeeId == EmployeeID).FirstOrDefault();
+            }
+
+            // Fetch Employee Details
+            var employeeDetails = new EmployeeDetailsDto
+            {
+                EmployeeId = emp.EmployeeId,
+                Name = emp.Name,
+                PhoneNumber = emp.PhoneNumber,
+                Email = emp.Email,
+                ImageUrl = emp.ImageUrl,
+                DateOfJoining = emp.DateOfJoining,
+                Address = emp.Address,
+                Designation = emp.Designation,
+                EmpCode = emp.EmployeeCode
+            };
+
+            var today = DateTime.Today;
+            var year = Year.HasValue ? (int)Year : today.Year;
+
+            var startOfMonth = Month.HasValue ? new DateTime(year, Month.Value, 1) : new DateTime(today.Year, today.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); // Get the last day of the month
+
+            ViewBag.EmployeeList = _context.Employees.ToList();
+            ViewBag.SelectedEmployeeID = employeeDetails.EmployeeId;
+            ViewBag.SelectedMonth = startOfMonth.Month;
+            ViewBag.SelectedYear = startOfMonth.Year;
+
+            List<EmployeeRequests> employeeRequestsList = new List<EmployeeRequests>();
+            var query = (from r in _context.EmployeeAttendanceRequest
+                         join e in _context.Employees on r.EmployeeId equals e.EmployeeId
+                         select new
+                         {
+                             EmployeeID = e.EmployeeId,
+                             EmpCode = e.EmployeeCode,
+                             Name = e.Name,
+                             RequestType = r.RequestType,
+                             StartDate = r.StartDate,
+                             EndDate = r.EndDate,
+                             //RequestDateTime = r.StartDate + " - " + r.EndDate,
+                             Reason = r.Reason,
+                             ApprovalStatus = r.Status
+                         });
+
+            if (EmployeeID != null)
+            {
+                query = from q in query
+                        where q.EmployeeID == EmployeeID
+                        select q;
+            }
+
+            if (Month != null)
+            {
+                query = from q in query
+                        where q.StartDate.Month == Month
+                        select q;
+            }
+
+            if (Year != null)
+            {
+                query = from q in query
+                        where q.StartDate.Year == Year
+                        select q;
+            }
+
+            var res = (from q in query
+                       select new EmployeeRequests
+                       {
+                           EmployeeID = q.EmployeeID,
+                           EmpCode = q.EmpCode,
+                           Name = q.Name,
+                           RequestType = q.RequestType,
+                           RequestDateTime = q.StartDate + " - " + q.EndDate,
+                           Reason = q.Reason,
+                           ApprovalStatus = q.ApprovalStatus
+                       }).ToList();
+
+            employeeRequestsList.AddRange(res);
+
+            return View();
+        }
     }
 }
