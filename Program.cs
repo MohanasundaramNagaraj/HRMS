@@ -247,9 +247,9 @@ finally
     Log.CloseAndFlush();
 }
 
-void SeedDatabase()
+async Task SeedDatabase()
 {
     using var scope = app.Services.CreateAsyncScope();
     var initializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-    initializer.Initialize();
+    await initializer.InitializeAsync();
 }

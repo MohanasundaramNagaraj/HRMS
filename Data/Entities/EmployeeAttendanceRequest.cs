@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SparkHRMS.Data.Masters;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SparkHRMS.Data.Entities
@@ -19,6 +20,10 @@ namespace SparkHRMS.Data.Entities
         public TimeSpan? EndTime { get; set; }
         public string Status { get; set; } // "Pending", "Approved", "Rejected"
         public string Reason { get; set; } 
+        public int SubStatusId { get; set; }
+        //[ForeignKey("Id")]
+        //public SubStatusMaster SubStatus { get; set; }
+        public int CreatedBy { get; set; }
         public DateTime CreatedTime { get; set; }
         public int? StatusUpdatedBy { get; set; }
         public DateTime? StatusUpdatedTime { get; set; }
