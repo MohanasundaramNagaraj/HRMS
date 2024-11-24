@@ -18,6 +18,7 @@ namespace SparkHRMS.Data.Entities
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
         public string Status { get; set; } // "Pending", "Approved", "Rejected"
+        public string Reason { get; set; } 
         public DateTime CreatedTime { get; set; }
         public int? StatusUpdatedBy { get; set; }
         public DateTime? StatusUpdatedTime { get; set; }
