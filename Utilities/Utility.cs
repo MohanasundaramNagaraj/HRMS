@@ -4,9 +4,8 @@ using SQLitePCL;
 
 namespace SparkHRMS.Utilities
 {
-   
     public class Location
-    {
+    { 
         [JsonProperty("lat")]
         public double Lat { get; set; }
 

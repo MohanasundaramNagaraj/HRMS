@@ -1,0 +1,190 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SparkHRMS.Data.Entities
+@using SparkHRMS.Utilities
+@using SparkHRMS.ViewModels
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Time Sheet";
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+}
+
+<script>
+    debugger;
+    var timeSheetData = JSON.parse('@Html.Raw(Json.Serialize(Model.TimeSheetRecords))');
+</script>
+<style>
+   
+    input::placeholder {
+       color:lightgray !important;
+        font-style: italic;
+    }
+</style>
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title">Time Sheet</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#">
+            Entry
+        </a>
+    </li>
+</ul>
+
+
+<div>
+
+    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+    {
+        <div class="col-md-12 mb-3">
+            <div>
+                <div class="">
+                    <select id="yearSelector" style="width:20%; margin-right:10px; display:inline-block">
+                        <option value="">Select Year</option>
+                        @{
+                            var yearList = ViewBag.YearList;
+                        }
+                        @* @for (int year = 0; year <= yearList; year++) *@
+                        @foreach (var year in yearList)
+                        {
+                            if (year.Year == ViewBag.SelectedYear)
+                            {
+                                <option value="@year.Year" id="@year.Id" selected>@year.Year</option>
+                            }
+                            else
+                            {
+                                <option value="@year.Id" id="@year.Id">@year.Year</option>
+                            }
+                        }
+                    </select>
+                    <select id="monthSelector" style="width:20%;margin-right:10px;display:inline-block">
+                        <option value="">Select Month</option>
+                        @for (int month = 1; month <= 12; month++)
+                        {
+                            if (month == ViewBag.SelectedMonth)
+                            {
+                                <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                            }
+                            else
+                            {
+                                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                            }
+                        }
+                    </select>
+                    <select style="width:35%;margin-right:10px;display:inline-block" id="empSelector">
+                        @{
+                            var employeeList = ViewBag.EmployeeList;
+                        }
+
+                        @foreach (var record in employeeList)
+                        {
+                            if (ViewBag.SelectedEmployeeID == record.EmployeeId)
+                            {
+                                <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
+                            }
+                        }
+                    </select>
+                    <button onclick="getData()" class="btn btn-info">
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="col-lg-12 col-md-12">
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="project" aria-expanded="true">
+                <div class="row clearfix">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="card">
+                            <div class="chat">
+                                <div class="chat-header clearfix">
+                                    @{
+                                        var UserImageUrl = "";
+                                        int lastSlashIndex = @Model.EmployeeDetails.ImageUrl.LastIndexOf('/');
+                                        if (lastSlashIndex >= 0)
+                                        {
+                                            UserImageUrl = Url.Content("~/uploads/" + Model.EmployeeDetails.ImageUrl.Substring(lastSlashIndex + 1));
+                                        }
+                                    }
+                                    <img src="@UserImageUrl" alt="avatar" style="    height: 45px;">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="chat-about">
+                                                <div class="chat-with">@Model.EmployeeDetails.Name</div>
+                                                <div class="chat-num-messages">@Model.EmployeeDetails.Designation</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="chat-about">
+                                                <div class="chat-with">Employee ID</div>
+                                                <div class="chat-num-messages">@Model.EmployeeDetails.EmpCode</div>
+                                                <div style="display:none;">@Model.EmployeeDetails.EmployeeId</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="chat-about">
+                                                <div class="chat-with">Joining Date</div>
+                                                <div class="chat-num-messages">@Model.EmployeeDetails.DateOfJoining?.ToString("dd MMM yyyy")</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="chat-about">
+                                                <div class="chat-with">Email</div>
+                                                <div class="chat-num-messages">@Model.EmployeeDetails.Email</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="timesheetTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Task Id</th>
+                                <th>Activity</th>
+                                <th>Task Description</th>
+                                <th>Hours Worked</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                        </tbody>
+                    </table>
+                  
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @*     <script src="~/app/assets/js/table.min.js"></script>
+
+    <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script> *@
+    <script src="~/js/utility/utility.js"></script>
+    <script src="~/js/timesheet.js"></script>
+
+}
+

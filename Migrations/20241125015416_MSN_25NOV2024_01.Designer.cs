@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241125015416_MSN_25NOV2024_01")]
+    partial class MSN_25NOV2024_01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -502,61 +505,6 @@ namespace SparkHRMS.Migrations
                     b.ToTable("Holiday");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.Timesheet", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Activity")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Day")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Descreption")
-                        .IsRequired()
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("HoursWorked")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MonthId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Task")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("UniqueId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("YearId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Timesheet");
-                });
-
             modelBuilder.Entity("SparkHRMS.Data.Logs.Serilog_Logs", b =>
                 {
                     b.Property<int>("Id")
@@ -707,141 +655,6 @@ namespace SparkHRMS.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("SubStatusMaster");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Setting.Month", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Set_Month");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsActive = true,
-                            Name = "January",
-                            Number = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            IsActive = true,
-                            Name = "February",
-                            Number = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            IsActive = true,
-                            Name = "March",
-                            Number = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            IsActive = true,
-                            Name = "April",
-                            Number = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            IsActive = true,
-                            Name = "May",
-                            Number = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            IsActive = true,
-                            Name = "June",
-                            Number = 6
-                        },
-                        new
-                        {
-                            Id = 7,
-                            IsActive = true,
-                            Name = "July",
-                            Number = 7
-                        },
-                        new
-                        {
-                            Id = 8,
-                            IsActive = true,
-                            Name = "August",
-                            Number = 8
-                        },
-                        new
-                        {
-                            Id = 9,
-                            IsActive = true,
-                            Name = "September",
-                            Number = 9
-                        },
-                        new
-                        {
-                            Id = 10,
-                            IsActive = true,
-                            Name = "October",
-                            Number = 10
-                        },
-                        new
-                        {
-                            Id = 11,
-                            IsActive = true,
-                            Name = "November",
-                            Number = 11
-                        },
-                        new
-                        {
-                            Id = 12,
-                            IsActive = true,
-                            Name = "December",
-                            Number = 12
-                        });
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Setting.SetYear", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Set_Year");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

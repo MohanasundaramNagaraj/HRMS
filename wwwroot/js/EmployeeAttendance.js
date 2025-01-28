@@ -51,11 +51,11 @@ function initCalendar() {
     calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: ["interaction", "dayGrid", "timeGrid"],
         header: {
-            left:"",
+            left: "",
             //left: "prev,next today",
             center: "title",
             //right: "dayGridMonth,timeGridWeek,timeGridDay",
-            right:""
+            right: ""
         },
         editable: false,
         droppable: false,
@@ -65,7 +65,7 @@ function initCalendar() {
         displayEventEnd: true,
         lazyFetching: true,
         selectable: true,
-       
+
         eventMouseEnter: function (info) {
             $(info.el).attr("id", info.event.id);
 
@@ -95,7 +95,7 @@ function initCalendar() {
         events: events(),
 
         select: function (start, end) {
-            
+
             addEvent.style.display = "block";
             editEvent.style.display = "none";
             addEventTitle.style.display = "block";
@@ -132,9 +132,9 @@ function initCalendar() {
     calendar.gotoDate(newDate);
     $('.fc-time').remove();
     $('#calendar').css({
-            'margin-top': '-50px'
+        'margin-top': '-50px'
     })
-   // $('.fc-header-toolbar').remove();
+    // $('.fc-header-toolbar').remove();
 }
 
 function clearModalForm() {
@@ -210,26 +210,26 @@ function randomIDGenerate(length, chars) {
 }
 
 function events() {
-        var employeeAttendanceRecordsArray = JSON.parse(employeeAttendanceRecords);
-     
-        var formattedEvents = [];
+    var employeeAttendanceRecordsArray = JSON.parse(employeeAttendanceRecords);
 
-       $.each(employeeAttendanceRecordsArray, function(index, record) {
-        var statusClass = ""; 
+    var formattedEvents = [];
+
+    $.each(employeeAttendanceRecordsArray, function (index, record) {
+        var statusClass = "";
         let title = '';
         title = record.CheckInTimeInString + ' - ' + record.CheckOutTimeInString;
-        let dayName = new Date(record.Date).toLocaleDateString('en-US', { weekday: 'long' }); 
-           let description = formatDate(record.Date) + "<br>" + dayName;
+        let dayName = new Date(record.Date).toLocaleDateString('en-US', { weekday: 'long' });
+        let description = formatDate(record.Date) + "<br>" + dayName;
         description += record.WorkingHours ? "<br>Working Hours: " + record.WorkingHours + "." : "";
 
-        
-       
+
+
         if (record.Id != 0 || record.Status == AttendanceStatus.Present) {
             statusClass = "fc-event-success"; // Present
             if (roles.includes("Admin") || roles.includes("SuperAdmin") || roles.includes("User")) {
-            description += "<br>CheckIn IP: " + (record.IP || "Not available") + 
-                           ",<br>CheckOut IP: " + (record.CheckOutMadeSystemIP || "Not available") + ".";
-        }
+                description += "<br>CheckIn IP: " + (record.IP || "Not available") +
+                    ",<br>CheckOut IP: " + (record.CheckOutMadeSystemIP || "Not available") + ".";
+            }
         } else if (record.Status == AttendanceStatus.Absent) {
             statusClass = "fc-event-danger"; // Absent
             title = 'Absent';
@@ -242,30 +242,30 @@ function events() {
             statusClass = "fc-event-warning"; // Holiday
             title = 'Holiday';
         }
-        else{
-                statusClass = "fc-event-warning";
-                title = 'Holiday';
+        else {
+            statusClass = "fc-event-warning";
+            title = 'Holiday';
         }
 
-        if(record.Status == AttendanceStatus.Weekend || record.Status == AttendanceStatus.Holiday || new Date(record.Date) < new Date()){
-             var eventObj = {
-            id: "event" + (index + 1),
-           // title: formatDate(record.Date),
-            title: title,
-            start: record.CheckInDateTime ? new Date(record.CheckInDateTime) : new Date(record.Date),
-            end: record.CheckOutDateTime ? new Date(record.CheckOutDateTime) : new Date(new Date(record.Date).setHours(23, 59)),
-            className: statusClass, // Set the class name based on attendance status
-            description: description
-        };
+        if (record.Status == AttendanceStatus.Weekend || record.Status == AttendanceStatus.Holiday || new Date(record.Date) < new Date()) {
+            var eventObj = {
+                id: "event" + (index + 1),
+                // title: formatDate(record.Date),
+                title: title,
+                start: record.CheckInDateTime ? new Date(record.CheckInDateTime) : new Date(record.Date),
+                end: record.CheckOutDateTime ? new Date(record.CheckOutDateTime) : new Date(new Date(record.Date).setHours(23, 59)),
+                className: statusClass, // Set the class name based on attendance status
+                description: description
+            };
 
-        // Push the event object to the formattedEvents array
-        formattedEvents.push(eventObj);
+            // Push the event object to the formattedEvents array
+            formattedEvents.push(eventObj);
         }
-       
+
     });
 
-        console.log(formattedEvents);
-        return formattedEvents;
+    console.log(formattedEvents);
+    return formattedEvents;
 }
 
 function formatDate(dateString) {

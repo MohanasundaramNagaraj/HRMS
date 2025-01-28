@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Data.Logs;
 using SparkHRMS.Data.Masters;
+using SparkHRMS.Data.Setting;
 
 namespace SparkHRMS.Data
 {
-    public class ApplicationDbContext :  IdentityDbContext<ApplicationUser, ApplicationRole, int>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
            : base(options)
@@ -28,11 +29,29 @@ namespace SparkHRMS.Data
         public DbSet<MST_WorkItemStatus> WorkItemStatus { get; set; }
         public DbSet<SubStatusMaster> SubStatus { get; set; }
         public DbSet<EmployeeTimeSheet> EmployeeTimeSheet { get; set; }
+        public DbSet<Timesheet> Timesheets { get; set; }
+       
+        public DbSet<SetYear> Year { get; set; }
+        public DbSet<Month> Month { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Month>().HasData(
+                new Month { Id = 1, Name = "January", Number = 1 },
+                new Month { Id = 2, Name = "February", Number = 2 },
+                new Month { Id = 3, Name = "March", Number = 3 },
+                new Month { Id = 4, Name = "April", Number = 4 },
+                new Month { Id = 5, Name = "May", Number = 5 },
+                new Month { Id = 6, Name = "June", Number = 6 },
+                new Month { Id = 7, Name = "July", Number = 7 },
+                new Month { Id = 8, Name = "August", Number = 8 },
+                new Month { Id = 9, Name = "September", Number = 9 },
+                new Month { Id = 10, Name = "October", Number = 10 },
+                new Month { Id = 11, Name = "November", Number = 11 },
+                new Month { Id = 12, Name = "December", Number = 12 }
+            );
         }
     }
 }

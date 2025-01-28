@@ -331,6 +331,62 @@ namespace SparkHRMS.Controllers
             return RedirectToAction("Index", new { date = ViewBag.SelectedDate, employeeName = ViewBag.EmployeeName });
         }
 
+        public async Task<ActionResult> NewRequest()
+        {
+            try
+            {
+                EmployeeAttendanceRequest request = new EmployeeAttendanceRequest();
+
+                request.EmployeeId = 1;
+                request.RequestType = "Leave";
+                request.StartDate = DateTime.Now;
+                request.EndDate = DateTime.Now.AddDays(1);
+                request.Reason = "";
+
+                // request.StartTime = new TimeSpan(9, 0, 0); 
+                // request.EndTime = new TimeSpan(5, 0, 0); 
+
+                request.Status = "Pending";
+                request.SubStatusId = 1;
+                request.CreatedBy = 1;//User.Identity.Name;
+                request.CreatedTime = DateTime.Now;
+
+                await _context.EmployeeAttendanceRequest.AddAsync(request);
+                await _context.SaveChangesAsync();
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ActionResult> UpdateRequest(int RequestId)
+        {
+            try
+            {
+                var request = _context.EmployeeAttendanceRequest.Where(x => x.Id == RequestId).FirstOrDefault();
+
+                if (request == null)
+                {
+
+                    _context.Update(request).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                   
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public async Task<IActionResult> EmployeeRequests(int? EmployeeID, int? Month, int? Year)
         {
             var emp = new Employee();
@@ -425,7 +481,7 @@ namespace SparkHRMS.Controllers
 
             employeeRequestsList.AddRange(res);
 
-            return View();
+            return View(employeeRequestsList);
         }
     }
 }
