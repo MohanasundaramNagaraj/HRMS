@@ -16,6 +16,9 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using SparkHRMS.Data;
 using Microsoft.EntityFrameworkCore;
 using Hangfire.Logging;
+using SendGrid.Helpers.Mail;
+using SendGrid;
+using Serilog;
 
 namespace SparkHRMS.Utilities
 {
@@ -42,28 +45,38 @@ namespace SparkHRMS.Utilities
             }
             subject = Configuration["EmailSenderSettings:Subject:" + subject] + dateTimeForCheckinCheckoutSubject;
 
-            var emailMessage = new MimeMessage();
-            emailMessage.From.Add(MailboxAddress.Parse(Configuration["EmailSenderSettings:From"]));
-            emailMessage.To.Add(MailboxAddress.Parse(email));
-            emailMessage.Subject = subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlMessage };
+            //var emailMessage = new MimeMessage();
+            //emailMessage.From.Add(MailboxAddress.Parse(Configuration["EmailSenderSettings:From"]));
+            //emailMessage.To.Add(MailboxAddress.Parse(email));
+            //emailMessage.Subject = subject;
+            //emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlMessage };
 
-            var smtpClient = new System.Net.Mail.SmtpClient(Configuration["EmailSenderSettings:SmtpServer"])
-            {
-                Port = 587,
-                Credentials = new NetworkCredential(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:Password"]),
-                EnableSsl = true,
-            };
+            //var smtpClient = new System.Net.Mail.SmtpClient(Configuration["EmailSenderSettings:SmtpServer"])
+            //{
+            //    Port = 587,
+            //    Credentials = new NetworkCredential(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:Password"]),
+            //    EnableSsl = true,
+            //    UseDefaultCredentials = false,
+            //    DeliveryMethod = SmtpDeliveryMethod.Network
+            //};
 
-            var mailMessage = new MailMessage
-            {
-                From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
-                Subject = subject,
-                Body = htmlMessage,
-                IsBodyHtml = true,
-            };
+            //var mailMessage = new MailMessage
+            //{
+            //    From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
+            //    Subject = subject,
+            //    Body = htmlMessage,
+            //    IsBodyHtml = true,
+            //};
 
-            mailMessage.To.Add(email);
+            //mailMessage.To.Add(email);
+           
+            var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
+           
+            var to = new EmailAddress(email, email);
+            var plainTextContent = "";
+            var htmlContent = htmlMessage;
 
             var emailLogs = new EmailLogs
             {
@@ -82,14 +95,27 @@ namespace SparkHRMS.Utilities
             int logId = emailLogs.Id;
             try
             {
-                await smtpClient.SendMailAsync(mailMessage);
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                var response = await client.SendEmailAsync(msg);
+                // await smtpClient.SendMailAsync(mailMessage);
                 await Task.Delay(500); // Delay in milliseconds
 
-                var log = _context.EmailLogs.Where(x=>x.Id == logId).FirstOrDefault();
+                var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
+                if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                {
 
-                log.IsSuccessful = true;
+                    log.IsSuccessful = true;
+                }
+                else
+                {
+                    string responseBody = await response.Body.ReadAsStringAsync();
+                    log.IsSuccessful = false;
+                    log.ErrorMessage = responseBody;
+                }
+               
                 _context.Entry(log).State = EntityState.Modified;
                 _context.SaveChanges();
+
             }
             catch (Exception ex)
             {
