@@ -50,7 +50,7 @@ function inputOnChangeCallback() {
 
         let month = '';
         if (isNaN(parseInt($('#monthSelector').val()))) {
-            month = new Date().getMonth()
+            month = new Date().getMonth() + 1;
         }
         else {
             month = parseInt($('#monthSelector').val());
