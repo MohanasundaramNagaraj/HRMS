@@ -15,9 +15,9 @@
     var timeSheetData = JSON.parse('@Html.Raw(Json.Serialize(Model.TimeSheetRecords))');
 </script>
 <style>
-   
+
     input::placeholder {
-       color:lightgray !important;
+        color: lightgray !important;
         font-style: italic;
     }
 </style>
@@ -146,23 +146,33 @@
                             </div>
                         </div>
                     </div>
-                    <table id="timesheetTable" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Day</th>
-                                <th>Task Id</th>
-                                <th>Activity</th>
-                                <th>Task Description</th>
-                                <th>Hours Worked</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                           
-                        </tbody>
-                    </table>
-                  
+                    <div style="float:right;margin-bottom:10px;    justify-content: flex-end;gap: 10px; display: flex; cursor:marker;">
+
+                        <button class="btn btn-success" onclick="update()"><i class="fa fa-save"></i> Save</button>
+                        <button class="btn btn-warning" onclick="exportToExcel()"> <i class="fa fa-file-excel"></i> Export to Excel</button>
+                        <button class="btn btn-danger" onclick="exportToPDF()"> <i class="fa fa-file"></i> Export to PDF</button>
+                        <button class="btn btn-primary" onclick="printTable()"> <i class="fa fa-print"></i> Print</button>
+                    </div>
+                    <br />
+                    <div>
+                        <table id="timesheetTable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Day</th>
+                                    <th>Task Id</th>
+                                    <th>Activity</th>
+                                    <th>Task Description</th>
+                                    <th>Hours Worked</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -179,12 +189,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
-    @*     <script src="~/app/assets/js/table.min.js"></script>
-
-    <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script> *@
     <script src="~/js/utility/utility.js"></script>
     <script src="~/js/timesheet.js"></script>
+
+
 
 }
 

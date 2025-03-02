@@ -35,68 +35,158 @@ $(document).ready(function () {
 });
 
 function inputOnChangeCallback() {
-    $('.timesheet-input').on('change', function (event) {
+    //debugger;
+    //$('.timesheet-input').on('change', function (event) {
+       
+    //});
+}
 
-        const input = event.target;
-        const row = input.closest("tr");
-        getday(row.id);
-        let year = '';
-        if (isNaN(parseInt($('#yearSelector').val()))) {
-            year = new Date().getFullYear()
-        }
-        else {
-            year = parseInt($('#yearSelector').val());
+function exportToExcel() {
+    let table = document.getElementById("timesheetTable");
+    let data = [];
+    let rows = table.querySelectorAll("tbody tr");
+
+    // Get headers except the last one (Actions)
+    let headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText.trim()).slice(0, -1);
+    data.push(headers);
+
+    rows.forEach(row => {
+        let rowData = [];
+        let cells = row.querySelectorAll("td");
+
+        // Loop through all cells except the last one (Actions)
+        for (let i = 0; i < cells.length - 1; i++) {
+            let input = cells[i].querySelector("input");
+            rowData.push(input ? input.value : cells[i].innerText);
         }
 
-        let month = '';
-        if (isNaN(parseInt($('#monthSelector').val()))) {
-            month = new Date().getMonth() + 1;
-        }
-        else {
-            month = parseInt($('#monthSelector').val());
+        data.push(rowData);
+    });
+
+    let ws = XLSX.utils.aoa_to_sheet(data);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
+    XLSX.writeFile(wb, "Timesheet.xlsx");
+}
+
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    let doc = new jsPDF();
+
+    doc.text("Timesheet Report", 14, 10);
+
+    let table = document.getElementById("timesheetTable");
+    let data = [];
+    let rows = table.querySelectorAll("tbody tr");
+
+    // Get headers except the last one (Actions)
+    let headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText.trim()).slice(0, -1);
+    data.push(headers);
+
+    rows.forEach(row => {
+        let rowData = [];
+        let cells = row.querySelectorAll("td");
+
+        // Loop through all cells except the last one (Actions)
+        for (let i = 0; i < cells.length - 1; i++) {
+            let input = cells[i].querySelector("input");
+            rowData.push(input ? input.value : cells[i].innerText);
         }
 
-        if (input.tagName === "INPUT") {
-            const inputs = row.querySelectorAll("input");
-            if (input.value.toLowerCase().includes("leave") || input.value.toLowerCase().includes("permission")) {
-                inputs.forEach((input) => {
-                    input.style.color = "red";
-                });
-            } else {
-                inputs.forEach((input) => {
-                    input.style.color = "";
-                });
+        data.push(rowData);
+    });
+
+    doc.autoTable({
+        head: [headers],
+        body: data.slice(1),
+        startY: 20
+    });
+
+    doc.save("Timesheet.pdf");
+}
+
+function printTable() {
+    let printWindow = window.open("", "", "width=800,height=600");
+    printWindow.document.write('<html><head><title>Print</title>');
+    printWindow.document.write('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write('<h3 class="text-center">Timesheet Report</h3>');
+
+    let table = document.getElementById("timesheetTable").cloneNode(true);
+    let rows = table.querySelectorAll("tr");
+
+    // Remove last column (Actions)
+    rows.forEach(row => row.removeChild(row.lastElementChild));
+
+    printWindow.document.write(table.outerHTML);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+}
+function update() {
+    let rows = $('tr');
+    $(rows).each(function (i, row) {
+        if (row.id != '') {
+            getday(row.id);
+            let year = '';
+            if (isNaN(parseInt($('#yearSelector').val()))) {
+                year = new Date().getFullYear()
+            }
+            else {
+                year = parseInt($('#yearSelector').val());
+            }
+
+            let month = '';
+            if (isNaN(parseInt($('#monthSelector').val()))) {
+                month = new Date().getMonth() + 1;
+            }
+            else {
+                month = parseInt($('#monthSelector').val());
+            }
+
+            //if (input.tagName === "INPUT") {
+            //    const inputs = row.querySelectorAll("input");
+            //    if (input.value.toLowerCase().includes("leave") || input.value.toLowerCase().includes("permission")) {
+            //        inputs.forEach((input) => {
+            //            input.style.color = "red";
+            //        });
+            //    } else {
+            //        inputs.forEach((input) => {
+            //            input.style.color = "";
+            //        });
+            //    }
+            //}
+
+            let empid;
+            if (isNaN(parseInt($('#empSelector').val()))) {
+                empid = 0;
+            }
+            else {
+                empid = parseInt($('#empSelector').val());
+            }
+
+
+            if (row) {
+                const data = {
+                    Id: 0,
+                    YearId: year,
+                    UniqueId: row.id,
+                    MonthId: month,
+                    Date: row.querySelector("input[type='date']")?.value || "",
+                    Day: row.querySelector("input[placeholder='Day']")?.value || "",
+                    Task: row.querySelector(".task-input")?.value || "",
+                    Activity: row.querySelector(".activity-input")?.value || "",
+                    Descreption: row.querySelector(".description-input")?.value || "",
+                    HoursWorked: parseInt(row.querySelector(".hours-worked-input")?.value) || 0,
+                    EmployeeId: empid
+                };
+
+                addTimesheet(data);
+
             }
         }
-
-        let empid;
-        if (isNaN(parseInt($('#empSelector').val()))) {
-            empid = 0;
-        }
-        else {
-            empid = parseInt($('#empSelector').val());
-        }
-
-
-        if (row) {
-            const data = {
-                Id: 0,
-                YearId: year,
-                UniqueId: row.id,
-                MonthId: month,
-                Date: row.querySelector("input[type='date']")?.value || "",
-                Day: row.querySelector("input[placeholder='Day']")?.value || "",
-                Task: row.querySelector(".task-input")?.value || "",
-                Activity: row.querySelector(".activity-input")?.value || "",
-                Descreption: row.querySelector(".description-input")?.value || "",
-                HoursWorked: parseInt(row.querySelector(".hours-worked-input")?.value) || 0,
-                EmployeeId: empid
-            };
-
-            addTimesheet(data);
-
-        }
-    });
+       
+    })
 }
 function addRow(row, index) {
     let uid;
