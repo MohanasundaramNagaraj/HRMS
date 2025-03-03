@@ -101,47 +101,52 @@ namespace SparkHRMS.Controllers
         {
             try
             {
-                var updatedTimesheet = JsonConvert.DeserializeObject<Timesheet>(timesheet);
-                if(updatedTimesheet.EmployeeId == 0)
+                var updatedTimesheets = JsonConvert.DeserializeObject<List<Timesheet>>(timesheet);
+                foreach(var updatedTimesheet in updatedTimesheets)
                 {
-                    var user = await _userManager.GetUserAsync(User);
-                    
-                    var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
-                    updatedTimesheet.EmployeeId = emp.EmployeeId;
-                }
-                var uniqueId = updatedTimesheet.UniqueId;
-
-                var yearid = _context.Year.Where(x => x.Year == updatedTimesheet.YearId).Select(x => x.Id).FirstOrDefault();
-                var isExistingTimesheet =  _context.Timesheets.Where(x => x.UniqueId == uniqueId).Any();
-
-                if (!isExistingTimesheet)
-                {
-                    updatedTimesheet.YearId = yearid;
-                    _context.Timesheets.Add(updatedTimesheet);
-                    await _context.SaveChangesAsync();
-                }
-                else
-                {
-                    var existingTimesheet = _context.Timesheets.Where(x => x.UniqueId == uniqueId).FirstOrDefault();
-                    if (existingTimesheet != null)
+                    if (updatedTimesheet.EmployeeId == 0)
                     {
-                        existingTimesheet.YearId = yearid;
-                        existingTimesheet.MonthId = updatedTimesheet.MonthId;
-                        existingTimesheet.Date = updatedTimesheet.Date;
-                        existingTimesheet.Day = updatedTimesheet.Day;
-                        existingTimesheet.EmployeeId = updatedTimesheet.EmployeeId;
-                        existingTimesheet.Task = updatedTimesheet.Task;
-                        existingTimesheet.Activity = updatedTimesheet.Activity;
-                        existingTimesheet.Descreption = updatedTimesheet.Descreption;
-                        existingTimesheet.HoursWorked = updatedTimesheet.HoursWorked;
+                        var user = await _userManager.GetUserAsync(User);
 
+                        var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+                        updatedTimesheet.EmployeeId = emp.EmployeeId;
+                    }
+                    var uniqueId = updatedTimesheet.UniqueId;
+
+                    var yearid = _context.Year.Where(x => x.Year == updatedTimesheet.YearId).Select(x => x.Id).FirstOrDefault();
+                    var isExistingTimesheet = _context.Timesheets.Where(x => x.UniqueId == uniqueId).Any();
+
+                    if (!isExistingTimesheet)
+                    {
+                        updatedTimesheet.YearId = yearid;
+                        _context.Timesheets.Add(updatedTimesheet);
                         await _context.SaveChangesAsync();
                     }
                     else
                     {
-                        throw new Exception("Timesheet not found!");
+                        var existingTimesheet = _context.Timesheets.Where(x => x.UniqueId == uniqueId).FirstOrDefault();
+                        if (existingTimesheet != null)
+                        {
+                            existingTimesheet.YearId = yearid;
+                            existingTimesheet.MonthId = updatedTimesheet.MonthId;
+                            existingTimesheet.Date = updatedTimesheet.Date;
+                            existingTimesheet.Day = updatedTimesheet.Day;
+                            existingTimesheet.EmployeeId = updatedTimesheet.EmployeeId;
+                            existingTimesheet.Task = updatedTimesheet.Task;
+                            existingTimesheet.Activity = updatedTimesheet.Activity;
+                            existingTimesheet.Descreption = updatedTimesheet.Descreption;
+                            existingTimesheet.HoursWorked = updatedTimesheet.HoursWorked;
+
+                            _context.Entry(existingTimesheet).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            throw new Exception("Timesheet not found!");
+                        }
                     }
                 }
+                
             
             }
   

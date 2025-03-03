@@ -125,6 +125,7 @@ function printTable() {
 }
 function update() {
     let rows = $('tr');
+    let rowDatas = [];
     $(rows).each(function (i, row) {
         if (row.id != '') {
             getday(row.id);
@@ -165,14 +166,14 @@ function update() {
                 empid = parseInt($('#empSelector').val());
             }
 
-
-            if (row) {
+            debugger;
+            if (row && row.querySelector("input[type='date']")?.value) {
                 const data = {
                     Id: 0,
                     YearId: year,
                     UniqueId: row.id,
                     MonthId: month,
-                    Date: row.querySelector("input[type='date']")?.value || "",
+                    Date: row.querySelector("input[type='date']")?.value || new Date(),
                     Day: row.querySelector("input[placeholder='Day']")?.value || "",
                     Task: row.querySelector(".task-input")?.value || "",
                     Activity: row.querySelector(".activity-input")?.value || "",
@@ -180,13 +181,14 @@ function update() {
                     HoursWorked: parseInt(row.querySelector(".hours-worked-input")?.value) || 0,
                     EmployeeId: empid
                 };
-
-                addTimesheet(data);
+                rowDatas.push(data);
+                
 
             }
         }
-       
     })
+
+    addTimesheet(rowDatas);
 }
 function addRow(row, index) {
     let uid;
@@ -299,10 +301,10 @@ function addTimesheet(timesheetData) {
         type: "POST",
         data: { timesheet: timeSheet },
         success: function (response) {
-
+            alert("Updated Successfully");
         },
         error: function (error) {
-
+            alert('error');
         },
     });
 }
@@ -312,10 +314,10 @@ function deleteTimesheet(timesheetId) {
         url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
         type: "POST",
         success: function (response) {
-
+            alert("Deleted successfully");
         },
         error: function (error) {
-
+            alert('error');
         },
     });
 }
