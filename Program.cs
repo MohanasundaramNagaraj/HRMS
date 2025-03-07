@@ -90,11 +90,11 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = false;
 });
 
-builder.Services.ConfigureApplicationCookie(options =>
+builder.Services.ConfigureApplicationCookie(options => 
 {
     // Cookie settings
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
 
     options.LoginPath = "/Identity/Account/Login";
     options.LogoutPath = "/Identity/Account/Logout";
@@ -150,17 +150,17 @@ services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
 });
 // Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .WriteTo.Console()
-    .WriteTo.MSSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
-        {
-            TableName = "Logs",
-            AutoCreateSqlTable = true
-        })
-    .CreateLogger();
+//Log.Logger = new LoggerConfiguration()
+//    .ReadFrom.Configuration(builder.Configuration)
+//    .WriteTo.Console()
+//    .WriteTo.MSSqlServer(
+//        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+//        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions
+//        {
+//            TableName = "Logs",
+//            AutoCreateSqlTable = true
+//        })
+//    .CreateLogger();
 
 // Add Serilog as the logging provider
 builder.Host.UseSerilog();
