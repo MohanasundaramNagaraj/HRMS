@@ -19,13 +19,16 @@ namespace SparkHRMS.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly Utility _utilityService;
 
-        public AdminAttendanceViewerController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context, IConfiguration configuration)
+       
+        public AdminAttendanceViewerController(Utility utilityService, ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context, IConfiguration configuration)
         {
             _logger = logger;
             _userManager = userManager;
             _context = context;
             _configuration = configuration;
+            _utilityService = utilityService;
         }
         public async Task<IActionResult> Index(DateTime? date = null)
         {
@@ -63,9 +66,9 @@ namespace SparkHRMS.Controllers
 
             foreach (var attendance in attendances)
             {
-                attendance.WorkingHours = Utility.CalculateWorkingHours(attendance.CheckInDateTime, attendance.CheckOutDateTime);
-                attendance.CheckInLocation = await Utility.GetLocationFromCoordinates(attendance.CheckInPosition);
-                attendance.CheckOutLocation = await Utility.GetLocationFromCoordinates(attendance.CheckOutPosition);
+                attendance.WorkingHours = _utilityService.CalculateWorkingHours(attendance.CheckInDateTime, attendance.CheckOutDateTime);
+                attendance.CheckInLocation = await _utilityService.GetLocationFromCoordinates(attendance.CheckInPosition);
+                attendance.CheckOutLocation = await _utilityService.GetLocationFromCoordinates(attendance.CheckOutPosition);
             };
 
             ViewBag.SelectedDate = selectedDate;

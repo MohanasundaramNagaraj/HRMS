@@ -1,0 +1,48 @@
+﻿@model SparkHRMS.Data.Setting.SetYear
+@{
+    ViewData["Title"] = "Edit Year";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    <form asp-action="Edit" method="post" class="needs-validation" novalidate>
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Year" class="form-label"></label>
+            <input asp-for="Year" class="form-control" required />
+            <div class="invalid-feedback">
+                Please enter the year.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="StartDate" class="form-label"></label>
+            <input asp-for="StartDate" type="date" class="form-control" required />
+            <div class="invalid-feedback">
+                Please select start date.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="EndDate" class="form-label"></label>
+            <input asp-for="EndDate" type="date" class="form-control" required />
+            <div class="invalid-feedback">
+                Please select end date.
+            </div>
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+
+        <button type="submit" class="btn btn-success">Update</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

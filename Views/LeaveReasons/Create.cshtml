@@ -1,0 +1,48 @@
+﻿@using SparkHRMS.Data.Masters
+
+@model LeaveReasons
+
+@{
+    ViewData["Title"] = "Create Leave Reason";
+}
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title"> Leave Reasons</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#">
+            <i class="fas fa-add"></i> Create
+        </a>
+    </li>
+</ul>
+<hr />
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="LeaveReasonName" class="form-label"></label>
+        <input asp-for="LeaveReasonName" class="form-control" />
+        <span asp-validation-for="LeaveReasonName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+
+    <div class="col-lg-12 p-t-20 text-center">
+        <div class="form-group">
+            <input type="submit" value="Add" class="btn btn-primary waves-effect m-r-15">
+            <a type="button" class="btn btn-danger waves-effect" href="@Url.Action("Index")">Cancel</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

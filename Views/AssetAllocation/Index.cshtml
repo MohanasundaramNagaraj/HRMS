@@ -1,0 +1,60 @@
+﻿@inject SparkHRMS.Utilities.Utility UtilityService
+
+@model IEnumerable<SparkHRMS.Data.Setting.AssetAllocation>
+
+@{
+    ViewData["Title"] = "Asset Allocations";
+}
+
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">Asset Allocation</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> List
+                </a>
+            </li>
+        </ul>
+
+        <a class="btn btn-tbl-add btn-success" href="@Url.Action("Create")" style="float:right;">
+            <i class="material-icons">add</i>
+        </a>
+    </div>
+</div>
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+
+            <th>Asset Code</th>
+            <th>Asset Name</th>
+            <th>Employee</th>
+            <th>Allocation Date</th>
+            <th>Return Date</th>
+            <th>Returned</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var allocation in Model)
+        {
+            var asset = UtilityService.GetAssetById(allocation.AssetId);
+
+            <tr>
+                <td>@asset.AssetCode</td>
+                <td>@asset.AssetName</td>
+                <td>@UtilityService.GetEmployeeCodeById(allocation.EmployeeId) - @UtilityService.GetEmployeeNameById(allocation.EmployeeId)</td>
+                <td>@allocation.AllocationDate.ToShortDateString()</td>
+                <td>@(allocation.ReturnDate.HasValue ? allocation.ReturnDate.Value.ToShortDateString() : "-")</td>
+                <td>@(allocation.IsReturned ? "Yes" : "No")</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" href="@Url.Action("Edit", new { id = allocation.AllocationId })">Edit</a>
+                   @*  <a class="btn btn-danger btn-sm" href="@Url.Action("Delete", new { id = allocation.AllocationId })">Delete</a> *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

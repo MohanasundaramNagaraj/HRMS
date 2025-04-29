@@ -1,0 +1,24 @@
+﻿@model SparkHRMS.Data.Setting.SetYear
+@{
+    ViewData["Title"] = "Delete Year";
+}
+
+<div class="container mt-4">
+    <h2>Are you sure you want to delete this Year?</h2>
+
+    <div class="mb-3">
+        <strong>Year:</strong> @Model.Year
+    </div>
+    <div class="mb-3">
+        <strong>Start Date:</strong> @Model.StartDate.ToShortDateString()
+    </div>
+    <div class="mb-3">
+        <strong>End Date:</strong> @Model.EndDate.ToShortDateString()
+    </div>
+
+    <form asp-action="DeleteConfirmed" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

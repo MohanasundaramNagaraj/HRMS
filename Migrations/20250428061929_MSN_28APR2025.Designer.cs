@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250428061929_MSN_28APR2025")]
+    partial class MSN_28APR2025
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -565,13 +568,6 @@ namespace SparkHRMS.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FromDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -589,9 +585,6 @@ namespace SparkHRMS.Migrations
 
                     b.Property<int>("RemainingDays")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("ToDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("UsedDays")
                         .HasColumnType("int");

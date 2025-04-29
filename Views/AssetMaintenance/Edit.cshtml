@@ -1,0 +1,32 @@
+﻿@model SparkHRMS.Data.Setting.AssetMaintenance
+@{
+    ViewData["Title"] = "Edit Asset Maintenance";
+}
+
+<h2>Edit Asset Maintenance</h2>
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="MaintenanceId" />
+    <div class="form-group">
+        <label>Asset</label>
+        <select asp-for="AssetId" asp-items="ViewBag.AssetId" class="form-control"></select>
+    </div>
+    <div class="form-group">
+        <label>Issue Description</label>
+        <textarea asp-for="IssueDescription" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Maintenance Provider</label>
+        <input asp-for="MaintenanceProvider" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Maintenance Cost</label>
+        <input asp-for="MaintenanceCost" type="number" step="0.01" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Resolved</label>
+        <input asp-for="IsResolved" type="checkbox" />
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a class="btn btn-secondary" href="@Url.Action("Index")">Cancel</a>
+</form>

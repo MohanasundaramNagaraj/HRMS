@@ -1,5 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SparkHRMS.Data;
+using SparkHRMS.Data.Masters;
+using SparkHRMS.Data.Setting;
 using SQLitePCL;
 
 namespace SparkHRMS.Utilities
@@ -12,11 +16,16 @@ namespace SparkHRMS.Utilities
         [JsonProperty("lng")]
         public double Lng { get; set; }
     }
-    public static class Utility
+    public  class Utility
     {
+        private  readonly ApplicationDbContext _context;
+        public  Utility(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-        private static readonly HttpClient client = new HttpClient();
-        public static string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
+        private  readonly HttpClient client = new HttpClient();
+        public  string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
         {
             if (checkInTime.HasValue && checkOutTime.HasValue)
             {
@@ -25,7 +34,7 @@ namespace SparkHRMS.Utilities
             }
             return string.Empty;
         }
-        public static async Task<string> GetLocationFromCoordinates(string? Position)
+        public  async Task<string> GetLocationFromCoordinates(string? Position)
         {
             if (!string.IsNullOrWhiteSpace(Position))
             {
@@ -59,6 +68,27 @@ namespace SparkHRMS.Utilities
             {
                 return string.Empty;
             }
+        }
+
+        public string GetEmployeeNameById(int EmployeeId)
+        {
+            string name =  _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.Name).FirstOrDefault();
+            return name;
+        } 
+         
+        public string GetEmployeeCodeById(int EmployeeId)
+        {
+            string name =  _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.EmployeeCode).FirstOrDefault();
+            return name;
+        }
+
+        public AssetMaster GetAssetById(int AssetId)
+        {
+            return  _context.AssetMasters.Where(x => x.AssetId == AssetId).Select(x => x).FirstOrDefault();
+        }   
+        public SetYear GetYearById(int YearId)
+        {
+            return  _context.Year.Where(x => x.Id == YearId).Select(x => x).FirstOrDefault();
         }
     }
 }

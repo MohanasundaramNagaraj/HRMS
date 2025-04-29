@@ -1,0 +1,245 @@
+﻿@using SparkHRMS.Data.Entities
+
+@model LeaveAllocation
+
+@{
+    ViewData["Title"] = @ViewBag.FMode;
+}
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title">Leave Allocation & Balance</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#">
+            @ViewData["Title"]
+        </a>
+    </li>
+</ul>
+
+<form asp-action="@ViewContext.RouteData.Values["action"]" class="needs-validation">
+    <div class="row mb-3">
+
+        <select name="EmployeeId" style="width:25%;margin-right:10px;display:inline-block" class="form-select" id="empSelector" required>
+            @{
+                var employeeList = ViewBag.EmployeeList;
+                var yearList = ViewBag.YearList;
+            }
+            <option value="">Select Employee</option>
+            @foreach (var record in employeeList)
+            {
+                if (Model.EmployeeId == record.EmployeeId)
+                {
+                    <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
+                }
+                else
+                {
+                    <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
+                }
+            }
+        </select>
+        <select name="YearId" id="yearSelector" style="width:20%; margin-right:10px; display:inline-block" class="form-select" required>
+            <option value="">Select Year</option>
+
+            @foreach (var record in yearList)
+            {
+                if (Model.YearId == record.Id)
+                {
+                    <option value="@record.Id" selected>@record.Year</option>
+                }
+                else
+                {
+                    <option value="@record.Id">@record.Year</option>
+                }
+            }
+
+        </select>
+
+        <button type="button" class="btn btn-secondary btn-sm" style="width:10%;" onclick="reDirectToEdit()">Get Leave Detail</button>
+    </div>
+    <br />
+
+    <div role="tabpanel" class="tab-pane active" id="project" aria-expanded="true">
+        <div class="row clearfix">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                @*   <div class="card">
+                <div class="chat">
+                <div class="chat-header clearfix">
+                @{
+                var UserImageUrl = "";
+                int lastSlashIndex = @Model.EmployeeDetails.ImageUrl.LastIndexOf('/');
+                if (lastSlashIndex >= 0)
+                {
+                UserImageUrl = Url.Content("~/uploads/" + Model.EmployeeDetails.ImageUrl.Substring(lastSlashIndex + 1));
+                }
+                }
+                <img src="@UserImageUrl" alt="avatar" style="    height: 45px;">
+                <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                <div class="chat-about">
+                <div class="chat-with">@Model.EmployeeDetails.Name</div>
+                <div class="chat-num-messages">@Model.EmployeeDetails.Designation</div>
+                </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                <div class="chat-about">
+                <div class="chat-with">Employee ID</div>
+                <div class="chat-num-messages">@Model.EmployeeDetails.EmpCode</div>
+                <div style="display:none;">@Model.EmployeeDetails.EmployeeId</div>
+                </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                <div class="chat-about">
+                <div class="chat-with">Joining Date</div>
+                <div class="chat-num-messages">@Model.EmployeeDetails.DateOfJoining?.ToString("dd MMM yyyy")</div>
+                </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                <div class="chat-about">
+                <div class="chat-with">Email</div>
+                <div class="chat-num-messages">@Model.EmployeeDetails.Email</div>
+                </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                </div> *@
+            </div>
+
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="timeline" aria-expanded="false">
+    </div>
+
+    <hr />
+    <table class="table table-hover" id="detailsTable">
+        <thead class="table-light">
+            <tr>
+                <th>Leave Type</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Allocated Days</th>
+                <th>Used Days</th>
+                <th style="    width: 400px;">Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.LeaveDetails != null)
+            {
+                for (var i = 0; i < Model.LeaveDetails.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @{
+                                var selectedValue = Model.LeaveDetails[i].LeaveTypeId;
+                            }
+
+                            <select name="LeaveDetails[@i].LeaveTypeId" class="form-select" required>
+                                <option value="">-- Select Leave Type --</option>
+
+                                @foreach (var leaveType in ViewBag.LeaveTypes)
+                                {
+                                    var selected = selectedValue == leaveType.LeaveTypeId ? "selected=\"selected\"" : "";
+                                    @:<option value="@leaveType.LeaveTypeId" @Html.Raw(selected)>@leaveType.Code - @leaveType.Description</option>
+                                }
+                            </select>
+
+                        </td>
+                       <td>
+                            <input name="LeaveDetails[@i].FromDate"
+                                   value="@Model.LeaveDetails[i].FromDate.ToString("yyyy-MM-dd")"
+                                   class="form-control" required type="date" />
+                        </td>
+                        <td>
+                            <input name="LeaveDetails[@i].ToDate"
+                                   value="@Model.LeaveDetails[i].ToDate.ToString("yyyy-MM-dd")"
+                                   class="form-control" required type="date" />
+                        </td>
+                        <td><input name="LeaveDetails[@i].AllocatedDays" value="@Model.LeaveDetails[i].AllocatedDays" class="form-control" required /></td>
+                        <td><input name="LeaveDetails[@i].UsedDays" value="@Model.LeaveDetails[i].UsedDays" class="form-control" required /></td>
+                        <td><input name="LeaveDetails[@i].Description" value="@Model.LeaveDetails[i].Description" class="form-control" required /></td>
+                        <td>
+                            <button type="button" class="btn btn-success btn-sm" onclick="addDetail()">Add</button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <div class="col-lg-12 p-t-20 text-center">
+        <div class="form-group">
+            <input type="submit" value="Update" class="btn btn-primary waves-effect m-r-15">
+            <a type="button" class="btn btn-danger waves-effect" href="@Url.Action("Index")">Cancel</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let detailIndex = @Model.LeaveDetails?.Count() ?? 0;
+        let FMode = '@ViewBag.FMode'
+        function addDetail() {
+
+            var leaveTypeOptions = `@foreach (var leaveType in ViewBag.LeaveTypes)
+        {
+                                                                                                    <option value="@leaveType.LeaveTypeId">@leaveType.Code - @leaveType.Description</option>
+        }`;
+
+            var table = document.getElementById('detailsTable').getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow();
+            newRow.innerHTML = `
+                                                            <td>
+                                                                <select name="LeaveDetails[${detailIndex}].LeaveTypeId" class="form-select" required>
+                                                                    <option value="">-- Select Leave Type --</option>
+                                                                    ${leaveTypeOptions}
+                                                                </select>
+                                                            </td>
+                                                            <td><input name="LeaveDetails[${detailIndex}].FromDate" class="form-control" required type="date" /></td>
+                                                    <td><input name="LeaveDetails[${detailIndex}].ToDate" class="form-control" required type="date" /></td>
+                                                    <td><input name="LeaveDetails[${detailIndex}].AllocatedDays" class="form-control" required /></td>
+                                                    <td><input name="LeaveDetails[${detailIndex}].UsedDays" value="0" class="form-control" required /></td>
+                                                    <td><input name="LeaveDetails[${detailIndex}].Description"  class="form-control" required /></td>
+                                                     <td>
+                                                            <button type="button" class="btn btn-success btn-sm" onclick="addDetail()">Add</button>
+                                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">Remove</button>
+                                                        </td>
+                                                `;
+            detailIndex++;
+        }
+
+
+        function removeRow(button) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        if (FMode == 'Add') {
+            addDetail();
+        }
+
+        // Bootstrap validation
+        (function () {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        })();
+
+        function reDirectToEdit() {
+            window.location.href = '/LeaveAllocation/RedirectToEdit?EmployeeId=' + parseInt($('#empSelector').val()) + '&YearId=' + parseInt($('#yearSelector').val());
+        }
+    </script>
+}

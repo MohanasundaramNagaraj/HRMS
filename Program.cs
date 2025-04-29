@@ -40,6 +40,7 @@ builder.Services.AddMvc();
 
 // Database initializer
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+builder.Services.AddScoped<Utility>();
 
 
 if (builder.Environment.IsDevelopment())

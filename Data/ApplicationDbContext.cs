@@ -34,6 +34,15 @@ namespace SparkHRMS.Data
         public DbSet<SetYear> Year { get; set; }
         public DbSet<Month> Month { get; set; }
 
+        public DbSet<AssetMaster> AssetMasters { get; set; }
+        public DbSet<AssetAllocation> AssetAllocations { get; set; }
+        public DbSet<AssetMaintenance> AssetMaintenances { get; set; }
+        public DbSet<LeaveType> LeaveTypes { get; set; }
+        public DbSet<LeaveReasons> LeaveReasons { get; set; }
+
+        public DbSet<LeaveAllocation> LeaveAllocations { get; set; }
+        public DbSet<LeaveAllocationDetail> LeaveAllocationDetails { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -52,6 +61,12 @@ namespace SparkHRMS.Data
                 new Month { Id = 11, Name = "November", Number = 11 },
                 new Month { Id = 12, Name = "December", Number = 12 }
             );
+
+            modelBuilder.Entity<LeaveAllocation>()
+           .HasMany(x => x.LeaveDetails)
+           .WithOne()
+           .HasForeignKey(d => d.LeaveAllocationId)
+           .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

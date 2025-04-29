@@ -1,0 +1,80 @@
+﻿@inject SparkHRMS.Utilities.Utility UtilityService
+@using SparkHRMS.Data.Entities
+
+@model IEnumerable<LeaveAllocation>
+
+@{
+    ViewData["Title"] = "List";
+}
+
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">Leave Allocation & Balance </h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> List
+                </a>
+            </li>
+        </ul>
+
+        <a class="btn btn-tbl-add btn-success" href="@Url.Action("Create")" style="float:right;">
+            <i class="material-icons">add</i>
+        </a>
+    </div>
+</div>
+
+<table class="table table-bordered mt-3">
+    <thead >
+        <tr>
+            <th>Employee</th>
+            <th>Year</th>
+            <th>Total Allocated</th>
+            <th>Total Used</th>
+            <th>Total Leave Balance</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+               
+                <td>@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
+                <td>@UtilityService.GetYearById(item.YearId).Year</td>
+                <td>@item.TotalLeaveAllocated</td>
+                <td>@item.TotalUsedDays</td>
+                <td>@item.TotalLeaveBalance</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <button onclick="confirmDelete('@item.Id')" class="btn btn-danger btn-sm">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This action cannot be undone!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/LeaveAllocation/Delete/' + id;
+                }
+            })
+        }
+    </script>
+}
+

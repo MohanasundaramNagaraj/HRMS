@@ -1,0 +1,51 @@
+﻿@using SparkHRMS.Data.Masters
+@model IEnumerable<LeaveReasons>
+
+@{
+    ViewData["Title"] = "Leave Reasons";
+}
+
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">Leave Reasons</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> List
+                </a>
+            </li>
+        </ul>
+
+        <a class="btn btn-tbl-add btn-success" href="@Url.Action("Create")" style="float:right;">
+            <i class="material-icons">add</i>
+        </a>
+    </div>
+</div>
+
+
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Is Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.LeaveReasonName</td>
+                <td>@item.Description</td>
+                <td>@(item.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.LeaveReasonId" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.LeaveReasonId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

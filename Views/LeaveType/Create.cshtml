@@ -1,0 +1,113 @@
+﻿@model SparkHRMS.Data.Setting.LeaveType
+
+@{
+    ViewData["Title"] = "Add Leave Type";
+}
+
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title"> Leave Type</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#">
+            <i class="fas fa-add"></i> Create
+        </a>
+    </li>
+</ul>
+<hr />
+
+<form asp-action="Create" class="card p-5">
+ 
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label asp-for="Code" class="form-label">Code</label>
+            <input asp-for="Code" class="form-control" required />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Name" class="form-label">Name</label>
+            <input asp-for="Name" class="form-control" required />
+        </div>
+        <div class="col-md-2 mb-3 form-check">
+            <br />
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label asp-for="MaxAllowedDaysPerYear" class="form-label">Max Allowed Days Per Year</label>
+            <input asp-for="MaxAllowedDaysPerYear" type="number" class="form-control" required />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="ApplicableAfterWorkingDays" class="form-label">Applicable After (Working Days)</label>
+            <input asp-for="ApplicableAfterWorkingDays" type="number" class="form-control" required />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="MaxConsecutiveLeaveAllowedDaysPerMonth" class="form-label">Max Consecutive Leaves / Month</label>
+            <input asp-for="MaxConsecutiveLeaveAllowedDaysPerMonth" type="number" class="form-control" required />
+        </div>
+    </div>
+
+    <hr />
+    <h5 class="mb-3">Leave Options</h5>
+
+    <div class="row mb-3">
+        <div class="col-md-4 form-check">
+            <input asp-for="IsCarryForward" class="form-check-input" />
+            <label asp-for="IsCarryForward" class="form-check-label"></label>
+        </div>
+        <div class="col-md-4 form-check">
+            <input asp-for="IsLeaveWithoutPay" class="form-check-input" />
+            <label asp-for="IsLeaveWithoutPay" class="form-check-label"></label>
+        </div>
+        <div class="col-md-4 form-check">
+            <input asp-for="IsPartiallyPaidLeave" class="form-check-input" />
+            <label asp-for="IsPartiallyPaidLeave" class="form-check-label"></label>
+        </div>
+    </div>
+    <br />
+    <div class="row mb-3">
+        <div class="col-md-4 form-check">
+            <input asp-for="IsOptionalLeave" class="form-check-input" />
+            <label asp-for="IsOptionalLeave" class="form-check-label"></label>
+        </div>
+        <div class="col-md-4 form-check">
+            <input asp-for="AllowNegativeBalance" class="form-check-input" />
+            <label asp-for="AllowNegativeBalance" class="form-check-label"></label>
+        </div>
+        <div class="col-md-4 form-check">
+            <input asp-for="IncludeHolidaysWithLeaves" class="form-check-input" />
+            <label asp-for="IncludeHolidaysWithLeaves" class="form-check-label"></label>
+        </div>
+    </div>
+    <br />
+    <div class="row mb-3">
+        <div class="col-md-4 form-check">
+            <input asp-for="IsCompensatory" class="form-check-input" />
+            <label asp-for="IsCompensatory" class="form-check-label"></label>
+        </div>
+        <div class="col-md-4 form-check">
+            <input asp-for="IsEncashmentLeave" class="form-check-input" />
+            <label asp-for="IsEncashmentLeave" class="form-check-label"></label>
+        </div>
+        <div class="col-md-4 form-check">
+            <input asp-for="IsEarnedLeave" class="form-check-input" />
+            <label asp-for="IsEarnedLeave" class="form-check-label"></label>
+        </div>
+    </div>
+    <br />
+ 
+
+    <div class="col-lg-12 p-t-20 text-center">
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary waves-effect m-r-15">
+            <a type="button" class="btn btn-danger waves-effect" href="@Url.Action("Index")">Cancel</a>
+        </div>
+    </div>
+</form>
