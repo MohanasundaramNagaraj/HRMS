@@ -9,23 +9,23 @@ using SQLitePCL;
 namespace SparkHRMS.Utilities
 {
     public class Location
-    { 
+    {
         [JsonProperty("lat")]
         public double Lat { get; set; }
 
         [JsonProperty("lng")]
         public double Lng { get; set; }
     }
-    public  class Utility
+    public class Utility
     {
-        private  readonly ApplicationDbContext _context;
-        public  Utility(ApplicationDbContext context)
+        private readonly ApplicationDbContext _context;
+        public Utility(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        private  readonly HttpClient client = new HttpClient();
-        public  string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
+        private readonly HttpClient client = new HttpClient();
+        public string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
         {
             if (checkInTime.HasValue && checkOutTime.HasValue)
             {
@@ -34,7 +34,7 @@ namespace SparkHRMS.Utilities
             }
             return string.Empty;
         }
-        public  async Task<string> GetLocationFromCoordinates(string? Position)
+        public async Task<string> GetLocationFromCoordinates(string? Position)
         {
             if (!string.IsNullOrWhiteSpace(Position))
             {
@@ -72,23 +72,106 @@ namespace SparkHRMS.Utilities
 
         public string GetEmployeeNameById(int EmployeeId)
         {
-            string name =  _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.Name).FirstOrDefault();
+            string name = _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.Name).FirstOrDefault();
             return name;
-        } 
-         
+        }
+
         public string GetEmployeeCodeById(int EmployeeId)
         {
-            string name =  _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.EmployeeCode).FirstOrDefault();
+            string name = _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.EmployeeCode).FirstOrDefault();
             return name;
         }
 
         public AssetMaster GetAssetById(int AssetId)
         {
-            return  _context.AssetMasters.Where(x => x.AssetId == AssetId).Select(x => x).FirstOrDefault();
-        }   
+            return _context.AssetMasters.Where(x => x.AssetId == AssetId).Select(x => x).FirstOrDefault();
+        }
         public SetYear GetYearById(int YearId)
         {
-            return  _context.Year.Where(x => x.Id == YearId).Select(x => x).FirstOrDefault();
+            return _context.Year.Where(x => x.Id == YearId).Select(x => x).FirstOrDefault();
         }
+
+        public string GenerateDocumentNumber(string documentType, bool commit, out string documentNumber)
+        {
+            int? nConfigId = null;
+            int? startNumber = null;
+            int? endNumber = null;
+            int? paddingNumber = null;
+            int? lastNumberGenerated = null;
+            string prefix = null;
+            string suffix = null;
+            int nextNumber = 0;
+
+            var configQuery = from y in _context.Year
+                              join nc in _context.SET_NumberConfig on y.Id equals nc.YearID
+                              where nc.DocumentType == documentType &&
+                                    DateTime.Now >= y.StartDate &&
+                                    DateTime.Now <= y.EndDate
+                              select new
+                              {
+                                  nc.NConfigID,
+                                  nc.StartNumber,
+                                  nc.EndNumber,
+                                  nc.PaddingNumber,
+                                  nc.LastNumberGenerated,
+                                  nc.Prefix,
+                                  nc.Suffix
+                              };
+
+            var config = configQuery.FirstOrDefault();
+
+            if (config != null)
+            {
+                nConfigId = config.NConfigID;
+                startNumber = config.StartNumber;
+                endNumber = config.EndNumber;
+                paddingNumber = config.PaddingNumber;
+                lastNumberGenerated = config.LastNumberGenerated;
+                prefix = config.Prefix;
+                suffix = config.Suffix;
+            }
+
+            if (nConfigId == null)
+            {
+                throw new Exception("Number configuration does not exist for " + documentType);
+            }
+
+            if (lastNumberGenerated >= endNumber)
+            {
+                throw new Exception("Last number reached for " + documentType);
+            }
+
+            if (lastNumberGenerated == null)
+            {
+                nextNumber = startNumber ?? 0;
+            }
+            else
+            {
+                nextNumber = lastNumberGenerated.Value + 1;
+            }
+
+            if (nextNumber > endNumber)
+            {
+                throw new Exception("Next number should not be greater than end number for " + documentType);
+            }
+
+            documentNumber = prefix +
+                                    new string('0', paddingNumber ?? 0 - nextNumber.ToString().Length) +
+                                    nextNumber +
+                                    suffix;
+
+            if (commit)
+            {
+                var configToUpdate = _context.SET_NumberConfig.Find(nConfigId);
+                if (configToUpdate != null)
+                {
+                    configToUpdate.LastNumberGenerated = nextNumber;
+                    _context.SaveChanges();
+                }
+            }
+
+            return documentNumber;
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using SparkHRMS.Data.Entities;
 using SparkHRMS.Data.Logs;
 using SparkHRMS.Data.Masters;
 using SparkHRMS.Data.Setting;
+using SparkVendorPortal.Models.EntityModels.Transaction;
 
 namespace SparkHRMS.Data
 {
@@ -24,25 +25,21 @@ namespace SparkHRMS.Data
         public DbSet<EmailLogs> EmailLogs { get; set; }
         public DbSet<Holiday> Holiday { get; set; }
         public DbSet<Serilog_Logs> Logs { get; set; }
-
         public DbSet<MST_WorkItemType> WorkItemType { get; set; }
         public DbSet<MST_WorkItemStatus> WorkItemStatus { get; set; }
         public DbSet<SubStatusMaster> SubStatus { get; set; }
         public DbSet<EmployeeTimeSheet> EmployeeTimeSheet { get; set; }
         public DbSet<Timesheet> Timesheets { get; set; }
-       
         public DbSet<SetYear> Year { get; set; }
         public DbSet<Month> Month { get; set; }
-
         public DbSet<AssetMaster> AssetMasters { get; set; }
         public DbSet<AssetAllocation> AssetAllocations { get; set; }
         public DbSet<AssetMaintenance> AssetMaintenances { get; set; }
         public DbSet<LeaveType> LeaveTypes { get; set; }
         public DbSet<LeaveReasons> LeaveReasons { get; set; }
-
         public DbSet<LeaveAllocation> LeaveAllocations { get; set; }
         public DbSet<LeaveAllocationDetail> LeaveAllocationDetails { get; set; }
-
+        public DbSet<SET_NumberConfig> SET_NumberConfig { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
