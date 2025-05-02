@@ -1,0 +1,204 @@
+﻿@model IEnumerable<SparkHRMS.Data.Masters.MST_Activity>
+
+@{
+    ViewData["Title"] = "Set Activity";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h2>Set Activities</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ActivityCreateModal">Add New</button>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Activity Name</th>
+                <th>Created Date</th>
+                <th>Is Active</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ActivityName</td>
+                    <td>@item.CreatedDate.ToShortDateString()</td>
+                    <td>@(item.IsActive ? "Yes" : "No")</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning edit-activity-btn" data-bs-toggle="modal" data-bs-target="#editActivityModal" data-id="@item.ActivityId">Edit</a>
+                        <a class="btn btn-sm btn-danger delete-confirm" data-id="@item.ActivityId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="modal fade" id="ActivityCreateModal" tabindex="-1" aria-labelledby="ActivityCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="activityForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ActivityCreateModalLabel">Add Activity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ActivityName" class="form-label">Activity Name</label>
+                        <input type="text" class="form-control" name="ActivityName" id="ActivityName" />
+                        <span id="activityNameError" class="text-danger d-none">Please enter an Activity Name.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editActivityModal" tabindex="-1" role="dialog" aria-labelledby="editActivityLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editActivityLabel">Edit Activity</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editActivityForm">
+                    <input type="hidden" id="editActivityId" />
+                
+                        <label for="">Activity Name</label>
+                        <input type="text" class="form-control" id="editActivityName" />
+                   
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveEditActivityBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+    
+        document.querySelectorAll('.delete-confirm').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post('/Activity/DeleteData', { id: id }, function (response) {
+                            if (response === "OK") {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted Successful',
+                                    text: 'Deleted Successfully!'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                                 
+                            } else {
+                                alert("Failed to delete.");
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+        document.getElementById('activityForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const activityName = formData.get("ActivityName")?.trim();
+            const errorSpan = document.getElementById("activityNameError");
+
+            if (!activityName) {
+                errorSpan.classList.remove("d-none");
+                return;
+            } else {
+                errorSpan.classList.add("d-none");
+            }
+
+            // Get and append Anti-Forgery Token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/Activity/Create', {
+                method: 'POST',
+                body: formData
+                
+            })
+                .then(response => response.text())
+                .then(result => {
+                    if (result === "OK") {
+                        location.reload(); 
+                    } else {
+                        const errorSpan = document.getElementById("activityNameError");
+                        errorSpan.textContent = result;
+                        errorSpan.classList.remove("d-none");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    errorSpan.textContent = "An error occurred.";
+                    errorSpan.classList.remove("d-none");
+                });
+        });
+
+
+    </script>
+}
+<script>
+    $(document).ready(function () {
+
+
+        $('.edit-activity-btn').click(function () {
+            debugger;
+            var id = $(this).data('id');
+            $.get('/Activity/GetEditData/' + id, function (data) {
+                $('#editActivityId').val(data.activityId);
+                $('#editActivityName').val(data.activityName);
+                $('#editActivityModal').modal('show');
+            });
+        });
+
+
+        $('#saveEditActivityBtn').click(function () {
+            var activity = {
+                ActivityId: $('#editActivityId').val(),
+                ActivityName: $('#editActivityName').val()
+            };
+
+            $.ajax({
+                url: '/Activity/EditData/' + activity.ActivityId,
+                type: 'POST',
+                data: activity,
+                success: function (response) {
+                    $('#editActivityModal').modal('hide');
+                    location.reload(); // Refresh page
+                },
+                error: function () {
+                    alert('Error saving activity');
+                }
+            });
+        });
+    });
+</script>
+

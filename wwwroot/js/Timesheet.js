@@ -191,6 +191,7 @@ function update() {
     addTimesheet(rowDatas);
 }
 function addRow(row, index) {
+    debugger;
     let uid;
     if (row == undefined || row.UniqueId == "") {
         row = {
@@ -213,11 +214,19 @@ function addRow(row, index) {
     const table = document.getElementById('timesheetTable').getElementsByTagName('tbody')[0]; 
     const newRow = table.insertRow(index);
     newRow.id = uid;
+    let activityOptions = `<option value="">Select Activity</option>`;
+    activities.forEach(function (activity) {
+        activityOptions += `<option value="${activity}">${activity}</option>`;
+    });
     newRow.innerHTML = `
                                         <td style="width:10%;"><input id='date_${uid}' onchange="getday('${uid}')" type="date" value="${row.Date}" class="form-control timesheet-input"></td>
                                         <td style="width:7%;"><input id='day_${uid}' type="text" class="form-control timesheet-input" placeholder="Day" value="${row.Day}" disabled></td>
                                         <td style="width:10%;"><input type="text" class="form-control timesheet-input task-input" placeholder="Task Id" value="${row.Task}"></td>
-                                        <td style="width:15%;"><input type="text" class="form-control timesheet-input activity-input" placeholder="Activity" value="${row.Activity}"></td>
+                                        <td style="width:15%;">
+                                                <select class="form-control timesheet-input activity-input">
+                                                    ${activityOptions}
+                                                </select>
+                                            </td>
                                         <td style="width:42%;"><input type="text" class="form-control timesheet-input description-input" placeholder="Task Description" value="${row.Descreption}"/></td>
                                         <td style="width:5%;"><input type="number" class="form-control timesheet-input hours-worked-input" placeholder="Hours Worked" value="${row.HoursWorked}"></td>
                                         <td style="width:8%;">
@@ -227,7 +236,7 @@ function addRow(row, index) {
                                       `;
     attachDeleteEvent();
     inputOnChangeCallback();
-
+    newRow.querySelector('.activity-input').value = row.Activity;
     const inputs = newRow.querySelectorAll("input");
     if (row.Descreption.toLowerCase().includes("leave") || row.Descreption.toLowerCase().includes("permission")) {
         inputs.forEach((input) => {

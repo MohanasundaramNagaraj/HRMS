@@ -76,7 +76,7 @@ namespace SparkHRMS.Controllers
             ViewBag.SelectedEmployeeID = employeeDetails.EmployeeId;
             ViewBag.SelectedMonth = startOfMonth.Month;
             ViewBag.SelectedYear = startOfMonth.Year;
-
+            ViewBag.Activities = getActivityData();
             //if(EmployeeID == null)
             //{
             //    EmployeeID = _context.Employees.FirstOrDefault().EmployeeId;
@@ -168,6 +168,12 @@ namespace SparkHRMS.Controllers
             {
                 throw new Exception("Timesheet not found!");
             }
+        }
+        private List<string> getActivityData()
+        {
+            List<string> acts = new List<string>();
+            acts = _context.MST_Activities.Where(v=>v.IsActive == true).Select(c=>c.ActivityName).ToList();
+            return acts;
         }
     }
 }
