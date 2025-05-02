@@ -1,0 +1,78 @@
+﻿@using SparkHRMS.Data.Setting
+@model SET_NumberConfig
+
+@{
+    var mode = ViewBag.Mode != null ? ViewBag.Mode : "Create";
+    bool isReadOnly = mode == "Detail";
+    string title = mode.ToString() + " Number Config";
+}
+
+
+<form asp-action="@mode" method="post" class="needs-validation" novalidate>
+    <div class="card shadow-sm p-4 rounded-4">
+        <h4 class="mb-4">Number Configuration</h4>
+        <input type="hidden" asp-for="NConfigID" />
+        <div class="row mb-3">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Document Type</label>
+                <input asp-for="DocumentType" class="form-control" />
+                <span asp-validation-for="DocumentType" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label asp-for="Prefix" class="form-label"></label>
+                <input asp-for="Prefix" class="form-control" />
+                <span asp-validation-for="Prefix" class="text-danger"></span>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label asp-for="Suffix" class="form-label"></label>
+                <input asp-for="Suffix" class="form-control" />
+                <span asp-validation-for="Suffix" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Start Number</label>
+                <input asp-for="StartNumber" class="form-control" />
+                <span asp-validation-for="StartNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label"> End Number </label>
+                <input asp-for="EndNumber" class="form-control" />
+                <span asp-validation-for="EndNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label"> Padding Number </label>
+                <input asp-for="PaddingNumber" class="form-control" />
+                <span asp-validation-for="PaddingNumber" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Year</label>
+                <input asp-for="YearID" class="form-control" />
+                <span asp-validation-for="YearID" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Last Number Generated</label>
+                <input asp-for="LastNumberGenerated" class="form-control" />
+                <span asp-validation-for="LastNumberGenerated" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3 form-check">
+                <br />
+                <br />
+                <input asp-for="IsActive" class="form-check-input" value="true" checked/>
+                <label class="form-check-label">Is Active</label>
+            </div>
+        </div>
+
+        <div class="col-lg-12 p-t-20 text-center">
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary waves-effect m-r-15">
+                <a type="button" class="btn btn-danger waves-effect" href="@Url.Action("Index")">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>

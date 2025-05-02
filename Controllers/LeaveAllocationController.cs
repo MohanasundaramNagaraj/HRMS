@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
+using SparkHRMS.Services;
 using System;
 
 public class LeaveAllocationController : Controller

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace SparkVendorPortal.Models.EntityModels.Transaction
+namespace SparkHRMS.Data.Setting
 {
     [Table("SET_NumberConfig")]
     public class SET_NumberConfig

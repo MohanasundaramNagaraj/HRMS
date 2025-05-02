@@ -6,7 +6,6 @@ using SparkHRMS.Data.Entities;
 using SparkHRMS.Data.Logs;
 using SparkHRMS.Data.Masters;
 using SparkHRMS.Data.Setting;
-using SparkVendorPortal.Models.EntityModels.Transaction;
 
 namespace SparkHRMS.Data
 {
@@ -28,7 +27,6 @@ namespace SparkHRMS.Data
         public DbSet<MST_WorkItemType> WorkItemType { get; set; }
         public DbSet<MST_WorkItemStatus> WorkItemStatus { get; set; }
         public DbSet<SubStatusMaster> SubStatus { get; set; }
-        public DbSet<EmployeeTimeSheet> EmployeeTimeSheet { get; set; }
         public DbSet<Timesheet> Timesheets { get; set; }
         public DbSet<SetYear> Year { get; set; }
         public DbSet<Month> Month { get; set; }
@@ -40,6 +38,8 @@ namespace SparkHRMS.Data
         public DbSet<LeaveAllocation> LeaveAllocations { get; set; }
         public DbSet<LeaveAllocationDetail> LeaveAllocationDetails { get; set; }
         public DbSet<SET_NumberConfig> SET_NumberConfig { get; set; }
+        public DbSet<LeaveRequest> LeaveRequest { get; set; }
+        public DbSet<LeaveRequestHistory> LeaveRequestHistory { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

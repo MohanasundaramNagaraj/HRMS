@@ -89,6 +89,15 @@ namespace SparkHRMS.Utilities
         public SetYear GetYearById(int YearId)
         {
             return _context.Year.Where(x => x.Id == YearId).Select(x => x).FirstOrDefault();
+        } 
+        
+        public LeaveType GetLeaveTypeById(int LeaveTypeId)
+        {
+            return _context.LeaveTypes.Where(x => x.LeaveTypeId == LeaveTypeId).Select(x => x).FirstOrDefault();
+        }
+         public LeaveReasons GetLeaveReasonById(int LeaveReasonId)
+        {
+            return _context.LeaveReasons.Where(x => x.LeaveReasonId == LeaveReasonId).Select(x => x).FirstOrDefault();
         }
 
         public string GenerateDocumentNumber(string documentType, bool commit, out string documentNumber)

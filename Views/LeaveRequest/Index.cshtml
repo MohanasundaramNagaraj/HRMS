@@ -1,0 +1,160 @@
+﻿@inject SparkHRMS.Utilities.Utility UtilityService
+
+@model List<SparkHRMS.Data.Entities.LeaveRequest>
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">Leave Request Approval</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> List
+                </a>
+            </li>
+        </ul>
+
+        <a class="btn btn-tbl-add btn-success" href="@Url.Action("Maintanance", new { FMode = "ADD" })"
+           style="float:right;">
+            <i class="material-icons">add</i>
+        </a>
+    </div>
+</div>
+<hr />
+<div class="row mb-3">
+
+    <select name="EmployeeId" style="width:25%;margin-right:10px;display:inline-block" class="form-select" id="empSelector" required>
+        @{
+            var employeeList = ViewBag.EmployeeList;
+
+            var yearList = ViewBag.YearList;
+        }
+        <option value="">Select Employee</option>
+        @foreach (var record in employeeList)
+        {
+            if (ViewBag.SelectedEmployeeId == record.EmployeeId)
+            {
+                <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
+            }
+            else
+            {
+                <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
+            }
+        }
+    </select>
+    <select name="YearId" id="yearSelector" style="width:20%; margin-right:10px; display:inline-block" class="form-select" required>
+        <option value="">Select Year</option>
+
+        @foreach (var record in yearList)
+        {
+            if (ViewBag.SelectedYearId == record.Id)
+            {
+                <option value="@record.Id" selected>@record.Year</option>
+            }
+            else{ <option value="@record.Id">@record.Year</option> }
+        }
+    </select>
+    <select id="monthSelector" style="width:20%;margin-right:10px;display:inline-block" class="form-select" required>
+        <option value="">Select Month</option>
+        @for (int month = 1; month <= 12; month++)
+        {
+            if (month == ViewBag.SelectedMonth)
+            {
+                <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+            }
+            else
+            {
+                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+            }
+
+        }
+    </select>
+
+    <button type="button" class="btn btn-secondary btn-sm" style="width:10%;" onclick="getRequestData()">Get Request Details</button>
+</div>
+<br />
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Request No</th>
+            <th>Requested Date</th>
+            <th>Leave From</th>
+            <th>Leave To</th>
+            <th>Number of Days</th>
+            <th>Leave Type</th>
+            <th>Leave Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+
+        {
+            <tr>
+                <td>@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
+                <td>
+                    <button id="requestNumber_@item.Id" class="btn btn-success">
+                        @item.RequestNumber
+                    </button>
+                   
+                </td>
+               
+                <td>@item.RequestedDate</td>
+                <td>@item.StartDate</td>
+                <td>@item.EndDate</td>
+                @{
+                    int countOfLeave = (item.EndDate - item.StartDate).Days + 1;
+                }
+                <td>@countOfLeave</td>
+                <td>@UtilityService.GetLeaveTypeById(item.LeaveTypeId).Code</td>
+                <td>@UtilityService.GetLeaveReasonById(item.LeaveReasonId).LeaveReasonName</td>
+                <td>
+                    @if (item.Status == "PEN")
+                    {
+                        <div class="badge col-cyan">Pending</div>
+                    }
+                    else if (item.Status == "CAN-REQ")
+                    {
+                        <div class="badge col-purple">Cancel Requested</div>
+                    }
+                    else if (item.Status == "CAN")
+                    {
+                        <div class="badge col-orange">Cancelled</div>
+                    }
+                    else if (item.Status == "ACC")
+                    {
+                        <div class="badge col-green">Accepted</div>
+                    }
+                    else if (item.Status == "REJ")
+                    {
+                        <div class="badge col-red">Rejected</div>
+                    }
+                </td>
+                <td>
+                    @if (item.Status == "PEN")
+                    {
+                        <a asp-action="Approve" asp-route-id="@item.Id">Approve</a>
+                        <a asp-action="Cancel" asp-route-id="@item.Id" asp-route-changedBy="1"> Cancel</a>
+                    }
+                    else if (item.Status == "CAN-REQ") 
+                    {
+                        <a asp-action="ReApprove" asp-route-id="@item.Id">Re-Approve</a>
+                    }
+                    else if (item.Status == "ACC")
+                    {
+                        <a asp-action="Cancel" asp-route-id="@item.Id" asp-route-changedBy="1"> Cancel</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    function getRequestData() {
+        location.href = "/LeaveRequest/Index?EmployeeId=" + $('#empSelector').val() + '&YearId=' + $('#yearSelector').val() + '&MonthId=' + $('#monthSelector').val();
+    }
+</script>

@@ -28,6 +28,12 @@
     <!-- Theme style. You can choose a theme from css/themes instead of get all themes -->
     <link href="~/app/assets/css/styles/all-themes.css" rel="stylesheet" />
 
+    <style>
+        body{
+          
+        }
+    </style>
+
 </head>
 
 <!--
@@ -41,7 +47,7 @@
         var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
         var UserImageUrl = "";
         var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
-        
+
         if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
         {
             UserImageUrl = Url.Content("~/uploads/" + user.UserName + ".jpg");
@@ -51,7 +57,7 @@
             int lastSlashIndex = emp.ImageUrl.LastIndexOf('/');
             if (lastSlashIndex >= 0)
             {
-                 UserImageUrl = Url.Content("~/uploads/" + emp.ImageUrl.Substring(lastSlashIndex + 1));
+                UserImageUrl = Url.Content("~/uploads/" + emp.ImageUrl.Substring(lastSlashIndex + 1));
             }
         }
         // var UserImageUrl = Url.Content("~/images/default-user.png"); // Set the default user image URL
@@ -78,7 +84,7 @@
                    data-bs-target="#navbar-collapse" aria-expanded="false"></a>
                 <a href="#" onClick="return false;" class="bars"></a>
                 <a class="navbar-brand" href="#">
-                    <img src="~/uploads/logo.png" alt="" style="height:100%;"/>
+                    <img src="~/uploads/logo.png" alt="" style="height:100%;" />
                     @*  <img src="~/app/assets/images/logo.png" alt="" /> *@
                     <span class="logo-name">@Configuration["AppSettings:SiteTitle"]</span>
                 </a>
@@ -300,17 +306,21 @@
                                 <span>Leave Management</span>
                             </a>
                             <ul class="ml-menu">
+                             
                                 <li>
-                                    <a href="../app/pages/leave/all-leave.html">All Leave Request</a>
+                                    <a href="/LeaveRequest/Index">Leave Request</a>
                                 </li>
-                               @*  <li>
-                                    <a href="../app/pages/leave/leave-balance.html">Leave Balance</a>
-                                </li>
-                                <li>
-                                    <a href="../app/pages/leave/add-leave.html">New Leave Request</a>
-                                </li>
-                                <li>
-                                    <a href="../app/pages/leave/edit-leave.html">Edit Leave Request</a>
+                                @* <li>
+                            <a href="../app/pages/leave/all-leave.html">All Leave Request</a>
+                            </li>
+                            <li>
+                            <a href="../app/pages/leave/leave-balance.html">Leave Balance</a>
+                            </li>
+                            <li>
+                            <a href="../app/pages/leave/add-leave.html">New Leave Request</a>
+                            </li>
+                            <li>
+                            <a href="../app/pages/leave/edit-leave.html">Edit Leave Request</a>
                             </li> *@
                                 <li>
                                     <a href="/LeaveAllocation/Index">Leave Allocation & Balance</a>
@@ -360,7 +370,7 @@
                                     <a href="/AssetAllocation/Index">Allocation</a>
                                 </li>
                                 <li>
-                                    <a href="/AssetMaintenance/Index">Maintanance</a>
+                                    <a href="/AssetMaintenance/Index">Manage</a>
                                 </li>
                             </ul>
                         </li>
@@ -370,7 +380,7 @@
                                 <span>Masters</span>
                             </a>
                             <ul class="ml-menu">
-                                
+
                                 <li>
                                     <a href="/SubStatusMasters/Index">Sub Status</a>
                                 </li>
@@ -380,8 +390,20 @@
                                 <li>
                                     <a href="/WorkItemType/Index">Work Item Type</a>
                                 </li>
-                                <li>
+                              
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i data-feather="headphones"></i>
+                                <span>Settings</span>
+                            </a>
+                            <ul class="ml-menu">
+                                 <li>
                                     <a href="/SetYear/Index">Year</a>
+                                </li>
+                                <li>
+                                    <a href="/NumberConfig/Index">Number Configuration</a>
                                 </li>
                             </ul>
                         </li>
@@ -423,6 +445,24 @@
                             <ul class="ml-menu">
                                 <li class="">
                                     <a href="/TimeSheets/Entry">Entry</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#" onClick="return false;" class="menu-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                     stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                                    </path>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1">
+                                    </rect>
+                                </svg>
+                                <span>Leave Management</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/LeaveRequest/Index">Leave Request</a>
                                 </li>
                             </ul>
                         </li>
