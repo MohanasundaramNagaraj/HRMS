@@ -29,28 +29,28 @@ namespace SparkHRMS.Migrations
                 nullable: false,
                 defaultValue: 0);
 
-            migrationBuilder.CreateTable(
-                name: "EmployeeTimeSheet",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    FromDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ToDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    WorkItemTypeID = table.Column<int>(type: "int", nullable: false),
-                    Activity = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Descreption = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WorkItemStatusID = table.Column<int>(type: "int", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeTimeSheet", x => x.ID);
-                });
+            //migrationBuilder.CreateTable(
+            //    name: "EmployeeTimeSheet",
+            //    columns: table => new
+            //    {
+            //        ID = table.Column<int>(type: "int", nullable: false)
+            //            .Annotation("SqlServer:Identity", "1, 1"),
+            //        UserID = table.Column<int>(type: "int", nullable: false),
+            //        FromDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        ToDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        WorkItemTypeID = table.Column<int>(type: "int", nullable: false),
+            //        Activity = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            //        Descreption = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            //        WorkItemStatusID = table.Column<int>(type: "int", nullable: false),
+            //        CreatedBy = table.Column<int>(type: "int", nullable: false),
+            //        CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        UpdatedBy = table.Column<int>(type: "int", nullable: true),
+            //        UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_EmployeeTimeSheet", x => x.ID);
+            //    });
 
             migrationBuilder.CreateTable(
                 name: "MST_WorkItemStatus",

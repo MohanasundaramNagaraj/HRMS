@@ -39,7 +39,8 @@ namespace SparkHRMS.Data
         public DbSet<LeaveReasons> LeaveReasons { get; set; }
         public DbSet<LeaveAllocation> LeaveAllocations { get; set; }
         public DbSet<LeaveAllocationDetail> LeaveAllocationDetails { get; set; }
-        public DbSet<SET_NumberConfig> SET_NumberConfig { get; set; }
+        public DbSet<SET_NumberConfig> SET_NumberConfig { get; set; }    
+        public DbSet<MST_Activity> MST_Activities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
