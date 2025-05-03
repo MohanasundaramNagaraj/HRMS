@@ -11,6 +11,7 @@ using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Data.Masters;
 using SparkHRMS.Services;
+using SparkHRMS.ViewModels;
 
 namespace SparkHRMS.Controllers
 {
@@ -32,17 +33,29 @@ namespace SparkHRMS.Controllers
         // GET: Activity
         public async Task<IActionResult> Index()    
         {
-            return View(await _context.MST_Activities.Where(v=>v.IsActive == true).ToListAsync());
+          List<ActivityViewModel> acts =new List<ActivityViewModel>();
+          var actdls = _context.MST_Activities.Where(v=>v.IsActive == true).ToList();
+            foreach (var item in actdls)
+            {
+                var user = await _userManager.FindByIdAsync(item.CreatedBy.ToString());
+                ActivityViewModel act = new ActivityViewModel();
+                act.ActivityId = item.ActivityId;
+                act.ActivityName = item.ActivityName;
+                act.CreatedDate = item.CreatedDate;
+                act.CreatedUserName = user.UserName;
+                acts.Add(act);
+            }
+            return View(acts);
         }
         [HttpPost]
-      
-        public async Task<string> CreateAsync(MST_Activity activity)
+
+        public async Task<string> CreateAsync(string activity)
         {
-            if(_context.MST_Activities.Any(v=>v.ActivityName == activity.ActivityName && v.IsActive == true) != true)
+            if(_context.MST_Activities.Any(v=>v.ActivityName == activity && v.IsActive == true) != true)
             {
                
                 MST_Activity act = new MST_Activity();
-                act.ActivityName = activity.ActivityName;
+                act.ActivityName = activity;
                 act.CreatedDate = DateTime.Now;
                 act.IsActive = true;
                 act.CreatedBy =(int)_userResolverService.GetUserId();

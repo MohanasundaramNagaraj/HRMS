@@ -1,10 +1,13 @@
 ﻿
 const attachDeleteEvent = () => {
-    document.querySelectorAll('.deleteRow').forEach(button => {
-        button.addEventListener('click', function () {
-            this.closest('tr').remove();
+    if (TimeSheetRowCount != 0 && TimeSheetRowCount != undefined) {
+        document.querySelectorAll('.deleteRow').forEach(button => {
+            button.addEventListener('click', function () {
+                this.closest('tr').remove();
+            });
         });
-    });
+    }
+    
 };
 
 let apiBaseUrl = "/TimeSheets";
@@ -190,8 +193,10 @@ function update() {
 
     addTimesheet(rowDatas);
 }
+var TimeSheetRowCount = 0;
 function addRow(row, index) {
     debugger;
+    TimeSheetRowCount = TimeSheetRowCount + 1;
     let uid;
     if (row == undefined || row.UniqueId == "") {
         row = {
@@ -227,7 +232,7 @@ function addRow(row, index) {
                                                     ${activityOptions}
                                                 </select>
                                             </td>
-                                        <td style="width:42%;"><input type="text" class="form-control timesheet-input description-input" placeholder="Task Description" value="${row.Descreption}"/></td>
+                                        <td style="width:42%;"><textarea  type="text" class="form-control timesheet-input description-input" placeholder="Task Description" value="${row.Descreption}"></textarea></td>
                                         <td style="width:5%;"><input type="number" class="form-control timesheet-input hours-worked-input" placeholder="Hours Worked" value="${row.HoursWorked}"></td>
                                         <td style="width:8%;">
                                             <button class="btn btn-success addRow" onclick="addRow(${undefined},${index + 1});"><i class="material-icons">add</i></button>
@@ -265,6 +270,7 @@ function addRow(row, index) {
 
     datePicker.min = formatDate(firstDay);
     datePicker.max = formatDate(lastDay);
+    
 };
 
 
@@ -310,7 +316,12 @@ function addTimesheet(timesheetData) {
         type: "POST",
         data: { timesheet: timeSheet },
         success: function (response) {
-            alert("Updated Successfully");
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated Successful',
+                text: 'Updated Successfully!'
+            });
+           // alert("Updated Successfully");
         },
         error: function (error) {
             alert('error');
@@ -319,14 +330,23 @@ function addTimesheet(timesheetData) {
 }
 
 function deleteTimesheet(timesheetId) {
-    $.ajax({
-        url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
-        type: "POST",
-        success: function (response) {
-            alert("Deleted successfully");
-        },
-        error: function (error) {
-            alert('error');
-        },
-    });
+    TimeSheetRowCount = TimeSheetRowCount - 1;
+    if (TimeSheetRowCount != 0 && TimeSheetRowCount != undefined) {
+        $.ajax({
+            url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
+            type: "POST",
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted Successful',
+                    text: 'Deleted Successfully!'
+                });
+
+            },
+            error: function (error) {
+                alert('error');
+            },
+        });
+    }
+  
 }
