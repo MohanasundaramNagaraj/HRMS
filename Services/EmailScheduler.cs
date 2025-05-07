@@ -13,11 +13,20 @@ public class EmailScheduler
     {
         var checkInCron = _configuration["EmailSenderSettings:JobSchedules:CheckInJobCron"];
         var checkOutCron = _configuration["EmailSenderSettings:JobSchedules:CheckOutJobCron"];
+        var autoCheckOutCron = _configuration["EmailSenderSettings:JobSchedules:AutoCheckOutJobCron"];
         // Schedule job for 11:00 AM with a unique identifier
         RecurringJob.AddOrUpdate<EmailQueueManager>(
             "CheckInJob", // Unique identifier for the "CheckIn" job
             job => job.SendScheduledEmail("CheckIn"),
             checkInCron); // At 11:00 AM every day
+
+
+        RecurringJob.AddOrUpdate<EmailQueueManager>(
+           "AutoCheckOutJob", // Unique identifier for the "CheckIn" job
+           job => job.AutoCheckOutEmail("CheckOut"),
+           checkInCron);
+
+
 
         // Schedule job for 11:00 PM with a unique identifier
         //RecurringJob.AddOrUpdate<EmailQueueManager>(
