@@ -4,6 +4,8 @@
 @using SparkHRMS.ViewModels
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+
+
 @{
     ViewData["Title"] = "Time Sheet";
     var user = await UserManager.GetUserAsync(User);
@@ -13,6 +15,7 @@
 <script>
     debugger;
     var timeSheetData = JSON.parse('@Html.Raw(Json.Serialize(Model.TimeSheetRecords))');
+ 
     var activities = @Html.Raw(Json.Serialize(ViewBag.Activities));
 </script>
 <style>
@@ -148,7 +151,7 @@
                         </div>
                     </div>
                     <div style="float:right;margin-bottom:10px;    justify-content: flex-end;gap: 10px; display: flex; cursor:marker;">
-
+                      
                         <button class="btn btn-success" onclick="update()"><i class="fa fa-save"></i> Save</button>
                         <button class="btn btn-warning" onclick="exportToExcel()"> <i class="fa fa-file-excel"></i> Export to Excel</button>
                         <button class="btn btn-danger" onclick="exportToPDF()"> <i class="fa fa-file"></i> Export to PDF</button>
@@ -159,12 +162,27 @@
                         <table id="timesheetTable" class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Day</th>
-                                    <th>Task Id</th>
-                                    <th>Activity</th>
-                                    <th>Task Description</th>
-                                    <th>Hours Worked</th>
+                                   
+                                    <th>Date <br />
+                                        <input type="text" class="column-filter form-control" placeholder="Search Date"></th>
+                                    <th>
+                                        Day <br />
+                                        <input type="text" class="column-filter form-control" placeholder="Search Day">
+                                    </th>
+                                    <th>
+                                        Task <br />
+                                        <input type="text" class="column-filter form-control" placeholder="Search Task Id">
+                                    </th>
+                                    <th>
+                                        Activity <br />
+                                        <input type="text" class="column-filter form-control" placeholder="Search Activity"></th>
+                                    <th>
+                                        Description <br />
+                                        <input type="text" class="column-filter form-control" placeholder="Search Description"></th>
+                                    <th>
+                                        Hours <br />
+                                        <input type="text" class="column-filter form-control" placeholder="Search Hours"></th>
+
                                     <th>Actions</th>
                                 </tr>
                             </thead>

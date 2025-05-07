@@ -1,12 +1,12 @@
 ﻿
 const attachDeleteEvent = () => {
-    if (TimeSheetRowCount != 0 && TimeSheetRowCount != undefined) {
-        document.querySelectorAll('.deleteRow').forEach(button => {
-            button.addEventListener('click', function () {
-                this.closest('tr').remove();
-            });
+  
+    document.querySelectorAll('.deleteRow').forEach(button => {
+        button.addEventListener('click', function () {
+            this.closest('tr').remove();
         });
-    }
+    });
+    
     
 };
 
@@ -57,15 +57,28 @@ function exportToExcel() {
         let rowData = [];
         let cells = row.querySelectorAll("td");
 
-        // Loop through all cells except the last one (Actions)
+         //Loop through all cells except the last one (Actions)
         for (let i = 0; i < cells.length - 1; i++) {
             let input = cells[i].querySelector("input");
-            rowData.push(input ? input.value : cells[i].innerText);
+            let select = cells[i].querySelector("select");
+            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text :cells[i].innerText);
         }
 
         data.push(rowData);
-    });
+        //for (let i = 0; i < cells.length - 1; i++) {
+        //    let input = cells[i].querySelector("input");
+        //    let select = cells[i].querySelector("select");
 
+        //    if (input) {
+        //        rowData.push(input.value);
+        //    } else if (select) {
+        //        rowData.push(select.options[select.selectedIndex].text); // or select.value if you want the value
+        //    } else {
+        //        rowData.push(cells[i].innerText.trim());
+        //    }
+        //}
+    });
+    
     let ws = XLSX.utils.aoa_to_sheet(data);
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
@@ -93,7 +106,9 @@ function exportToPDF() {
         // Loop through all cells except the last one (Actions)
         for (let i = 0; i < cells.length - 1; i++) {
             let input = cells[i].querySelector("input");
-            rowData.push(input ? input.value : cells[i].innerText);
+            let select = cells[i].querySelector("select");
+            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text : cells[i].innerText);
+
         }
 
         data.push(rowData);
@@ -171,6 +186,9 @@ function update() {
 
             debugger;
             if (row && row.querySelector("input[type='date']")?.value) {
+
+                const description = row.querySelector(".description-input")?.value || "";
+                const jsonDescriptionString = '{"Description": ' + JSON.stringify(description) + '}';
                 const data = {
                     Id: 0,
                     YearId: year,
@@ -180,7 +198,7 @@ function update() {
                     Day: row.querySelector("input[placeholder='Day']")?.value || "",
                     Task: row.querySelector(".task-input")?.value || "",
                     Activity: row.querySelector(".activity-input")?.value || "",
-                    Descreption: row.querySelector(".description-input")?.value || "",
+                    Descreption: jsonDescriptionString || "",
                     HoursWorked: parseInt(row.querySelector(".hours-worked-input")?.value) || 0,
                     EmployeeId: empid
                 };
@@ -193,10 +211,9 @@ function update() {
 
     addTimesheet(rowDatas);
 }
-var TimeSheetRowCount = 0;
+;
 function addRow(row, index) {
     debugger;
-    TimeSheetRowCount = TimeSheetRowCount + 1;
     let uid;
     if (row == undefined || row.UniqueId == "") {
         row = {
@@ -330,9 +347,7 @@ function addTimesheet(timesheetData) {
 }
 
 function deleteTimesheet(timesheetId) {
-    TimeSheetRowCount = TimeSheetRowCount - 1;
-    if (TimeSheetRowCount != 0 && TimeSheetRowCount != undefined) {
-        $.ajax({
+    $.ajax({
             url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
             type: "POST",
             success: function (response) {
@@ -347,6 +362,47 @@ function deleteTimesheet(timesheetId) {
                 alert('error');
             },
         });
-    }
-  
+    
 }
+const table = document.getElementById('timesheetTable');
+const filters = table.querySelectorAll('.column-filter');
+
+filters.forEach((input, colIndex) => {
+    input.addEventListener('input', () => {
+        const filterValues = Array.from(filters).map(f => f.value.toLowerCase().trim());
+
+        Array.from(table.tBodies[0].rows).forEach(row => {
+            let showRow = true;
+
+            filterValues.forEach((val, i) => {
+                if (!val) return;
+
+                const cell = row.cells[i];
+                if (!cell) return;
+
+                let cellText = '';
+                const inputElement = cell.querySelector('input');
+
+                if (inputElement && inputElement.type === 'date') {
+                   
+                    const raw = inputElement.value.trim();
+
+                    
+                    const [y, m, d] = raw.split("-");
+                    cellText = `${d}-${m}-${y}`; 
+                } else if (inputElement) {
+                    cellText = inputElement.value.toLowerCase().trim();
+                } else {
+                    cellText = cell.textContent.toLowerCase().trim();
+                }
+
+            
+                if (!cellText.includes(val)) {
+                    showRow = false;
+                }
+            });
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    });
+});
