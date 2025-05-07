@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250507092506_MSN_07MAY2025_01")]
+    partial class MSN_07MAY2025_01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -534,17 +537,17 @@ namespace SparkHRMS.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("TotalCarriedForwardLeaves")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalCarriedForwardLeaves")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("TotalLeaveAllocated")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalLeaveAllocated")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("TotalLeaveBalance")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalLeaveBalance")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("TotalUsedDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalUsedDays")
+                        .HasColumnType("int");
 
                     b.Property<int>("YearId")
                         .HasColumnType("int");
@@ -562,8 +565,8 @@ namespace SparkHRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AllocatedDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("AllocatedDays")
+                        .HasColumnType("int");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -593,14 +596,14 @@ namespace SparkHRMS.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("RemainingDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("RemainingDays")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("ToDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("UsedDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("UsedDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -653,8 +656,8 @@ namespace SparkHRMS.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<decimal>("TotalLeaveDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalLeaveDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1386,11 +1389,13 @@ namespace SparkHRMS.Migrations
 
             modelBuilder.Entity("LeaveRequestDetail", b =>
                 {
-                    b.HasOne("SparkHRMS.Data.Entities.LeaveRequest", null)
+                    b.HasOne("SparkHRMS.Data.Entities.LeaveRequest", "LeaveRequest")
                         .WithMany("LeaveRequestDetails")
                         .HasForeignKey("LeaveRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LeaveRequest");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

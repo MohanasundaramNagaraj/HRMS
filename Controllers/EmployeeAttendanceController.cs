@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
+using SparkHRMS.Services;
 using SparkHRMS.Utilities;
 using SparkHRMS.ViewModels;
 using System;
@@ -199,24 +200,37 @@ namespace SparkHRMS.Controllers
                 return BadRequest("You have already checked in today.");
             }
 
-            var checkIn = new EmployeeAttendance
-            {
-                EmployeeId = emp.EmployeeId,
-                CheckInTime = DateTime.Now,
-                CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                CheckOutMadeSystemIP = null,
-                CheckInPosition = CheckInPosition
-            };
+            var machineService = new MachineIDService();
+            string? machineId = machineService.GetMachineId();
 
-            _context.EmployeeAttendance.Add(checkIn);
-            await _context.SaveChangesAsync();
-            try
+            if (machineId != null)
             {
-                return Ok("Check-in successful.");
+                Console.WriteLine("Machine ID: " + machineId);
+                var checkIn = new EmployeeAttendance
+                {
+                    EmployeeId = emp.EmployeeId,
+                    CheckInTime = DateTime.Now,
+                    CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    CheckOutMadeSystemIP = null,
+                    CheckInPosition = CheckInPosition
+                };
+
+                _context.EmployeeAttendance.Add(checkIn);
+                await _context.SaveChangesAsync();
+
+                try
+                {
+                    return Ok("Check-in successful.");
+                }
+                catch (Exception ex)
+                {
+                    return Ok(ex.ToString());
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return Ok(ex.ToString());
+               
+                return BadRequest("Machine ID file not found.");
             }
         }
 
@@ -240,19 +254,28 @@ namespace SparkHRMS.Controllers
             {
                 return BadRequest("You have not checked in today or have already checked out.");
             }
+            var machineService = new MachineIDService();
+            string? machineId = machineService.GetMachineId();
 
-            checkInRecord.CheckOutTime = DateTime.Now;
-            checkInRecord.CheckOutPosition = CheckOutPosition;
-            checkInRecord.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
-            await _context.SaveChangesAsync();
-
-            try
+            if (machineId != null)
             {
-                return Ok("Check-out successful.");
+                checkInRecord.CheckOutTime = DateTime.Now;
+                checkInRecord.CheckOutPosition = CheckOutPosition;
+                checkInRecord.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                await _context.SaveChangesAsync();
+
+                try
+                {
+                    return Ok("Check-out successful.");
+                }
+                catch (Exception ex)
+                {
+                    return Ok(ex.ToString());
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return Ok(ex.ToString());
+                return BadRequest("Machine ID file not found.");
             }
         }
 

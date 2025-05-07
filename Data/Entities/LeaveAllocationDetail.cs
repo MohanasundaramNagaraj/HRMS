@@ -16,11 +16,11 @@ namespace SparkHRMS.Data.Entities
         public DateTime ToDate { get; set; }
         public string Description  { get; set; }
         [Required]
-        public int AllocatedDays { get; set; }
+        public decimal AllocatedDays { get; set; }
 
         [Required]
-        public int UsedDays { get; set; }
-        public int RemainingDays { get; set; }
+        public decimal UsedDays { get; set; }
+        public decimal RemainingDays { get; set; }
         public bool IsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

@@ -27,11 +27,17 @@ namespace SparkHRMS.Data.Entities
         public string Designation { get; set; }
 
         [DataType(DataType.Upload)]
-        [Display(Name = "Image")]
+        [Display(Name = "Image")] 
         public string? ImageUrl { get; set; }
         public DateTime? DateOfJoining { get; set; }
+        public DateTime? DateOfReleving { get; set; }
         public string? Address { get; set; }
 
+        public bool IsActive { get; set; } = true;
+        public int CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public int? UpdatedBy { get; set; }
+        public DateTime? LastUpdatedDate { get; set; }
         public int ApplicationUserId { get; set; }
 
         [ForeignKey("ApplicationUserId")]

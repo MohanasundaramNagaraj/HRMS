@@ -47,7 +47,7 @@ public class LeaveAllocationController : Controller
             allocation.IsActive = true;
             allocation.CreatedDate = DateTime.UtcNow;
             allocation.CreatedBy = 1;
-            int totalAllocatedDays = 0;
+            decimal totalAllocatedDays = 0;
             foreach (var detail in allocation.LeaveDetails)
             {
                 detail.IsActive = true;
@@ -113,9 +113,9 @@ public class LeaveAllocationController : Controller
             var existing = await _context.LeaveAllocations.Include(x => x.LeaveDetails).FirstOrDefaultAsync(x => x.Id == id);
             if (existing == null) return NotFound();
 
-            int totalAllocated = 0;
-            int totalUsedDays = 0;
-            int totalLeaveBalance = 0;
+            decimal totalAllocated = 0;
+            decimal totalUsedDays = 0;
+            decimal totalLeaveBalance = 0;
             allocation.LeaveDetails.ForEach(x =>
             {
                 totalAllocated += x.AllocatedDays;

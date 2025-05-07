@@ -17,7 +17,7 @@ namespace SparkHRMS.Data.Entities
 
         public DateTime CheckInTime { get; set; }
 
-        public DateTime? CheckOutTime { get; set; }
+        public DateTime? CheckOutTime { get; set; } 
 
         public string? CheckinMadeSystemIP { get; set; }
         public string? CheckOutMadeSystemIP { get; set; }
@@ -25,7 +25,7 @@ namespace SparkHRMS.Data.Entities
 
         public string? CheckInPosition { get; set; }
         public string? CheckOutPosition { get; set; }
-
+        public bool? IsAutoCheckedOut { get; set; }
         //public bool IsPermission { get; set; }
         //public DateTime? PermissionStartTime { get; set; }
         //public DateTime? PermissionEndTime { get; set; }

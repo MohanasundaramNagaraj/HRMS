@@ -41,6 +41,7 @@ namespace SparkHRMS.Data
         public DbSet<MST_Activity> MST_Activities { get; set; }
        
         public DbSet<LeaveRequest> LeaveRequest { get; set; }
+        public DbSet<LeaveRequestDetail> LeaveRequestDetail { get; set; }
         public DbSet<LeaveRequestHistory> LeaveRequestHistory { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,11 +1,14 @@
 ﻿@inject SparkHRMS.Utilities.Utility UtilityService
 
 @model List<SparkHRMS.Data.Entities.LeaveRequest>
+@{
+    ViewData["Title"] = "Leave Request - List";
+}
 <div class="row mr-0">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <ul class="breadcrumb breadcrumb-style" style="display:inline">
             <li class="breadcrumb-item">
-                <h4 class="page-title">Leave Request Approval</h4>
+                <h4 class="page-title">Leave Request</h4>
             </li>
             <li class="breadcrumb-item bcrumb-1">
                 <a href="#">
@@ -21,140 +24,217 @@
     </div>
 </div>
 <hr />
-<div class="row mb-3">
+@if (ViewBag.IsUserAdmin){
+    <div class="row mb-3">
 
-    <select name="EmployeeId" style="width:25%;margin-right:10px;display:inline-block" class="form-select" id="empSelector" required>
-        @{
-            var employeeList = ViewBag.EmployeeList;
+        <select name="EmployeeId" style="width:25%;margin-right:10px;display:inline-block" class="form-select" id="empSelector" required>
+            @{
+                var employeeList = ViewBag.EmployeeList;
 
-            var yearList = ViewBag.YearList;
-        }
-        <option value="">Select Employee</option>
-        @foreach (var record in employeeList)
-        {
-            if (ViewBag.SelectedEmployeeId == record.EmployeeId)
-            {
-                <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
+                var yearList = ViewBag.YearList;
             }
-            else
+            <option value="">All Employees</option>
+            @foreach (var record in employeeList)
             {
-                <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
-            }
-        }
-    </select>
-    <select name="YearId" id="yearSelector" style="width:20%; margin-right:10px; display:inline-block" class="form-select" required>
-        <option value="">Select Year</option>
-
-        @foreach (var record in yearList)
-        {
-            if (ViewBag.SelectedYearId == record.Id)
-            {
-                <option value="@record.Id" selected>@record.Year</option>
-            }
-            else{ <option value="@record.Id">@record.Year</option> }
-        }
-    </select>
-    <select id="monthSelector" style="width:20%;margin-right:10px;display:inline-block" class="form-select" required>
-        <option value="">Select Month</option>
-        @for (int month = 1; month <= 12; month++)
-        {
-            if (month == ViewBag.SelectedMonth)
-            {
-                <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
-            }
-            else
-            {
-                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
-            }
-
-        }
-    </select>
-
-    <button type="button" class="btn btn-secondary btn-sm" style="width:10%;" onclick="getRequestData()">Get Request Details</button>
-</div>
-<br />
-<table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>Employee</th>
-            <th>Request No</th>
-            <th>Requested Date</th>
-            <th>Leave From</th>
-            <th>Leave To</th>
-            <th>Number of Days</th>
-            <th>Leave Type</th>
-            <th>Leave Reason</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-
-        {
-            <tr>
-                <td>@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
-                <td>
-                    <button id="requestNumber_@item.Id" class="btn btn-success">
-                        @item.RequestNumber
-                    </button>
-                   
-                </td>
-               
-                <td>@item.RequestedDate</td>
-                <td>@item.StartDate</td>
-                <td>@item.EndDate</td>
-                @{
-                    int countOfLeave = (item.EndDate - item.StartDate).Days + 1;
+                if (ViewBag.SelectedEmployeeId == record.EmployeeId)
+                {
+                    <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
                 }
-                <td>@countOfLeave</td>
-                <td>@UtilityService.GetLeaveTypeById(item.LeaveTypeId).Code</td>
-                <td>@UtilityService.GetLeaveReasonById(item.LeaveReasonId).LeaveReasonName</td>
-                <td>
-                    @if (item.Status == "PEN")
-                    {
-                        <div class="badge col-cyan">Pending</div>
-                    }
-                    else if (item.Status == "CAN-REQ")
-                    {
-                        <div class="badge col-purple">Cancel Requested</div>
-                    }
-                    else if (item.Status == "CAN")
-                    {
-                        <div class="badge col-orange">Cancelled</div>
-                    }
-                    else if (item.Status == "ACC")
-                    {
-                        <div class="badge col-green">Accepted</div>
-                    }
-                    else if (item.Status == "REJ")
-                    {
-                        <div class="badge col-red">Rejected</div>
-                    }
-                </td>
-                <td>
-                    @if (item.Status == "PEN")
-                    {
-                        <a asp-action="Approve" asp-route-id="@item.Id">Approve</a>
-                        <a asp-action="Cancel" asp-route-id="@item.Id" asp-route-changedBy="1"> Cancel</a>
-                    }
-                    else if (item.Status == "CAN-REQ") 
-                    {
-                        <a asp-action="ReApprove" asp-route-id="@item.Id">Re-Approve</a>
-                    }
-                    else if (item.Status == "ACC")
-                    {
-                        <a asp-action="Cancel" asp-route-id="@item.Id" asp-route-changedBy="1"> Cancel</a>
-                    }
-                </td>
+                else
+                {
+                    <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
+                }
+            }
+        </select>
+        <select name="YearId" id="yearSelector" style="width:20%; margin-right:10px; display:inline-block" class="form-select" required>
+            <option value="">All Year</option>
+
+            @foreach (var record in yearList)
+            {
+                if (ViewBag.SelectedYearId == record.Id)
+                {
+                    <option value="@record.Id" selected>@record.Year</option>
+                }
+                else
+                {
+                    <option value="@record.Id">@record.Year</option>
+                }
+            }
+        </select>
+        <select id="monthSelector" style="width:20%;margin-right:10px;display:inline-block" class="form-select" required>
+            <option value="">All Month</option>
+            @for (int month = 1; month <= 12; month++)
+            {
+                if (month == ViewBag.SelectedMonth)
+                {
+                    <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                }
+                else
+                {
+                    <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                }
+
+            }
+        </select>
+
+        <button type="button" class="btn btn-secondary btn-sm" style="width:10%;" onclick="getRequestData()">Get Request Details</button>
+    </div>
+}
+
+<br />
+<div>
+    <table id="leaveTable" class="table table-bordered mt-3 display nowrap" style="width:100%">
+        <thead style="top:0px;position:sticky;">
+            <tr>
+                <th>Employee</th>
+                <th>Request No</th>
+                <th>Requested Date</th>
+                <th>Leave From</th>
+                <th>Leave To</th>
+                <th>Number of Days</th>
+                @* <th>Leave Type</th> *@
+                <th>Leave Reason</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var countOfLeave = (item.EndDate - item.StartDate).Days + 1;
+                <tr>
+                    <td style="text-align-last: start;">@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
+                    <td>
+                        <button class="btn btn-info show-timeline" data-id="@item.Id" data-bs-toggle="modal" data-bs-target="#timelineModal">
+                            @item.RequestNumber
+                        </button>
+                    </td>
+                    <td>@item.RequestedDate.ToString("dd-MM-yyyy")</td>
+                    <td>@item.StartDate.ToString("dd-MM-yyyy")</td>
+                    <td>@item.EndDate.ToString("dd-MM-yyyy")</td>
+                    <td style="text-align-last: end;">@countOfLeave</td>
+                    @* <td style="text-align-last: start;">@UtilityService.GetLeaveTypeById(item.LeaveTypeId).Code</td> *@
+                    <td style="text-align-last: start;">@UtilityService.GetLeaveReasonById(item.LeaveReasonId).LeaveReasonName</td>
+                    <td>
+                        @if (item.Status == "PEN")
+                        {
+                            <div class="badge col-cyan">Approval Pending</div>
+                        }
+                        else if (item.Status == "CAN-REQ")
+                        {
+                            <div class="badge col-purple">Cancel Requested</div>
+                        }
+                        else if (item.Status == "CAN-ACC")
+                        {
+                            <div class="badge col-orange">Cancelled</div>
+                        }
+                        else if (item.Status == "CAN-REJ")
+                        {
+                            <div class="badge col-red">Cancel Request Rejected</div>
+                        }
+                        else if (item.Status == "ACC")
+                        {
+                            <div class="badge col-green">Accepted</div>
+                        }
+                        else if (item.Status == "REJ")
+                        {
+                            <div class="badge col-red">Rejected</div>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Status == "PEN")
+                        {
+                            if (ViewBag.IsUserAdmin)
+                            {
+                                <button class="btn btn-success" onclick="redirectToMaintanance('Approve',@item.Id)">Approve</button>
+                            }
+                            <button class="btn btn-warning" onclick="redirectToMaintanance('Cancel',@item.Id)">Cancel</button>
+                        }
+                        else if (item.Status == "CAN-REQ" && ViewBag.IsUserAdmin)
+                        {
+                            <button class="btn btn-success" onclick="redirectToMaintanance('Can-Approve',@item.Id)">Approve</button>
+                        }
+                        else if (item.Status == "ACC")
+                        {
+                            <button class="btn btn-warning" onclick="redirectToMaintanance('Cancel',@item.Id)">Cancel</button>
+                        }
+                        <button class="btn btn-primary" onclick="redirectToMaintanance('View',@item.Id)">View</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<div class="modal fade" id="timelineModal" tabindex="-1" aria-labelledby="timelineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="padding:0px;">
+            <div class="modal-header bg-primary text-white" style="    border-radius: 0px;">
+                <h5 class="modal-title" id="timelineModalLabel">Leave Request Timeline - <span id="leave-request-number"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding:0px;">
+                <div id="timelineContent">
+                    <!-- History will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" />
+
+<!-- jQuery and DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <script>
     function getRequestData() {
         location.href = "/LeaveRequest/Index?EmployeeId=" + $('#empSelector').val() + '&YearId=' + $('#yearSelector').val() + '&MonthId=' + $('#monthSelector').val();
     }
+
+    function redirectToMaintanance(fmode, id) {
+        const url = `/LeaveRequest/Maintanance?FMode=${fmode}&EntryID=${id}`;
+        location.href = url;
+    }
+
+    $(".show-timeline").click(function () {
+        var requestId = $(this).data("id");
+
+        $.get("/LeaveRequest/GetTimeline", { id: requestId }, function (data) {
+            $("#timelineContent").html(data);
+        });
+    });
+
+    $(document).ready(function () {
+        setTimeout(function () {
+            $('#leaveTable').DataTable({
+                responsive: true,
+                paging: true,                // enables pagination
+                pageLength: 10,              // items per page
+                lengthMenu: [5, 10, 25, 50, 100],
+                info: true,                  // shows "Showing x to y of z entries"
+                dom: 'Bfrtip',
+                buttons: ['copy', 'excel', 'pdf', 'print'],
+                language: {
+                    paginate: {
+                        previous: '←',
+                        next: '→'
+                    },
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    lengthMenu: "Show _MENU_ entries per page"
+                }
+
+            });
+        },100)
+      
+    });
 </script>

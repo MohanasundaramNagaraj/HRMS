@@ -43,8 +43,10 @@ namespace SparkHRMS.Utilities
             {
                 dateTimeForCheckinCheckoutSubject = DateTime.Now.ToString("dd MMM yyyy");
             }
-            subject = Configuration["EmailSenderSettings:Subject:" + subject] + dateTimeForCheckinCheckoutSubject;
-
+            if (subject == "CheckIn" || subject == "CheckOut" || subject == "ForgetPassword" || subject == "Confirm your email")
+            {
+                subject = Configuration["EmailSenderSettings:Subject:" + subject] + dateTimeForCheckinCheckoutSubject;
+            }
             //var emailMessage = new MimeMessage();
             //emailMessage.From.Add(MailboxAddress.Parse(Configuration["EmailSenderSettings:From"]));
             //emailMessage.To.Add(MailboxAddress.Parse(email));
@@ -69,11 +71,11 @@ namespace SparkHRMS.Utilities
             //};
 
             //mailMessage.To.Add(email);
-           
+
             var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
-           
+
             var to = new EmailAddress(email, email);
             var plainTextContent = "";
             var htmlContent = htmlMessage;
@@ -112,7 +114,7 @@ namespace SparkHRMS.Utilities
                     log.IsSuccessful = false;
                     log.ErrorMessage = responseBody;
                 }
-               
+
                 _context.Entry(log).State = EntityState.Modified;
                 _context.SaveChanges();
 
