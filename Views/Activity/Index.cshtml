@@ -1,21 +1,32 @@
-﻿@model IEnumerable<SparkHRMS.Data.Masters.MST_Activity>
+﻿@model IEnumerable<SparkHRMS.ViewModels.ActivityViewModel>
 
 @{
     ViewData["Title"] = "Set Activity";
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 <div class="container mt-4">
     <div class="d-flex justify-content-between mb-3">
         <h2>Set Activities</h2>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ActivityCreateModal">Add New</button>
     </div>
 
+    <div class="container mt-3">
+        <div class="position-relative" style="max-width: 400px; float: right;">
+            <input type="text" id="activitySearch" class="form-control ps-5" placeholder="Search Activity Name..." />
+            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ps-3 text-muted"></i>
+        </div>
+    </div>
+
+    <!-- ✅ Activity Table -->
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Activity Name</th>
-                <th>Created Date</th>
-                <th>Is Active</th>
+                <th style="text-align: left;">Activity Name</th>
+                <th style="text-align: left;">Created Date</th>
+                <th style="text-align: left;">Created By</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -23,18 +34,35 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.ActivityName</td>
-                    <td>@item.CreatedDate.ToShortDateString()</td>
-                    <td>@(item.IsActive ? "Yes" : "No")</td>
+                    <td style="font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: left;">
+                        @item.ActivityName
+                    </td>
+                    <td style="font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: left;">
+                        @item.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")
+                    </td>
+                    <td style="font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; text-align: left;">
+                        @item.CreatedUserName
+                    </td>
                     <td>
-                        <a class="btn btn-sm btn-warning edit-activity-btn" data-bs-toggle="modal" data-bs-target="#editActivityModal" data-id="@item.ActivityId">Edit</a>
-                        <a class="btn btn-sm btn-danger delete-confirm" data-id="@item.ActivityId">Delete</a>
+                        <a class="btn btn-sm btn-warning edit-activity-btn" style="padding-top: 8px;" data-bs-toggle="modal" data-bs-target="#editActivityModal" data-id="@item.ActivityId">Edit</a>
+                        <a class="btn btn-sm btn-danger delete-confirm" style="padding-top: 8px;" data-id="@item.ActivityId">Delete</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    <div class="d-flex justify-content-between align-items-center mt-2">
+        <div id="tableInfo" class="text-muted"></div>
+
+        <div>
+            <span id="activityCount" class="mb-2 fw-bold text-primary" style="margin: 10px;">Total Activities: @Model.Count()</span>
+            <button class="btn btn-sm btn-outline-secondary me-2" id="prevPage">Previous</button>
+            <button class="btn btn-sm btn-outline-secondary" id="nextPage">Next</button>
+        </div>
+    </div>
 </div>
+
+<!-- Add Activity Modal -->
 <div class="modal fade" id="ActivityCreateModal" tabindex="-1" aria-labelledby="ActivityCreateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -58,6 +86,8 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Activity Modal -->
 <div class="modal fade" id="editActivityModal" tabindex="-1" role="dialog" aria-labelledby="editActivityLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -68,24 +98,36 @@
             <div class="modal-body">
                 <form id="editActivityForm">
                     <input type="hidden" id="editActivityId" />
-                
-                        <label for="">Activity Name</label>
-                        <input type="text" class="form-control" id="editActivityName" />
-                   
+                    <label for="">Activity Name</label>
+                    <input type="text" class="form-control" id="editActivityName" />
                 </form>
             </div>
             <div class="modal-footer">
+               
+                <button type="button" class="btn btn-primary" id="saveEditActivityBtn">Update</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveEditActivityBtn">Save</button>
             </div>
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-    
+
+        $(document).ready(function () {
+            $('#activitySearch').on('keyup', function () {
+                var value = $(this).val().toLowerCase();
+                $('table tbody tr').filter(function () {
+                    $(this).toggle(
+                        $(this).find('td:first').text().toLowerCase().indexOf(value) > -1
+                    );
+                });
+            });
+        });
+
+        // ✅ Delete with Confirmation
         document.querySelectorAll('.delete-confirm').forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -110,7 +152,6 @@
                                 }).then(() => {
                                     location.reload();
                                 });
-                                 
                             } else {
                                 alert("Failed to delete.");
                             }
@@ -120,15 +161,17 @@
             });
         });
 
+        // ✅ Create Activity Validation
         document.getElementById('activityForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const form = e.target;
             const formData = new FormData(form);
 
-            const activityName = formData.get("ActivityName")?.trim();
+            let activityName = formData.get("ActivityName")?.replace(/\s+/g, ' ').trim();
             const errorSpan = document.getElementById("activityNameError");
 
+            debugger;
             if (!activityName) {
                 errorSpan.classList.remove("d-none");
                 return;
@@ -136,21 +179,20 @@
                 errorSpan.classList.add("d-none");
             }
 
-            // Get and append Anti-Forgery Token
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
             formData.append('__RequestVerificationToken', token);
 
-            fetch('/Activity/Create', {
+            fetch('/Activity/Create?activity=' + encodeURIComponent(activityName), {
                 method: 'POST',
-                body: formData
-                
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
                 .then(response => response.text())
                 .then(result => {
                     if (result === "OK") {
-                        location.reload(); 
+                        location.reload();
                     } else {
-                        const errorSpan = document.getElementById("activityNameError");
                         errorSpan.textContent = result;
                         errorSpan.classList.remove("d-none");
                     }
@@ -162,43 +204,99 @@
                 });
         });
 
+        // ✅ Edit Activity
+        $(document).ready(function () {
+            $('.edit-activity-btn').click(function () {
+                var id = $(this).data('id');
+                $.get('/Activity/GetEditData/' + id, function (data) {
+                    $('#editActivityId').val(data.activityId);
+                    $('#editActivityName').val(data.activityName);
+                    $('#editActivityModal').modal('show');
+                });
+            });
+
+            $('#saveEditActivityBtn').click(function () {
+                var activity = {
+                    ActivityId: $('#editActivityId').val(),
+                    ActivityName: $('#editActivityName').val().replace(/\s+/g, ' ').trim()
+                };
+
+                $.ajax({
+                    url: '/Activity/EditData/' + activity.ActivityId,
+                    type: 'POST',
+                    data: activity,
+                    success: function (response) {
+                        $('#editActivityModal').modal('hide');
+                        location.reload();
+                    },
+                    error: function () {
+                        alert('Error saving activity');
+                    }
+                });
+            });
+        });
+
+        let currentPage = 1;
+        const rowsPerPage = 5;
+
+        function paginateTable() {
+            const allRows = document.querySelectorAll("table tbody tr");
+            const searchValue = document.getElementById("activitySearch").value.toLowerCase();
+
+            let visibleRows = [];
+
+            // Filter rows based on search input
+            allRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const match = rowText.includes(searchValue);
+                row.style.display = match ? "" : "none";
+                if (match) visibleRows.push(row);
+            });
+
+            const totalRows = visibleRows.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+            // Apply pagination on filtered rows
+            visibleRows.forEach((row, index) => {
+                row.style.display = (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) ? "" : "none";
+            });
+
+            // Info text
+            const start = totalRows === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+            const end = Math.min(currentPage * rowsPerPage, totalRows);
+            document.getElementById("tableInfo").textContent = `Showing ${start}-${end} of ${totalRows}`;
+
+            // Disable prev/next buttons
+            document.getElementById("prevPage").disabled = currentPage === 1;
+            document.getElementById("nextPage").disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        document.getElementById("prevPage").addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                paginateTable();
+            }
+        });
+
+        document.getElementById("nextPage").addEventListener("click", () => {
+            const allVisibleRows = Array.from(document.querySelectorAll("table tbody tr")).filter(row => row.style.display !== 'none');
+            const totalPages = Math.ceil(allVisibleRows.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                paginateTable();
+            }
+        });
+
+        // Initial call
+        paginateTable();
+
+        // Reapply pagination after search
+        document.getElementById("activitySearch").addEventListener("keyup", function () {
+            currentPage = 1;
+            paginateTable();
+        });
 
     </script>
 }
-<script>
-    $(document).ready(function () {
 
-
-        $('.edit-activity-btn').click(function () {
-            debugger;
-            var id = $(this).data('id');
-            $.get('/Activity/GetEditData/' + id, function (data) {
-                $('#editActivityId').val(data.activityId);
-                $('#editActivityName').val(data.activityName);
-                $('#editActivityModal').modal('show');
-            });
-        });
-
-
-        $('#saveEditActivityBtn').click(function () {
-            var activity = {
-                ActivityId: $('#editActivityId').val(),
-                ActivityName: $('#editActivityName').val()
-            };
-
-            $.ajax({
-                url: '/Activity/EditData/' + activity.ActivityId,
-                type: 'POST',
-                data: activity,
-                success: function (response) {
-                    $('#editActivityModal').modal('hide');
-                    location.reload(); // Refresh page
-                },
-                error: function () {
-                    alert('Error saving activity');
-                }
-            });
-        });
-    });
-</script>
 

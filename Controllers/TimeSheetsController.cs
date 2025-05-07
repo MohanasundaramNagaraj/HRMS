@@ -8,6 +8,7 @@ using SparkHRMS.Data.Setting;
 using SparkHRMS.ViewModels;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Authorization;
+using Org.BouncyCastle.Pqc.Crypto.Falcon;
 
 namespace SparkHRMS.Controllers
 {
@@ -164,10 +165,11 @@ namespace SparkHRMS.Controllers
                 timesheet.IsDeleted = true;
                 await _context.SaveChangesAsync();
             }
-            else
-            {
-                throw new Exception("Timesheet not found!");
-            }
+            //else
+            //{
+            //    return null;
+            //    //throw new Exception("Timesheet not found!");
+            //}
         }
         private List<string> getActivityData()
         {

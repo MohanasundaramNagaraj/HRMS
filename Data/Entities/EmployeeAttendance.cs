@@ -26,6 +26,7 @@ namespace SparkHRMS.Data.Entities
         public string? CheckInPosition { get; set; }
         public string? CheckOutPosition { get; set; }
         public bool? IsAutoCheckedOut { get; set; }
+
         //public bool IsPermission { get; set; }
         //public DateTime? PermissionStartTime { get; set; }
         //public DateTime? PermissionEndTime { get; set; }

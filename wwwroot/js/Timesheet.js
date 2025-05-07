@@ -1,10 +1,13 @@
 ﻿
 const attachDeleteEvent = () => {
+  
     document.querySelectorAll('.deleteRow').forEach(button => {
         button.addEventListener('click', function () {
             this.closest('tr').remove();
         });
     });
+    
+    
 };
 
 let apiBaseUrl = "/TimeSheets";
@@ -54,15 +57,28 @@ function exportToExcel() {
         let rowData = [];
         let cells = row.querySelectorAll("td");
 
-        // Loop through all cells except the last one (Actions)
+         //Loop through all cells except the last one (Actions)
         for (let i = 0; i < cells.length - 1; i++) {
             let input = cells[i].querySelector("input");
-            rowData.push(input ? input.value : cells[i].innerText);
+            let select = cells[i].querySelector("select");
+            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text :cells[i].innerText);
         }
 
         data.push(rowData);
-    });
+        //for (let i = 0; i < cells.length - 1; i++) {
+        //    let input = cells[i].querySelector("input");
+        //    let select = cells[i].querySelector("select");
 
+        //    if (input) {
+        //        rowData.push(input.value);
+        //    } else if (select) {
+        //        rowData.push(select.options[select.selectedIndex].text); // or select.value if you want the value
+        //    } else {
+        //        rowData.push(cells[i].innerText.trim());
+        //    }
+        //}
+    });
+    
     let ws = XLSX.utils.aoa_to_sheet(data);
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
@@ -90,7 +106,9 @@ function exportToPDF() {
         // Loop through all cells except the last one (Actions)
         for (let i = 0; i < cells.length - 1; i++) {
             let input = cells[i].querySelector("input");
-            rowData.push(input ? input.value : cells[i].innerText);
+            let select = cells[i].querySelector("select");
+            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text : cells[i].innerText);
+
         }
 
         data.push(rowData);
@@ -168,6 +186,9 @@ function update() {
 
             debugger;
             if (row && row.querySelector("input[type='date']")?.value) {
+
+                const description = row.querySelector(".description-input")?.value || "";
+                const jsonDescriptionString = '{"Description": ' + JSON.stringify(description) + '}';
                 const data = {
                     Id: 0,
                     YearId: year,
@@ -177,7 +198,7 @@ function update() {
                     Day: row.querySelector("input[placeholder='Day']")?.value || "",
                     Task: row.querySelector(".task-input")?.value || "",
                     Activity: row.querySelector(".activity-input")?.value || "",
-                    Descreption: row.querySelector(".description-input")?.value || "",
+                    Descreption: jsonDescriptionString || "",
                     HoursWorked: parseInt(row.querySelector(".hours-worked-input")?.value) || 0,
                     EmployeeId: empid
                 };
@@ -190,6 +211,7 @@ function update() {
 
     addTimesheet(rowDatas);
 }
+;
 function addRow(row, index) {
     debugger;
     let uid;
@@ -227,7 +249,7 @@ function addRow(row, index) {
                                                     ${activityOptions}
                                                 </select>
                                             </td>
-                                        <td style="width:42%;"><input type="text" class="form-control timesheet-input description-input" placeholder="Task Description" value="${row.Descreption}"/></td>
+                                        <td style="width:42%;"><textarea  type="text" class="form-control timesheet-input description-input" placeholder="Task Description" value="${row.Descreption}"></textarea></td>
                                         <td style="width:5%;"><input type="number" class="form-control timesheet-input hours-worked-input" placeholder="Hours Worked" value="${row.HoursWorked}"></td>
                                         <td style="width:8%;">
                                             <button class="btn btn-success addRow" onclick="addRow(${undefined},${index + 1});"><i class="material-icons">add</i></button>
@@ -265,6 +287,7 @@ function addRow(row, index) {
 
     datePicker.min = formatDate(firstDay);
     datePicker.max = formatDate(lastDay);
+    
 };
 
 
@@ -310,7 +333,12 @@ function addTimesheet(timesheetData) {
         type: "POST",
         data: { timesheet: timeSheet },
         success: function (response) {
-            alert("Updated Successfully");
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated Successful',
+                text: 'Updated Successfully!'
+            });
+           // alert("Updated Successfully");
         },
         error: function (error) {
             alert('error');
@@ -320,13 +348,61 @@ function addTimesheet(timesheetData) {
 
 function deleteTimesheet(timesheetId) {
     $.ajax({
-        url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
-        type: "POST",
-        success: function (response) {
-            alert("Deleted successfully");
-        },
-        error: function (error) {
-            alert('error');
-        },
-    });
+            url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
+            type: "POST",
+            success: function (response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted Successful',
+                    text: 'Deleted Successfully!'
+                });
+
+            },
+            error: function (error) {
+                alert('error');
+            },
+        });
+    
 }
+const table = document.getElementById('timesheetTable');
+const filters = table.querySelectorAll('.column-filter');
+
+filters.forEach((input, colIndex) => {
+    input.addEventListener('input', () => {
+        const filterValues = Array.from(filters).map(f => f.value.toLowerCase().trim());
+
+        Array.from(table.tBodies[0].rows).forEach(row => {
+            let showRow = true;
+
+            filterValues.forEach((val, i) => {
+                if (!val) return;
+
+                const cell = row.cells[i];
+                if (!cell) return;
+
+                let cellText = '';
+                const inputElement = cell.querySelector('input');
+
+                if (inputElement && inputElement.type === 'date') {
+                   
+                    const raw = inputElement.value.trim();
+
+                    
+                    const [y, m, d] = raw.split("-");
+                    cellText = `${d}-${m}-${y}`; 
+                } else if (inputElement) {
+                    cellText = inputElement.value.toLowerCase().trim();
+                } else {
+                    cellText = cell.textContent.toLowerCase().trim();
+                }
+
+            
+                if (!cellText.includes(val)) {
+                    showRow = false;
+                }
+            });
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    });
+});
