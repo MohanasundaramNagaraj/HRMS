@@ -59,6 +59,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(/*options => opti
 //Services configuration
 builder.Services.AddScoped<ApplicationUser>();
 builder.Services.AddTransient<SparkHRMS.Interfaces.IEmailSender,  EmailSender>();
+builder.Services.AddTransient<SparkHRMS.Interfaces.IAutoCheckOut,  AutoCheckOut>();
 
 // Session cache
 builder.Services.AddDistributedMemoryCache();
