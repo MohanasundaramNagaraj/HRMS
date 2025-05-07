@@ -17,15 +17,17 @@ namespace SparkHRMS.Services
     {
         private readonly IConfiguration Configuration;
         private readonly IEmailSender _emailService;
+        private readonly IAutoCheckOut _autoCheckOut;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IBackgroundJobClient _backgroundJobClient;
-        public EmailQueueManager(IEmailSender emailService, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IBackgroundJobClient backgroundJobClient)
+        public EmailQueueManager(IEmailSender emailService,IAutoCheckOut autoCheckOut, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IBackgroundJobClient backgroundJobClient)
         {
             _emailService = emailService;
             _context = context;
             _userManager = userManager;
             _backgroundJobClient = backgroundJobClient;
+            _autoCheckOut = autoCheckOut;
         }
         public async Task SendScheduledEmail(string Event)
         {
@@ -40,7 +42,19 @@ namespace SparkHRMS.Services
                 _backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync(user.Email, Event, html));
             }
         }
+        public async Task AutoCheckOutEmail(string Event)
+        {
+            string html = "";
+            DateTime Yesterday = DateTime.Today.Date.AddDays(-1);
+            //html += await getAutoCheckOutEmailContent(Yesterday);
+            //html += await getAutoCheckOutEmailContent(DateTime.Today);
 
+            var adminUsers = await GetAdminsAndSuperAdminsAsync();
+            foreach (var user in adminUsers)
+            {
+                _backgroundJobClient.Enqueue(() => _autoCheckOut.AutoCheckOutAsync(user.Email, Event, html));
+            }
+        }
         private string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
         {
             if (checkInTime.HasValue && checkOutTime.HasValue)

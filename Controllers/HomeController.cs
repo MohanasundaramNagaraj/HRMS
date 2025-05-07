@@ -23,17 +23,18 @@ namespace SparkHRMS.Controllers
         private readonly ApplicationDbContext _context;
        // private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IEmailSender _emailService;
-
+        private readonly IAutoCheckOut _autoCheckOut;
       
         public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context, 
            // IBackgroundJobClient backgroundJobClient,
-            IEmailSender emailService)
+            IEmailSender emailService,IAutoCheckOut autoCheckOut)
         {
             _logger = logger;
             _userManager = userManager;
             _context = context;
            // _backgroundJobClient = backgroundJobClient;
             _emailService = emailService;
+            _autoCheckOut = autoCheckOut;
         }
 
         public async Task<IActionResult> Index()
