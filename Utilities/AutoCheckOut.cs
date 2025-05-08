@@ -54,8 +54,8 @@ namespace SparkHRMS.Utilities
                 var yesterday = DateTime.Today.AddDays(-1);
                 var employeeAttendance = (from emp in _context.EmployeeAttendance
                                           join employee in _context.Employees on emp.EmployeeId equals employee.EmployeeId
-                                          where emp.CheckInTime != null
-                                                && emp.CheckInTime.Date == today || emp.CheckInTime.Date == yesterday
+                                          where emp.CheckInTime != null &&
+                                                emp.CheckInTime.Date == today || emp.CheckInTime.Date == yesterday
                                                 && emp.CheckOutTime == null
                                           select new
                                           {
@@ -66,7 +66,7 @@ namespace SparkHRMS.Utilities
                 foreach (var emplyoee in employeeAttendance)
                 {
                     var empAttendance = (from em in _context.EmployeeAttendance
-                                         where em.EmployeeId == emplyoee.Employee.EmployeeId
+                                         where em.EmployeeId == emplyoee.Employee.EmployeeId && em.CheckInTime.Date== today || em.CheckInTime.Date == yesterday
                                          select em).FirstOrDefault();
                     empAttendance.CheckOutTime = emplyoee.EmployeeAttendance.CheckInTime.AddHours(9); // Add 9 hours to CheckInTime
                     empAttendance.IsAutoCheckedOut = true;
@@ -87,9 +87,9 @@ namespace SparkHRMS.Utilities
                     string workingHours = CalculateWorkingHours(record.CheckInTime, record.CheckOutTime);
 
 
-                    var employeeName = record.Employee.Name;
-                    var systemIP = record.CheckinMadeSystemIP ?? "N/A";
-                    var checkOutIP = record.CheckOutMadeSystemIP ?? "N/A";
+                    var employeeName = emplyoee.Employee.Name;
+                    var systemIP = emplyoee.EmployeeAttendance.CheckinMadeSystemIP ?? "N/A";
+                    var checkOutIP = emplyoee.EmployeeAttendance.CheckOutMadeSystemIP ?? "N/A";
                     string siteUrl = Configuration["AppSettings:ThisSiteUrl"];
                     //htmlMessage += @"
                     //<p>Dear "+ employeeName +@",
@@ -165,7 +165,7 @@ namespace SparkHRMS.Utilities
                     var client = new SendGridClient(apiKey);
                     var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
                     //var mailTo = (from emp in _context.Users);
-                    var to = new EmailAddress(empAttendance.Employee.Email);
+                    var to = new EmailAddress(emplyoee.Employee.Email);
                     // var to = new EmailAddress(email, email);
                     var plainTextContent = "";
                     var htmlContent = htmlMessage;
@@ -222,6 +222,107 @@ namespace SparkHRMS.Utilities
                     }
                 }
 
+                var autoCheckOutEmployees = (from emp in _context.EmployeeAttendance
+                                             join employee in _context.Employees on emp.EmployeeId equals employee.EmployeeId
+                                             where (
+                                             //emp.CheckInTime.Date == today ||
+                                             emp.CheckInTime.Date == yesterday)
+                                                   && emp.IsAutoCheckedOut == true
+                                             select new
+                                             {
+                                                 EmployeeAttendance = emp,
+                                                 Employee = employee
+                                             }).ToList();
+
+                 htmlMessage = @"
+<div style=""width: 100%; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;"">
+    <div style=""max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);"">
+        <div style=""background-color: #17a2b8; color: #ffffff; padding: 15px; border-top-left-radius: 8px; border-top-right-radius: 8px;"">
+            <h2 style=""margin: 0;"">Employee Attendance for " + today.ToString("dd MMM yyyy") + @"</h2>
+        </div>
+        <div style=""padding: 20px;"">
+            <p>Dear Team,</p>
+            <p>Below are the details of employees who were automatically checked out by the system:</p>";
+
+                foreach (var employee in autoCheckOutEmployees)
+                {
+                    var record = employee.EmployeeAttendance;
+
+                    var checkInTime = record.CheckInTime != null ? ((DateTime)record.CheckInTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "Not Checked In";
+                    var checkOutTime = record.CheckOutTime != null ? ((DateTime)record.CheckOutTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "Not Checked Out";
+                    string workingHours = CalculateWorkingHours(record.CheckInTime, record.CheckOutTime);
+
+                    var employeeName = employee.Employee.Name;
+                    var systemIP = record.CheckinMadeSystemIP ?? "N/A";
+                    var checkOutIP = record.CheckOutMadeSystemIP ?? "N/A";
+
+                    htmlMessage += $@"
+    <div style='border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 15px; padding: 15px; background-color: #f9f9f9;'>
+        <h3 style='margin: 0 0 10px;'>{employeeName}</h3>
+        <p style='margin: 5px 0;'><strong>Check-In Time:</strong> {checkInTime}</p>
+        <p style='margin: 5px 0;'><strong>Check-Out Time:</strong> {checkOutTime}</p>
+        <p style='margin: 5px 0;'><strong>Working Hours:</strong> {workingHours}</p>
+        <p style='margin: 5px 0;'><strong>Check-In IP:</strong> {systemIP}</p>
+        <p style='margin: 5px 0;'><strong>Check-Out IP:</strong> {checkOutIP}</p>
+    </div>";
+                }
+
+                htmlMessage += @"
+            <p>Regards,</p>
+            <p>HR Team<br/>Spark IT Tech</p>
+            <p>Please visit <a href='" + Configuration["AppSettings:ThisSiteUrl"] + @"' style='color: #007bff; text-decoration: none;'>" + Configuration["AppSettings:SiteTitle"] + @"</a> for more information.</p>
+        </div>
+    </div>
+</div>";
+
+                subject = Configuration["EmailSenderSettings:Subject:AutoCheckOut"] + " on " + dateTimeForCheckinCheckoutSubject;
+
+                // Send the email using SendGrid
+                try
+                {
+                    var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
+                    var client = new SendGridClient(apiKey);
+                    var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
+                    var to = new EmailAddress("nandhakumarmurugesan45@gmail.com");
+                    var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
+                    var response = await client.SendEmailAsync(msg);
+                    await Task.Delay(500); // Delay in milliseconds
+                    var emailLogs = new EmailLogs
+                    {
+                        Recipient = email,
+                        Cc = string.Empty,
+                        Subject = subject,
+                        Body = htmlMessage,
+                        SentDate = DateTime.Now,
+                        IsSuccessful = false,
+                        ErrorMessage = string.Empty
+                    };
+
+                    _context.EmailLogs.Add(emailLogs);
+                    _context.SaveChanges();
+                    int logId = emailLogs.Id;
+                    var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
+                    if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                    {
+
+                        log.IsSuccessful = true;
+                    }
+                    else
+                    {
+                        string responseBody = await response.Body.ReadAsStringAsync();
+                        log.IsSuccessful = false;
+                        log.ErrorMessage = responseBody;
+                    }
+
+                    _context.Entry(log).State = EntityState.Modified;
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    // Log error
+                    _logger.LogError(ex.Message);
+                    throw;
+                }
 
             }
             catch (Exception ex)

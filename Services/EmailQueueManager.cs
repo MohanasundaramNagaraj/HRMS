@@ -45,9 +45,7 @@ namespace SparkHRMS.Services
         public async Task AutoCheckOutEmail(string Event)
         {
             string html = "";
-            DateTime Yesterday = DateTime.Today.Date.AddDays(-1);
-            //html += await getAutoCheckOutEmailContent(Yesterday);
-            //html += await getAutoCheckOutEmailContent(DateTime.Today);
+            //DateTime Yesterday = DateTime.Today.Date.AddDays(-1);
 
             var adminUsers = await GetAdminsAndSuperAdminsAsync();
             foreach (var user in adminUsers)
