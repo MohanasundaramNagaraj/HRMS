@@ -13,6 +13,8 @@
     // }
     ViewData["Title"] = "Leave Request - " + ViewBag.FMode;
 }
+
+<link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
 <style>
     input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default), input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default), input[type=tel]:not(.browser-default), input[type=number]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea {
         border: 1px solid #afafaf;
@@ -63,11 +65,16 @@ else
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/app/assets/js/bundles/flatpicker/flatpicker.min.js"></script>
+
+<script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
+<script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
 <script>
+
     let leaveRequestId = @Model.Id;
     let fmode = '@ViewBag.FMode';
     $(document).ready(function () {
-        function toggleComments() {
+        function toggleComments() { 
             var selectedText = $("#leaveReasonSelect option:selected").text().toLowerCase();
             if (selectedText === "others") {
                 $("#commentsDiv").show();
@@ -85,7 +92,7 @@ else
             toggleComments();
         });
 
-        $("#StartDate, #EndDate, #IsStartDateHalfDay, #IsEndDateHalfDay").on("change", function () {
+        $("#date1, #EndDate, #IsStartDateHalfDay, #IsEndDateHalfDay").on("change", function () {
             calculateEndDate();
         });
 
@@ -195,7 +202,10 @@ else
 
 
     function calculateEndDate() {
-        const startDateStr = $("#StartDate").val();
+        const inputDate = $("#date1").val();
+
+        const [day, month, year] = inputDate.split('-');
+        const startDateStr = `${year}-${month}-${day}`;
         const daysInput = parseFloat($("#LeaveDayCount").val());
 
         if (startDateStr && !isNaN(daysInput) && daysInput > 0) {
