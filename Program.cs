@@ -62,6 +62,7 @@ builder.Services.AddTransient<SparkHRMS.Interfaces.IEmailSender,  EmailSender>()
 builder.Services.AddTransient<SparkHRMS.Interfaces.IAutoCheckOut,  AutoCheckOut>();
 builder.Services.AddTransient<SparkHRMS.Interfaces.IAutoTimeSheetMail, TimeSheetAutoMail>();
 
+
 // Session cache
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

@@ -16,10 +16,10 @@ namespace SparkHRMS.Data.Entities
         public int YearId { get; set; }
 
         [Required]
-        public int TotalLeaveAllocated { get; set; }
-        public int TotalLeaveBalance { get; set; }
-        public int TotalUsedDays { get; set; }
-        public int TotalCarriedForwardLeaves { get; set; }
+        public decimal TotalLeaveAllocated { get; set; }
+        public decimal TotalLeaveBalance { get; set; }
+        public decimal TotalUsedDays { get; set; }
+        public decimal TotalCarriedForwardLeaves { get; set; }
         public bool IsActive { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

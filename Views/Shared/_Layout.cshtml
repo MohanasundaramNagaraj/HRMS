@@ -40,7 +40,7 @@
     Add below class to body tag for dark theme
     class="dark menu_dark logo-black theme-black ltr side-closed-hover"
 -->
-<body>
+<body class="form-control">
     @{
         var user = await UserManager.GetUserAsync(User);
 
@@ -275,9 +275,7 @@
                                 <li class="">
                                     <a href="/AdminAttendanceViewer/EmployeeMonthlySummary">Monthly Summary</a>
                                 </li>
-                                <li class="">
-                                    <a href="/AdminAttendanceViewer/EmployeeRequests">Requests</a>
-                                </li>
+                              
                             </ul>
                         </li>
 
@@ -434,10 +432,7 @@
                             <ul class="ml-menu">
                                 <li>
                                     <a href="/EmployeeAttendance/Index">Employee Attendance</a>
-                                </li>
-                                <li>
-                                    <a href="/EmployeeAttendance/Index">Request</a>
-                                </li>
+                                </li>   
                             </ul>
                         </li>
                         <li>

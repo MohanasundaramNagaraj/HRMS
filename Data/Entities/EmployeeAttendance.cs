@@ -17,7 +17,7 @@ namespace SparkHRMS.Data.Entities
 
         public DateTime CheckInTime { get; set; }
 
-        public DateTime? CheckOutTime { get; set; }
+        public DateTime? CheckOutTime { get; set; } 
 
         public string? CheckinMadeSystemIP { get; set; }
         public string? CheckOutMadeSystemIP { get; set; }

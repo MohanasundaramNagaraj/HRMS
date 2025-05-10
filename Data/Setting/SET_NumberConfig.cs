@@ -27,7 +27,7 @@ namespace SparkHRMS.Data.Setting
         public string Suffix { get; set; }
         [Required]
         public int YearID { get; set; }
-        public bool IsActive { get; set; } = false;
+        public bool IsActive { get; set; } = true;
         public int CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public int? UpdatedBy { get; set; }

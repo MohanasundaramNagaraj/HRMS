@@ -1,13 +1,35 @@
 ﻿@using SparkHRMS.Data.Entities
-
+@using Microsoft.AspNetCore.Html
 @using SparkHRMS.Utilities
 
 @model LeaveRequest
 @{
-    var isReadOnly = ViewData["IsReadOnly"] as bool? ?? false;
+    var isReadOnly = ViewBag.FMode != "ADD";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Leave Request";
+
+    // if (ViewBag.FMode == "Can-Approve")
+    // {
+    //     ViewBag.FMode = "Cancel-Approval";
+    // }
+    ViewData["Title"] = "Leave Request - " + ViewBag.FMode;
 }
+
+<link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
+<style>
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default), input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default), input[type=tel]:not(.browser-default), input[type=number]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
+    }
+
+    .form-label {
+        margin-bottom: .5rem;
+        font-weight: bolder;
+    }
+</style>
 <div class="row mr-0">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <ul class="breadcrumb breadcrumb-style" style="display:inline">
@@ -16,134 +38,43 @@
             </li>
             <li class="breadcrumb-item bcrumb-1">
                 <a href="#">
-                    <i class="fas fa-add"></i> Create
+                    <i class="fas fa-add"></i> @ViewBag.FMode
                 </a>
             </li>
         </ul>
     </div>
 </div>
+<div id="leaveValidationMessage" class="text-danger mt-2" style="display:none;"></div>
 
 <hr />
 
-<form asp-action="Create">
-    <div class="card shadow p-4">
-       
-        <div class="row">
-            <div class="col-md-3 mb-3">
+@if (ViewBag.FMode == "ADD")
+{
+    <form asp-action="@(ViewBag.FMode == "ADD" ? "Create" : null)" id="leaveRequestForm">
+        @await Html.PartialAsync("LeaveRequestForm", Model)
+    </form>
 
-                <label asp-for="EmployeeId" class="form-label"></label>
-                @* <input asp-for="EmployeeId" class="form-control" readonly="@isReadOnly" hidden /> *@
-
-                <select style="margin-top: 10px;" asp-for="EmployeeId" class="form-control" readonly="@isReadOnly" class="form-select" id="empSelector" required>
-                    @{
-                        var employeeList = ViewBag.EmployeeList;
-                    }
-                    <option value="">Select Employee</option>
-                    @foreach (var record in employeeList)
-                    {
-                        if (Model.EmployeeId == record.EmployeeId)
-                        {
-                            <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
-                        }
-
-                    }
-                </select>
-            </div>
-
-            <div class="col-md-3 mb-3">
-                <div class="mb-3">
-                    <label asp-for="RequestNumber" class="form-label"></label>
-                    <input asp-for="RequestNumber" class="form-control" readonly="true" />
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="mb-3">
-                    <label asp-for="RequestedDate" class="form-label"></label>
-                    <input asp-for="RequestedDate" class="form-control" readonly="true" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                </div>
-            </div>
-            
-            <div class="col-md-3 mb-3">
-                <div class="mb-3" id="isactivediv">
-                    <label asp-for="Status" class="form-label"></label>
-                    <input asp-for="Status" class="form-control" value="@Model.Status" readonly="true" />
-                </div>
-            </div>
-
-        </div>
-
-      
-        @{
-            var today = DateTime.Today;
-            var firstDayOfThisMonth = new DateTime(today.Year, today.Month, 1);
-            var lastDayOfNextMonth = new DateTime(today.Year, today.Month, 1).AddMonths(2).AddDays(-1);
-        }
-
-        <div class="row mb-3">
-            <div class="col-md-4 mb-3 ">
-                <label asp-for="StartDate" class="form-label"></label>
-                <input asp-for="StartDate" type="date" class="form-control"
-                       min="@firstDayOfThisMonth:yyyy-MM-dd" max="@lastDayOfNextMonth:yyyy-MM-dd"
-                       readonly="@isReadOnly" id="StartDate" />
-                <div class="form-check mt-1">
-                    <input asp-for="IsStartDateHalfDay" class="form-check-input" disabled="@isReadOnly" id="IsStartDateHalfDay" />
-                    <label class="form-check-label" asp-for="IsStartDateHalfDay">Half Day</label>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Number of Days</label>
-                <input type="number" class="form-control" id="LeaveDayCount" min="0.5" step="0.5" />
-            </div>
-       
-            <div class="col-md-4 mb-3">
-                <label asp-for="EndDate" class="form-label"></label>
-                <input asp-for="EndDate" type="date" class="form-control" readonly id="EndDate" />
-                <div class="form-check mt-1">
-                    <input asp-for="IsEndDateHalfDay" class="form-check-input" disabled="@isReadOnly" id="IsEndDateHalfDay" />
-                    <label class="form-check-label" asp-for="IsEndDateHalfDay">Half Day</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-6 mb-3">
-                <label asp-for="LeaveTypeId" class="form-label"></label>
-                <select asp-for="LeaveTypeId" class="form-control" asp-items="ViewBag.LeaveTypes" disabled="@isReadOnly"></select>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label asp-for="LeaveReasonId" class="form-label"></label>
-                <select asp-for="LeaveReasonId" class="form-control" asp-items="ViewBag.LeaveReasons" id="leaveReasonSelect" disabled="@isReadOnly"></select>
-            </div>
-        </div>
-
-        <div class="mb-3" id="commentsDiv_">
-            <label asp-for="Comments" class="form-label"></label>
-            <input asp-for="Comments" class="form-control" value="Leave Request" rows="3" readonly="@isReadOnly"/>
-        </div>
-
-        <div class="col-lg-12 p-t-20 text-center">
-            <div class="form-group">
-                @if (!isReadOnly)
-                {
-                    <input type="submit" value="Update" class="btn btn-primary waves-effect m-r-15">
-                }
-                <a type="button" class="btn btn-danger waves-effect" href="@Url.Action("Index")">Cancel</a>
-            </div>
-        </div>
+}
+else
+{
+    <div>
+        @await Html.PartialAsync("LeaveRequestForm", Model)
     </div>
-</form>
+
+}
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="~/app/assets/js/bundles/flatpicker/flatpicker.min.js"></script>
 
+<script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
+<script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
 <script>
-    $(document).ready(function () {
 
-        function toggleComments() {
+    let leaveRequestId = @Model.Id;
+    let fmode = '@ViewBag.FMode';
+    $(document).ready(function () {
+        function toggleComments() { 
             var selectedText = $("#leaveReasonSelect option:selected").text().toLowerCase();
             if (selectedText === "others") {
                 $("#commentsDiv").show();
@@ -161,7 +92,7 @@
             toggleComments();
         });
 
-        $("#StartDate, #EndDate, #IsStartDateHalfDay, #IsEndDateHalfDay").on("change", function () {
+        $("#date1, #EndDate, #IsStartDateHalfDay, #IsEndDateHalfDay").on("change", function () {
             calculateEndDate();
         });
 
@@ -169,34 +100,261 @@
             calculateEndDate();
         });
 
-        
+        var employeeId = $('#empSelector').val();
+        if (employeeId) {
+            fetchLeaveTypes(employeeId);
+        }
+
+        $('#empSelector').change(function () {
+            var empId = $(this).val();
+            fetchLeaveTypes(empId);
+        });
+
+        function fetchLeaveTypes(empId) {
+
+            $.get('/LeaveRequest/GetLeaveTypeDetails?employeeId=' + empId + '&LeaveRequestId=' + leaveRequestId, function (data) {
+
+                var tbody = $('#leaveTypeBody');
+                tbody.empty();
+                data.forEach(function (item, index) {
+                    item.BalanceDays = item.AllocatedDays - item.UsedDays;
+                    let uniqueid = generateUUIDv4();
+
+                    tbody.append(`
+                                                        <tr uid="${uniqueid}">
+                                                        <td>
+                                                                ${item.LeaveTypeName}
+                                                                <input type="hidden" name="LeaveRequestDetails[${index}].LeaveTypeId" value="${item.LeaveTypeId}" />
+                                                        </td>
+                                                        <td>
+                                                                <input type="number" class="form-control text-end" name="LeaveRequestDetails[${index}].AllocatedDays" value="${item.AllocatedDays}" readonly />
+                                                        </td>
+                                                        <td>
+                                                                <input type="number" class="form-control text-end" name="LeaveRequestDetails[${index}].UsedDays" value="${item.UsedDays}" readonly />
+                                                        </td>
+                                                        <td>
+                                                                <input type="number" class="form-control text-end" name="LeaveRequestDetails[${index}].BalanceDays" value="${item.BalanceDays}" readonly />
+                                                        </td>
+                                                        <td>
+                                                               <input type="number" class="form-control text-center requiredDays" name="LeaveRequestDetails[${index}].RequiredDays" value="${item.RequiredDays}" step="0.5" min="0" />
+                                                        </td>
+                                                    </tr>
+                                                `);
+                });
+
+                if (data.length == 0) {
+                    tbody.append(`
+                                                        <tr>
+                                                           <td colspan="5">
+                                                                No Leave Allocated
+                                                           </td>
+                                                        </tr>
+                                                    `);
+                }
+                if(fmode != 'ADD'){
+                    $('.requiredDays').prop('disabled',true);
+                }
+            });
+        }
     });
 
-   function calculateEndDate() {
-        const startDateStr = $("#StartDate").val();
+    $(document).on('input', 'input[name^="LeaveRequestDetails"][name$=".RequiredDays"]', function () {
+        let isValid = true;
+        let totalRequiredDays = 0;
+
+        $('#leaveTypeBody tr').each(function () {
+            const $row = $(this);
+            const requiredInput = $row.find('input[name$=".RequiredDays"]');
+            const balanceInput = $row.find('input[name$=".BalanceDays"]');
+
+            const required = parseFloat(requiredInput.val()) || 0;
+            const balance = parseFloat(balanceInput.val()) || 0;
+
+
+            if (required > balance) {
+                requiredInput.addClass('is-invalid');
+                $('#leaveValidationMessage').text('Required Days must be less than balance days.');
+                isValid = false;
+            } else {
+                requiredInput.removeClass('is-invalid');
+            }
+
+            totalRequiredDays += required;
+        });
+
+        const leaveDayCount = parseFloat($('#LeaveDayCount').val()) || 0;
+
+
+        if (totalRequiredDays !== leaveDayCount) {
+            $('#LeaveDayCount').addClass('is-invalid');
+            $('#leaveValidationMessage').text('Total Leave Days must be equal with total required days.');
+            isValid = false;
+        } else {
+            $('#LeaveDayCount').removeClass('is-invalid');
+        }
+
+        if (!isValid) {
+            $('#leaveValidationMessage').show();
+        } else {
+            $('#leaveValidationMessage').hide();
+        }
+    });
+
+
+    function calculateEndDate() {
+        const inputDate = $("#date1").val();
+
+        const [day, month, year] = inputDate.split('-');
+        const startDateStr = `${year}-${month}-${day}`;
         const daysInput = parseFloat($("#LeaveDayCount").val());
 
         if (startDateStr && !isNaN(daysInput) && daysInput > 0) {
-            const startDate = new Date(startDateStr);
-            let fullDays = Math.floor(daysInput);
-            let isHalfDay = daysInput % 1 !== 0;
+            $.ajax({
+                url: '/LeaveRequest/GetNonWorkingDays',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ startDate: startDateStr }),
+                success: function (response) {
+                    const nonWorkingDates = response.holidays; // array of 'yyyy-MM-dd'
+                    const weekOffs = response.weekOffDays; // array of integers: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + fullDays - 1);
+                    const startDate = new Date(startDateStr);
+                    let fullDays = Math.floor(daysInput);
+                    const isHalfDay = daysInput % 1 !== 0;
 
-            // If half day at end, add one more day
-            if (isHalfDay) {
-                endDate.setDate(endDate.getDate() + 1);
-                $("#IsEndDateHalfDay").prop("checked", true);
-            } else {
-                $("#IsEndDateHalfDay").prop("checked", false);
-            }
+                    let countedDays = 0;
+                    let currentDate = new Date(startDate);
 
-            // Format as yyyy-MM-dd
-            const formatted = endDate.toISOString().split('T')[0];
-            $("#EndDate").val(formatted);
+                    while (countedDays < fullDays) {
+                        const isoDate = currentDate.toISOString().split('T')[0];
+                        const isWeekOff = weekOffs.includes(currentDate.getDay());
+                        const isHoliday = nonWorkingDates.includes(isoDate);
+
+                        if (!isWeekOff && !isHoliday) {
+                            countedDays++;
+                        }
+
+                        if (countedDays < fullDays) {
+                            currentDate.setDate(currentDate.getDate() + 1);
+                        }
+                    }
+
+                    // Handle half day
+                    if (isHalfDay) {
+                        while (true) {
+                            currentDate.setDate(currentDate.getDate() + 1);
+                            const isoDate = currentDate.toISOString().split('T')[0];
+                            const isWeekOff = weekOffs.includes(currentDate.getDay());
+                            const isHoliday = nonWorkingDates.includes(isoDate);
+
+                            if (!isWeekOff && !isHoliday) {
+                                $("#IsEndDateHalfDay").prop("checked", true);
+                                break;
+                            }
+                        }
+                    } else {
+                        $("#IsEndDateHalfDay").prop("checked", false);
+                    }
+
+                    const formatted = currentDate.toISOString().split('T')[0];
+                    $("#EndDate").val(formatted);
+                },
+                error: function () {
+                    alert("Unable to fetch holiday data from server.");
+                }
+            });
         }
     }
 
-   
+    function saveLeaveRequest() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update the data?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var form = $('#leaveRequestForm');
+                var formData = form.serialize();
+                $.ajax({
+                    url: '/LeaveRequest/Create',
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Leave Request Submitted',
+                                html: 'Your leave request has been submitted successfully. You can track the status of request <b>' + $('#RequestNumber').val() + '</b> on the timeline in the list page.'
+                            }).then(() => {
+                                window.history.back();
+                            });
+                            
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Added Failed',
+                                text: 'Failed to Add'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        let errors = xhr.responseJSON;
+                        if (errors) {
+                            let messages = [];
+                            for (let key in errors) {
+                                messages.push(errors[key]);
+                            }
+                           
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Added Failed',
+                                text: 'Failed to Add: ' + messages.join("\n")
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Added Failed',
+                                text: 'Failed to Add'
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    function submitWithComment(id, status) {
+        Swal.fire({
+            title: 'Enter Comments',
+            input: 'textarea',
+            inputPlaceholder: 'Type your comments here...',
+            showCancelButton: true,
+            confirmButtonText: 'Submit'
+        }).then((result) => {
+            if (result.isConfirmed && result.value.trim() !== "") {
+                const comments = encodeURIComponent(result.value);
+                window.location.href = `/LeaveRequest/Approve?id=${id}&Status=${status}&Comments=${comments}`;
+            }
+        });
+    }
+
+    function cancelWithComment(id) {
+        Swal.fire({
+            title: 'Enter Cancel Comments',
+            input: 'textarea',
+            inputPlaceholder: 'Why are you cancelling?',
+            showCancelButton: true,
+            confirmButtonText: 'Submit'
+        }).then((result) => {
+            if (result.isConfirmed && result.value.trim() !== "") {
+                const comments = encodeURIComponent(result.value);
+                window.location.href = `/LeaveRequest/Cancel?id=${id}&changedBy=1&Comments=${comments}`;
+            }
+        });
+    }
 </script>

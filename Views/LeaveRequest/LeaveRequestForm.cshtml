@@ -1,0 +1,215 @@
+﻿@using SparkHRMS.Data.Entities
+@using Microsoft.AspNetCore.Html
+@using SparkHRMS.Utilities
+
+@model LeaveRequest
+@{
+    var isReadOnly = ViewBag.FMode != "ADD";
+    Layout = null;
+    ViewData["Title"] = "Leave Request - " + ViewBag.FMode;
+}
+
+@{
+    var employeeList = ViewBag.EmployeeList;
+    var today = DateTime.Today;
+    var firstDayOfThisMonth = new DateTime(today.Year, today.Month, 1);
+    var lastDayOfNextMonth = new DateTime(today.Year, today.Month, 1).AddMonths(2).AddDays(-1);
+}
+<style>
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default), input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default), input[type=tel]:not(.browser-default), input[type=number]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
+    }
+
+    .form-label {
+        margin-bottom: .5rem;
+        font-weight: bolder;
+    }
+</style>
+
+<div class="card shadow p-4">
+
+    <div class="row">
+        <div class="col-md-3 mb-3">
+
+            <label asp-for="EmployeeId" class="form-label"></label>
+
+            <select style="margin-top: 10px;" asp-for="EmployeeId" class="form-control" disabled="@isReadOnly" class="form-select" id="empSelector" required>
+
+                <option value="">Select All Employee</option>
+                @foreach (var record in employeeList)
+                {
+                    if (Model.EmployeeId == record.EmployeeId)
+                    {
+                        <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
+                    }
+                    else
+                    {
+                        <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
+                    }
+
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="mb-3">
+                <label asp-for="RequestNumber" class="form-label"></label>
+                <input asp-for="RequestNumber" class="form-control" readonly="true" />
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="mb-3">
+                <label asp-for="RequestedDate" class="form-label"></label>
+                <input asp-for="RequestedDate" class="form-control" readonly="true" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="mb-3" id="isactivediv">
+                <label asp-for="Status" class="form-label"></label>
+                @{
+                    string status = "";
+                }
+                @if (Model.Status == "PEN")
+                {
+                    status = "Approval Pending";
+                }
+                else if (Model.Status == "CAN-REQ")
+                {
+                    status = "Cancel Requested";
+                }
+                else if (Model.Status == "CAN-ACC")
+                {
+                    status = "Cancelled";
+                }
+                else if (Model.Status == "CAN-REJ")
+                {
+                    status = "Cancel Request Rejected";
+                }
+                else if (Model.Status == "ACC")
+                {
+                    status = "Accepted";
+                }
+                else if (Model.Status == "REJ")
+                {
+                    status = "Rejected";
+                }
+                else
+                {
+                    status = "Pending";
+                }
+                <input asp-for="Status" class="form-control" value="@status" readonly="true" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-3 mb-3 row">
+            <div class="col-md-7 mb-3">
+                <label asp-for="StartDate" class="form-label"></label>
+               @*  <input asp-for="StartDate" type="date" class="form-control"
+                       min="@firstDayOfThisMonth:yyyy-MM-dd" max="@lastDayOfNextMonth:yyyy-MM-dd"
+                       readonly="@isReadOnly" id="StartDate" />
+ *@
+                <input type="date" class="form-control datetimepicker flatpickr-input" asp-for="StartDate"
+                       name="date1" 
+                       min="@firstDayOfThisMonth:yyyy-MM-dd" max="@lastDayOfNextMonth:yyyy-MM-dd"
+                       readonly="@isReadOnly" id="date1"
+                       fdprocessedid="ivq72r">
+            </div>
+            <div class="col-md-5 form-check mt-5 text-center">
+                <input asp-for="IsStartDateHalfDay" class="form-check-input" disabled="@isReadOnly" id="IsStartDateHalfDay" />
+                <label class="form-check-label" asp-for="IsStartDateHalfDay">Half Day</label>
+            </div>
+        </div>
+
+        <div class="col-md-2 mb-3">
+            <label asp-for="TotalLeaveDays" class="form-label">Number of Days</label>
+            <input asp-for="TotalLeaveDays" type="number" class="form-control" id="LeaveDayCount" min="0.5" step="0.5" disabled="@isReadOnly" />
+        </div>
+
+        <div class="col-md-3 mb-3 row">
+            <div class="col-md-7 mb-3">
+                <label asp-for="EndDate" class="form-label"></label>
+                <input asp-for="EndDate" type="date" class="form-control" readonly id="EndDate" />
+            </div>
+            <div class="col-md-5  form-check mt-5 text-center">
+                <input asp-for="IsEndDateHalfDay" class="form-check-input" disabled="@isReadOnly" id="IsEndDateHalfDay" />
+                <label class="form-check-label" asp-for="IsEndDateHalfDay">Half Day</label>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="LeaveReasonId" class="form-label  mb-3"></label>
+            <select asp-for="LeaveReasonId" class="form-control " asp-items="ViewBag.LeaveReasons" id="leaveReasonSelect" disabled="@isReadOnly"></select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 mb-3" id="commentsDiv_">
+            <label asp-for="Comments" class="form-label"></label>
+
+            @if (ViewBag.FMode == "ADD")
+            {
+                <input asp-for="Comments" class="form-control"  rows="3" readonly="@isReadOnly" />
+            }
+            else
+            {
+                <input class="form-control" value="@Model.Comments" readonly="true" />
+            }
+        </div>
+    </div>
+
+    <div class="row mb-3 container" id="leaveTypeSection">
+        <h3>Split Your Leaves</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Leave Type</th>
+                    <th>Allocated</th>
+                    <th>Used</th>
+                    <th>Balance</th>
+                    <th>Required</th>
+                </tr>
+            </thead>
+            <tbody id="leaveTypeBody">
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="col-lg-12 p-t-20 text-center">
+        <div class="form-group">
+            @if (ViewBag.FMode == "ADD")
+            {
+                @if (!isReadOnly)
+                {
+                    <a value="Update" class="btn btn-primary waves-effect m-r-15" onclick="saveLeaveRequest();">Request</a>
+                }
+            }
+
+            @if (ViewBag.FMode == "Approve")
+            {
+                <button class="btn btn-success waves-effect m-r-15" onclick="submitWithComment(@Model.Id, 'ACC')">Accept</button>
+                <button class="btn btn-danger waves-effect m-r-15" onclick="submitWithComment(@Model.Id, 'REJ')">Reject</button>
+            } 
+            
+            @if (ViewBag.FMode == "Can-Approve")
+            {
+                <button class="btn btn-success waves-effect m-r-15" onclick="submitWithComment(@Model.Id, 'CAN-ACC')">Accept</button>
+                <button class="btn btn-danger waves-effect m-r-15" onclick="submitWithComment(@Model.Id, 'CAN-REJ')">Reject</button>
+            }
+            @if (ViewBag.FMode == "Cancel")
+            {
+                <button class="btn btn-warning waves-effect m-r-15" onclick="cancelWithComment(@Model.Id)">Cancel</button>
+            }
+
+            <a type="button" class="btn btn-info waves-effect" href="@Url.Action("Index")">Back</a>
+        </div>
+    </div>
+</div>
+

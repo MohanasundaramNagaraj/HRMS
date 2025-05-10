@@ -38,8 +38,8 @@ namespace SparkHRMS.Data.Entities
         public bool IsEndDateHalfDay { get; set; }
 
         [Required]
-        [Display(Name = "Leave Type")]
-        public int LeaveTypeId { get; set; }
+        [Display(Name = "Total Leave Days")]
+        public decimal TotalLeaveDays { get; set; }
 
         [Required]
         [Display(Name = "Leave Reason")]
@@ -52,5 +52,8 @@ namespace SparkHRMS.Data.Entities
         [StringLength(20)]
         [Display(Name = "Status")]
         public string Status { get; set; }
+
+
+        public ICollection<LeaveRequestDetail> LeaveRequestDetails { get; set; }
     }
 }
