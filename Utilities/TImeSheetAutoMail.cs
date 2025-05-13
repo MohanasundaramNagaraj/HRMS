@@ -1,0 +1,241 @@
+﻿
+using Humanizer;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MimeKit;
+using SparkHRMS.ViewModels;
+using SparkHRMS.Interfaces;
+using System.Net;
+using System.Net.Mail;
+using IAutoCheckOut = SparkHRMS.Interfaces.IAutoCheckOut;
+using SparkHRMS.Data.Entities;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using SparkHRMS.Data;
+using Microsoft.EntityFrameworkCore;
+using Hangfire.Logging;
+using SendGrid.Helpers.Mail;
+using SendGrid;
+using Serilog;
+using SparkHRMS.Services;
+using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
+using System.Security.Cryptography.Xml;
+using System.Reflection.Metadata;
+using SparkHRMS.Data.Setting;
+using Org.BouncyCastle.Ocsp;
+using System.Collections.Generic;
+namespace SparkHRMS.Utilities
+{
+    public class TimeSheetAutoMail : IAutoTimeSheetMail
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly SmtpSettings _smtpSettings;
+        private IConfiguration Configuration { get; }
+        private readonly ILogger<AutoCheckOut> _logger;
+
+        public TimeSheetAutoMail(ApplicationDbContext context, ILogger<AutoCheckOut> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
+        {
+            _context = context;
+            Configuration = configuration;
+            _logger = logger;
+            _smtpSettings = smtpSettings.Value;
+        }
+        public async Task AutoTimeSheetMailAsync(List<Employee> employees, string subject, string htmlMessage,List<EmailAddress> ccs)
+        {
+
+            try
+            {
+                List<EmployeeMailVM> emps = await getEmployeeBalanceDayCountAsync(employees);
+                var today = DateTime.Today;
+
+
+                string siteUrl = Configuration["AppSettings:ThisSiteUrl"];
+                List<EmailAddress> tos = new List<EmailAddress>();
+                string tableContent = "";
+                foreach (var emp in emps)
+                {
+                    string tr = "<tr><td>" + emp.EmpName + "</td><td>" + emp.BalanceDayscount + "</td></tr>";
+
+                    tableContent = tableContent + tr;
+                    var to = new EmailAddress(emp.EmailId, emp.EmpName);
+                    tos.Add(to);
+                }
+
+                htmlMessage = @"
+                    <p>Hi Team,</p>
+                    <p>The following employees have not updated their timesheets. Please update your timesheet ASAP.</p>
+
+                    <table border='1' cellpadding='8' cellspacing='0' style='border-collapse: collapse; font-family: Arial;'>
+                        <thead style='background-color: #f2f2f2;'>
+                            <tr>
+                                <th>Employee Name</th>
+                                <th>Timesheet Pending Days</th></tr></thead><tbody>" + tableContent + "</tbody></table><p>Regards,</p><p>HR Team<br/>Spark IT Tech</p>";
+
+
+                string dateTimeForSubject = DateTime.Now.ToString("dd MMM yyyy");
+                //htmlMessage += await getAutoCheckOutEmailContent(DateTime.Today);
+                subject = Configuration["EmailSenderSettings:Subject:AutoTimeSheetMailOut"] + " on " + dateTimeForSubject;
+
+                var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
+                var client = new SendGridClient(apiKey);
+                var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
+                //var mailTo = (from emp in _context.Users);
+                //var to = new EmailAddress(emp.EmpName);
+                // var to = new EmailAddress(email, email);
+                var plainTextContent = "";
+                var htmlContent = htmlMessage;
+
+             
+               // var singleRecipient = tos.FirstOrDefault();
+                var emailLogs = new EmailLogs
+                {
+                    Recipient = string.Join(",", tos.Select(t => t.Email)), // multiple recipients
+                    //Recipient = singleRecipient.Email, // multiple recipients
+                    Cc = string.Join(",", ccs.Select(c => c.Email)),
+                    Subject = subject,
+                    Body = htmlMessage,
+                    SentDate = DateTime.Now,
+                    IsSuccessful = false,
+                    ErrorMessage = string.Empty
+                };
+
+                _context.EmailLogs.Add(emailLogs);
+                _context.SaveChanges();
+
+                int logId = emailLogs.Id;
+                try
+                {
+
+                    var msg = MailHelper.CreateSingleEmailToMultipleRecipients(
+                        from,
+                        //new List<EmailAddress> { singleRecipient },
+                        tos,
+                        subject,
+                        plainTextContent,
+                        htmlContent,
+                        false
+                    );
+
+
+
+                    msg.Personalizations[0].Ccs = ccs;
+
+                    var response = await client.SendEmailAsync(msg);
+                    await Task.Delay(500); // Delay in milliseconds
+
+                    var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
+                    if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                    {
+
+                        log.IsSuccessful = true;
+                    }
+                    else
+                    {
+                        string responseBody = await response.Body.ReadAsStringAsync();
+                        log.IsSuccessful = false;
+                        log.ErrorMessage = responseBody;
+                    }
+
+                    _context.Entry(log).State = EntityState.Modified;
+                    _context.SaveChanges();
+
+                }
+                catch (Exception ex)
+                {
+                    var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
+
+                    log.IsSuccessful = false;
+                    log.ErrorMessage = ex.ToString();
+                    _context.Entry(log).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    // log an error message or throw an exception or both.
+                    _logger.LogError(ex.Message);
+                    throw;
+                }
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+
+        }
+        private async Task<List<EmployeeMailVM>> getEmployeeBalanceDayCountAsync(List<Employee> employees)
+        {
+            List<EmployeeMailVM> empDetls = new List<EmployeeMailVM>();
+
+            var today = DateTime.Today;
+            int yearId = today.Year;
+            int monthId = today.Month;
+
+            // Generate dates from the 1st to today
+            var validDates = Enumerable.Range(1, today.Day)
+                .Select(day => new DateTime(yearId, monthId, day))
+                .ToList();
+
+            // Fetch holidays once
+            var holidays = await _context.Holiday
+                .Where(h => h.Date.Month == monthId && h.Date.Year == yearId)
+                .Select(h => h.Date.Date)
+                .ToListAsync();
+
+            // Remove holidays from valid working dates
+            var workingDates = validDates
+                .Where(date => !holidays.Contains(date))
+                .ToList();
+
+            foreach (var i in employees)
+            {
+                var timesheetData = await _context.Timesheets
+                    .Where(t =>
+                        t.Date.Month == monthId &&
+                        t.Date.Year == yearId &&
+                        t.EmployeeId == i.EmployeeId &&
+                        !t.IsDeleted)
+                    .GroupBy(t => t.Date.Date)
+                    .Select(g => new
+                    {
+                        Date = g.Key,
+                        TotalHours = g.Sum(x => x.HoursWorked)
+                    })
+                    .ToListAsync();
+
+                var incompleteDays = workingDates
+                    .Where(date =>
+                    {
+                        var entry = timesheetData.FirstOrDefault(d => d.Date == date);
+                        return entry == null || entry.TotalHours < 8;
+                    })
+                    .ToList();
+
+                int incompleteDayCount = incompleteDays.Count;
+
+                empDetls.Add(new EmployeeMailVM
+                {
+                    EmpName = i.Name,         // Assuming Employee model has Name
+                    EmailId = i.Email,
+                    BalanceDayscount = incompleteDayCount
+                });
+            }
+
+            return empDetls;
+        }
+
+        private string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
+        {
+            if (checkInTime.HasValue && checkOutTime.HasValue)
+            {
+                var duration = checkOutTime.Value - checkInTime.Value;
+                return string.Format("{0:%h} hours {0:%m} mins", duration);
+            }
+            return "N/A";
+        }
+    }
+}

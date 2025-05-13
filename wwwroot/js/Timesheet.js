@@ -187,8 +187,8 @@ function update() {
             debugger;
             if (row && row.querySelector("input[type='date']")?.value) {
 
-                const description = row.querySelector(".description-input")?.value || "";
-                const jsonDescriptionString = '{"Description": ' + JSON.stringify(description) + '}';
+                //const description = row.querySelector(".description-input")?.value || "";
+                //const jsonDescriptionString = '{"Description": ' + JSON.stringify(description) + '}';
                 const data = {
                     Id: 0,
                     YearId: year,
@@ -198,7 +198,7 @@ function update() {
                     Day: row.querySelector("input[placeholder='Day']")?.value || "",
                     Task: row.querySelector(".task-input")?.value || "",
                     Activity: row.querySelector(".activity-input")?.value || "",
-                    Descreption: jsonDescriptionString || "",
+                    Descreption: row.querySelector(".description-input")?.value || "",
                     HoursWorked: parseInt(row.querySelector(".hours-worked-input")?.value) || 0,
                     EmployeeId: empid
                 };
