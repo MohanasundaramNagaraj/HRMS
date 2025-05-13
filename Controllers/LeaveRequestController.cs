@@ -5,13 +5,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using SparkHRMS.Data;
+using Microsoft.IdentityModel.Tokens;
+using SparkHRMS.Data; 
 using SparkHRMS.Data.Entities;
+using SparkHRMS.Data.Setting;
 using SparkHRMS.Interfaces;
 using SparkHRMS.Utilities;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Utility = SparkHRMS.Utilities.Utility;
 
 namespace SparkHRMS.Controllers
 {
@@ -33,7 +37,7 @@ namespace SparkHRMS.Controllers
             _backgroundJobClient = backgroundJobClient;
         }
 
-        public async Task<IActionResult> Index(int? EmployeeId, int? YearId, int? MonthId)
+        public async Task<IActionResult> Index(int? EmployeeId, int? YearId, int? MonthId, string? Status)
         {
             ViewBag.EmployeeList = _context.Employees.ToList();
             ViewBag.YearList = _context.Year.ToList();
@@ -69,13 +73,30 @@ namespace SparkHRMS.Controllers
                 var month = _context.Month.Where(x => x.Id == MonthId).FirstOrDefault();
                 query = query.Where(x => x.RequestedDate.Month == month.Number);
             }
-
-            var requests = await query.ToListAsync();
+            
+            if (!Status.IsNullOrEmpty())
+            {
+                query = query.Where(x => x.Status == Status);
+            }
 
             ViewBag.SelectedEmployeeId = EmployeeId;
             ViewBag.SelectedYearId = YearId;
             ViewBag.SelectedMonth = MonthId;
+            ViewBag.SelectedStatus = Status;
 
+            ViewBag.StatusList = new SelectList(new List<SelectListItem>
+            {
+                new SelectListItem { Value = "PEN", Text = "Approval Pending" },
+                new SelectListItem { Value = "CAN-REQ", Text = "Cancel Requested" },
+                new SelectListItem { Value = "CAN-ACC", Text = "Cancelled" },
+                new SelectListItem { Value = "CAN-REJ", Text = "Cancel Request Rejected" },
+                new SelectListItem { Value = "ACC", Text = "Accepted" },
+                new SelectListItem { Value = "REJ", Text = "Rejected" }
+            }, "Value", "Text", ViewBag.SelectedStatus);
+
+            var requests = await query.OrderByDescending(x=>x.RequestedDate).ToListAsync();
+
+         
             return View(requests);
         }
 
@@ -98,6 +119,12 @@ namespace SparkHRMS.Controllers
                 request.EndDate = DateTime.Now;
                 request.Status = "Pending";
                 request.RequestNumber = documentNumber;
+
+                
+                var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                var isSuperAdmin = await _userManager.IsInRoleAsync(user, "SuperAdmin");
+
+                ViewBag.IsUserAdmin = isAdmin || isSuperAdmin;
             }
             else
             {
@@ -157,9 +184,24 @@ namespace SparkHRMS.Controllers
             model.Comments = model.Comments == null ? "" : model.Comments;
             if (ModelState.IsValid)
             {
+                if(model.EmployeeId == 0)
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    if (user == null) return NotFound();
+                    var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+                    if (emp != null)
+                    {
+                        model.EmployeeId = emp.EmployeeId;
+                    }
+                }
                 model.RequestedDate = DateTime.Now;
+
+                var cultureInfo = new CultureInfo("en-IN");
+                CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+                CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
                 model.Status = "PEN";
-                _context.LeaveRequest.Add(model);
+                 _context.LeaveRequest.Add(model);
                 await _context.SaveChangesAsync();
                 var currentUserId = Convert.ToInt32(_userManager.GetUserId(User));
                 _context.LeaveRequestHistory.Add(new LeaveRequestHistory
@@ -176,25 +218,6 @@ namespace SparkHRMS.Controllers
 
                 string documentNumber = "";
                 utility.GenerateDocumentNumber("Leave_Request", true, out documentNumber);
-
-                if (model.LeaveRequestDetails != null && model.LeaveRequestDetails.Any())
-                {
-                    foreach (var detail in model.LeaveRequestDetails)
-                    {
-                        detail.LeaveRequestId = model.Id;
-                        detail.Id = 0;
-                        _context.LeaveRequestDetail.Add(detail);
-                    }
-
-                }
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.ToString());
-                }
 
                 var adminUsers = await GetAdminsAndSuperAdminsAsync();
                 string subject = "Leave Request by " + utility.GetEmployeeCodeById(model.EmployeeId) + "-" + utility.GetEmployeeNameById(model.EmployeeId);
@@ -271,11 +294,19 @@ namespace SparkHRMS.Controllers
 
             string siteUrl = _configuration["AppSettings:ThisSiteUrl"] + "/LeaveRequest";
 
-            string leaveCountBasedOnLeaveType = "";
-            foreach(var det in leaveRequestDetails)
+            string leaveCountBasedOnLeaveType = "<table style=' border-collapse: collapse;' border='1'>";
+            leaveCountBasedOnLeaveType += "<thead></thead><tbody>";
+
+            foreach (var det in leaveRequestDetails)
             {
-                leaveCountBasedOnLeaveType += "<span>" + det.Code + " : " + det.RequiredDays + " days" + "</span></br>";
+                leaveCountBasedOnLeaveType += "<tr>";
+                leaveCountBasedOnLeaveType += $"<td style='padding: 6px;'>{det.Code}</td>";
+                leaveCountBasedOnLeaveType += $"<td style='padding: 6px;'>{det.RequiredDays}</td>";
+                leaveCountBasedOnLeaveType += "</tr>";
             }
+
+            leaveCountBasedOnLeaveType += "</tbody></table>";
+
             string htmlContent = $@"
                     <table style='width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;'>
                         <tr>
@@ -287,10 +318,11 @@ namespace SparkHRMS.Controllers
 
                         <tr><td style='padding: 8px 15px; background: #f7f7f7; width: 40%;'>Request Number</td><td style='padding: 8px 15px;'>{leave.RequestNumber}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Employee Name</td><td style='padding: 8px 15px;'>{utility.GetEmployeeCodeById(leave.EmployeeId)} - {utility.GetEmployeeNameById(leave.EmployeeId)}</td></tr>
+                        <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Designation</td><td style='padding: 8px 15px;'>{utility.GetEmployeeById(leave.EmployeeId)}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Requested Date</td><td style='padding: 8px 15px;'>{leave.RequestedDate:dd MMM yyyy}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Start Date</td><td style='padding: 8px 15px;'>{leave.StartDate:dd MMM yyyy} {(leave.IsStartDateHalfDay ? "(Half Day)" : "")}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>End Date</td><td style='padding: 8px 15px;'>{leave.EndDate:dd MMM yyyy} {(leave.IsEndDateHalfDay ? "(Half Day)" : "")}</td></tr>
-                        <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Total Leave Days</td><td style='padding: 8px 15px;'>{leave.TotalLeaveDays} ({leaveCountBasedOnLeaveType})</td></tr>
+                        <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Total Leave Days</td><td style='padding: 8px 15px;'>{leave.TotalLeaveDays} {leaveCountBasedOnLeaveType}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Leave Reason</td><td style='padding: 8px 15px;'>{utility.GetLeaveReasonById(leave.LeaveReasonId).LeaveReasonName}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Comments</td><td style='padding: 8px 15px;'>{leave.Comments}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Status</td><td style='padding: 8px 15px;'>{status}</td></tr>
@@ -312,15 +344,14 @@ namespace SparkHRMS.Controllers
             return result;
         }
         // Admin: Approve request
-        public async Task<IActionResult> Approve(int id, string Status, string Comments)
+        public async Task<IActionResult> Approve(int id, string Status, string Comments, List<LeaveRequestDetail> LeaveRequestDetails)
         {
             var request = await _context.LeaveRequest.FindAsync(id);
             if (request != null)
             {
-                request.Status = Status;
                 var user = await _userManager.GetUserAsync(User);
 
-                if(request.Status == "ACC")
+                if(Status == "ACC" || Status == "CAN")
                 {
                     var year = _context.Year.Where(x => x.Year == DateTime.Now.Year).FirstOrDefault();
                     var allocHeader = _context.LeaveAllocations.Where(x => x.EmployeeId == request.EmployeeId && x.YearId == year.Id).FirstOrDefault();
@@ -330,12 +361,18 @@ namespace SparkHRMS.Controllers
                     {
                         var aloc_detail = _context.LeaveAllocationDetails.Where(x => x.LeaveAllocationId == allocHeader.Id && x.LeaveTypeId == detail.LeaveTypeId).FirstOrDefault();
 
-                        aloc_detail.UsedDays += detail.RequiredDays;
-
+                        if(Status == "ACC")
+                        {
+                            aloc_detail.UsedDays += detail.RequiredDays;
+                        }
+                        else if (request.Status == "ACC" || Status == "CAN")
+                        {
+                            aloc_detail.UsedDays -= detail.RequiredDays;
+                        }
                         _context.Entry(aloc_detail).State = EntityState.Modified;
                     }
                 }
-              
+                request.Status = Status;
                 _context.LeaveRequestHistory.Add(new LeaveRequestHistory
                 {
                     LeaveRequestId = request.Id,

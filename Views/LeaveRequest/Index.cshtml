@@ -24,7 +24,8 @@
     </div>
 </div>
 <hr />
-@if (ViewBag.IsUserAdmin){
+@if (ViewBag.IsUserAdmin)
+{
     <div class="row mb-3">
 
         <select name="EmployeeId" style="width:25%;margin-right:10px;display:inline-block" class="form-select" id="empSelector" required>
@@ -77,6 +78,23 @@
             }
         </select>
 
+        <select class="form-select" id="statusSelector" name="Status" style="width:20%;margin-right:10px;display:inline-block">
+            <option value="">All Status</option>
+            @foreach (var item in ViewBag.StatusList as SelectList)
+            {
+                if (ViewBag.SelectedStatus == item.Value)
+                {
+                    <option value="@item.Value" selected>@item.Text</option>
+                }
+                else
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+
+            }
+        </select>
+
+
         <button type="button" class="btn btn-secondary btn-sm" style="width:10%;" onclick="getRequestData()">Get Request Details</button>
     </div>
 }
@@ -112,7 +130,7 @@
                     <td>@item.RequestedDate.ToString("dd-MM-yyyy")</td>
                     <td>@item.StartDate.ToString("dd-MM-yyyy")</td>
                     <td>@item.EndDate.ToString("dd-MM-yyyy")</td>
-                    <td style="text-align-last: end;">@countOfLeave</td>
+                    <td style="text-align-last: end;">@item.TotalLeaveDays</td>
                     @* <td style="text-align-last: start;">@UtilityService.GetLeaveTypeById(item.LeaveTypeId).Code</td> *@
                     <td style="text-align-last: start;">@UtilityService.GetLeaveReasonById(item.LeaveReasonId).LeaveReasonName</td>
                     <td>
@@ -184,11 +202,18 @@
 </div>
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
-<link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
-<link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" />
+
+<link href="~/app/assets/css/app.min.css" rel="stylesheet" />
+<!-- Plugins Core Css -->
+<link href="~/app/assets/css/common.min.css" rel="stylesheet">
+<link href="~/app/assets/css/bundles/dataTables.bootstrap5.min.css" rel="stylesheet">
+<!-- Custom Css -->
+<link href="~/app/assets/css/style.css" rel="stylesheet">
+<!-- You can choose a theme from css/styles instead of get all themes -->
+<link href="~/app/assets/css/styles/all-themes.css" rel="stylesheet" />
 
 <!-- jQuery and DataTables JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@* <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> *@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
@@ -198,7 +223,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 <script>
     function getRequestData() {
-        location.href = "/LeaveRequest/Index?EmployeeId=" + $('#empSelector').val() + '&YearId=' + $('#yearSelector').val() + '&MonthId=' + $('#monthSelector').val();
+        location.href = "/LeaveRequest/Index?EmployeeId=" + $('#empSelector').val() + '&YearId=' + $('#yearSelector').val() + '&MonthId=' + $('#monthSelector').val() + '&Status=' + $('#statusSelector').val();
     }
 
     function redirectToMaintanance(fmode, id) {
@@ -234,7 +259,7 @@
                 }
 
             });
-        },100)
-      
+        }, 100)
+
     });
 </script>
