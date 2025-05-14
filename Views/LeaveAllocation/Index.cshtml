@@ -26,10 +26,10 @@
     </div>
 </div>
 
-<table class="table table-bordered mt-3">
+<table class="table table-bordered mt-3 js-basic-example dataTable">
     <thead >
         <tr>
-            <th>Employee</th>
+            <th >Employee</th>
             <th>Year</th>
             <th>Total Allocated</th>
             <th>Total Used</th>
@@ -41,12 +41,12 @@
         @foreach (var item in Model)
         {
             <tr>
-               
-                <td>@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
-                <td>@UtilityService.GetYearById(item.YearId).Year</td>
-                <td>@item.TotalLeaveAllocated</td>
-                <td>@item.TotalUsedDays</td>
-                <td>@item.TotalLeaveBalance</td>
+
+                <td style="text-align-last: start;">@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
+                <td style="text-align-last: end;">@UtilityService.GetYearById(item.YearId).Year</td>
+                <td style="text-align-last: end;">@item.TotalLeaveAllocated</td>
+                <td style="text-align-last: end;">@item.TotalUsedDays</td>
+                <td style="text-align-last: end;">@item.TotalLeaveBalance</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
                     <button onclick="confirmDelete('@item.Id')" class="btn btn-danger btn-sm">Delete</button>
@@ -59,7 +59,24 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" />
+
+    <!-- jQuery and DataTables JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
     <script>
+        $(document).ready(function () {
+            $('.table').DataTable();
+        });
         function confirmDelete(id) {
             Swal.fire({
                 title: 'Are you sure?',

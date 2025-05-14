@@ -6,30 +6,11 @@
 @{
     var isReadOnly = ViewBag.FMode != "ADD";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
-    // if (ViewBag.FMode == "Can-Approve")
-    // {
-    //     ViewBag.FMode = "Cancel-Approval";
-    // }
     ViewData["Title"] = "Leave Request - " + ViewBag.FMode;
 }
 
 <link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
-<style>
-    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default), input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default), input[type=tel]:not(.browser-default), input[type=number]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea {
-        border: 1px solid #afafaf;
-        padding-left: 5px;
-        border-radius: 5px;
-        height: 30px;
-        font-size: small;
-        margin-top: 10px;
-    }
 
-    .form-label {
-        margin-bottom: .5rem;
-        font-weight: bolder;
-    }
-</style>
 <div class="row mr-0">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <ul class="breadcrumb breadcrumb-style" style="display:inline">
@@ -122,7 +103,7 @@ else
 
                     tbody.append(`
                                                         <tr uid="${uniqueid}">
-                                                        <td>
+                                                        <td> 
                                                                 ${item.LeaveTypeName}
                                                                 <input type="hidden" name="LeaveRequestDetails[${index}].LeaveTypeId" value="${item.LeaveTypeId}" />
                                                         </td>
@@ -151,7 +132,7 @@ else
                                                         </tr>
                                                     `);
                 }
-                if(fmode != 'ADD'){
+                if (fmode != 'ADD' && fmode != 'Approve') {
                     $('.requiredDays').prop('disabled',true);
                 }
             });
@@ -202,10 +183,13 @@ else
 
 
     function calculateEndDate() {
-        const inputDate = $("#date1").val();
+        const inputDate = $("#StartDate").val();
 
-        const [day, month, year] = inputDate.split('-');
-        const startDateStr = `${year}-${month}-${day}`;
+       //  const inputDate = $("#date1").val();
+        // const [day, month, year] = inputDate.split('-');
+        // const startDateStr = `${year}-${month}-${day}`;
+
+        const startDateStr = inputDate;
         const daysInput = parseFloat($("#LeaveDayCount").val());
 
         if (startDateStr && !isNaN(daysInput) && daysInput > 0) {
@@ -328,6 +312,27 @@ else
 
     }
 
+    function getLeaveRequestDetails() {
+        let details = [];
+
+        $('#leaveTypeBody tr').each(function (index, row) {
+            const $row = $(row);
+
+            const detail = {
+                LeaveTypeId: parseInt($row.find(`input[name^="LeaveRequestDetails["][name$="].LeaveTypeId"]`).val()),
+                AllocatedDays: parseFloat($row.find(`input[name^="LeaveRequestDetails["][name$="].AllocatedDays"]`).val()) || 0,
+                UsedDays: parseFloat($row.find(`input[name^="LeaveRequestDetails["][name$="].UsedDays"]`).val()) || 0,
+                BalanceDays: parseFloat($row.find(`input[name^="LeaveRequestDetails["][name$="].BalanceDays"]`).val()) || 0,
+                RequiredDays: parseFloat($row.find(`input[name^="LeaveRequestDetails["][name$="].RequiredDays"]`).val()) || 0
+            };
+
+            details.push(detail);
+        });
+
+        return details;
+    }
+
+
     function submitWithComment(id, status) {
         Swal.fire({
             title: 'Enter Comments',
@@ -337,8 +342,9 @@ else
             confirmButtonText: 'Submit'
         }).then((result) => {
             if (result.isConfirmed && result.value.trim() !== "") {
+                let LeaveRequestDetails = getLeaveRequestDetails();
                 const comments = encodeURIComponent(result.value);
-                window.location.href = `/LeaveRequest/Approve?id=${id}&Status=${status}&Comments=${comments}`;
+                window.location.href = `/LeaveRequest/Approve?id=${id}&Status=${status}&Comments=${comments}&LeaveRequestDetails=${LeaveRequestDetails}`;
             }
         });
     }
@@ -357,4 +363,10 @@ else
             }
         });
     }
+
+    flatpickr("#date1", {
+        dateFormat: "Y-m-d",     
+        altInput: true,
+        altFormat: "d-m-Y",    
+    });
 </script>

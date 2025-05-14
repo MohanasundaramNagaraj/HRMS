@@ -8,7 +8,7 @@ public class LeaveRequestDetail
     [Key]
     public int Id { get; set; }
 
-    [Required]
+    
     [ForeignKey("LeaveRequest")]
     public int LeaveRequestId { get; set; }
 

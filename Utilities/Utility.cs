@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SparkHRMS.Data;
+using SparkHRMS.Data.Entities;
 using SparkHRMS.Data.Masters;
 using SparkHRMS.Data.Setting;
 using SQLitePCL;
@@ -74,6 +75,11 @@ namespace SparkHRMS.Utilities
         {
             string name = _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.Name).FirstOrDefault();
             return name;
+        }
+
+        public Employee GetEmployeeById(int EmployeeId)
+        {
+            return _context.Employees.Where(x => x.EmployeeId == EmployeeId).FirstOrDefault();
         }
 
         public string GetEmployeeCodeById(int EmployeeId)
