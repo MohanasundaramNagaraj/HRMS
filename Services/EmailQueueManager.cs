@@ -60,7 +60,7 @@ namespace SparkHRMS.Services
         public async Task AutoTimeSheetEmail(string Event)
         {
             string html = "";
-            List<ApplicationUser> users = (await _userManager.GetUsersInRoleAsync("Employee")).ToList();
+            List<ApplicationUser> users = (await _userManager.GetUsersInRoleAsync("Employee")).Where(c => c.UserName == "shankar.spark@hotmail.com").ToList();
             List<ApplicationUser> admins = await GetAdminsAndSuperAdminsAsync();
             List<EmailAddress> ccs = new List<EmailAddress>();
             foreach(var i in admins)
