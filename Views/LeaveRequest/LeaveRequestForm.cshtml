@@ -10,7 +10,7 @@
 }
 
 @{
-    var employeeList = ViewBag.EmployeeList;
+    var employeeList = ViewBag.EmployeeList; 
     var today = DateTime.Today;
     var firstDayOfThisMonth = new DateTime(today.Year, today.Month, 1);
     var lastDayOfNextMonth = new DateTime(today.Year, today.Month, 1).AddMonths(2).AddDays(-1);
@@ -119,7 +119,7 @@
 
     <div class="row mb-3">
         <div class="col-md-3 mb-3 row">
-            <div class="col-md-7 mb-3">
+            <div class="col-md-12 mb-3">
                 <label asp-for="StartDate" class="form-label"></label>
                  <input asp-for="StartDate" type="date" class="form-control"
                 min="@firstDayOfThisMonth:yyyy-MM-dd" max="@lastDayOfNextMonth:yyyy-MM-dd"
@@ -133,26 +133,21 @@
                        id="date1" /> *@
 
             </div>
-            <div class="col-md-5 form-check mt-5 text-center">
-                <input asp-for="IsStartDateHalfDay" class="form-check-input" disabled="@isReadOnly" id="IsStartDateHalfDay" />
-                <label class="form-check-label" asp-for="IsStartDateHalfDay">Half Day</label>
-            </div>
+         
         </div>
 
         <div class="col-md-2 mb-3">
             <label asp-for="TotalLeaveDays" class="form-label">Number of Days</label>
-            <input asp-for="TotalLeaveDays" type="number" class="form-control" id="LeaveDayCount" min="0.5" step="0.5" disabled="@isReadOnly" />
+            <input asp-for="TotalLeaveDays" type="number" class="form-control" id="LeaveDayCount" min="0.5" step="0.5" disabled="@isReadOnly" 
+            oninput="if (this.value < 0.5) this.value = '';" />
         </div>
 
         <div class="col-md-3 mb-3 row">
-            <div class="col-md-7 mb-3">
+            <div class="col-md-12 mb-3">
                 <label asp-for="EndDate" class="form-label"></label>
                 <input asp-for="EndDate" type="date" class="form-control" readonly id="EndDate" />
             </div>
-            <div class="col-md-5  form-check mt-5 text-center">
-                <input asp-for="IsEndDateHalfDay" class="form-check-input" disabled="@isReadOnly" id="IsEndDateHalfDay" />
-                <label class="form-check-label" asp-for="IsEndDateHalfDay">Half Day</label>
-            </div>
+           
         </div>
 
         <div class="col-md-4 mb-3">
@@ -162,11 +157,11 @@
     </div>
     <div class="row">
         <div class="col-md-12 mb-3" id="commentsDiv_">
-            <label asp-for="Comments" class="form-label"></label>
+            <label asp-for="Comments" class="form-label"></label> 
 
             @if (ViewBag.FMode == "ADD")
             {
-                <input asp-for="Comments" class="form-control" rows="3" readonly="@isReadOnly" />
+                <input asp-for="Comments" class="form-control" rows="3" readonly="@isReadOnly" required/>
             }
             else
             {
@@ -201,7 +196,7 @@
             {
                 @if (!isReadOnly)
                 {
-                    <a value="Update" class="btn btn-primary waves-effect m-r-15" onclick="saveLeaveRequest();">Request</a>
+                    <a value="Update" class="btn btn-primary waves-effect m-r-15" onclick="saveLeaveRequest();" id="requestLeaveBtn">Request</a>
                 }
             }
 
