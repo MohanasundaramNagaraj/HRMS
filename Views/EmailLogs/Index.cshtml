@@ -40,9 +40,22 @@
         }
 
 </style>
-<h1>Email Logs</h1>
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">Email</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> Logs
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
 
-<table class="table">
+<table class="table table-bordered mt-3 display" style="width:100%" id="emailLogs">
     <thead>
         <tr>
             <th>
@@ -73,11 +86,11 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Recipient)
+                <td style="max-width:100px;">
+                    <p style="    word-wrap: break-word;">@Html.DisplayFor(modelItem => item.Recipient)</p>
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Cc)
+                <td style="max-width:100px;">
+                    <p style=" word-wrap: break-word;">@Html.DisplayFor(modelItem => item.Cc)</p>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Subject)
@@ -169,4 +182,6 @@
             modal.style.display = "none";
         }
     }
+
+    $('#emailLogs').DataTable();
 </script>

@@ -28,6 +28,13 @@
     <!-- Theme style. You can choose a theme from css/themes instead of get all themes -->
     <link href="~/app/assets/css/styles/all-themes.css" rel="stylesheet" />
 
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/app/assets/js/table.min.js"></script>
+    <!-- Custom Js -->
+    @* <script src="~/app/assets/js/admin.js"></script> *@
+    <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
+
     <style>
         body{
           
@@ -585,12 +592,8 @@
     @* <script src="~/app/assets/js/common.min.js"></script> *@
     @await RenderSectionAsync("Scripts", required: false)
 
-    <!-- Include jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
-    <!-- Include SweetAlert from CDN -->
+   
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/utility/utility.js"></script>
@@ -598,6 +601,7 @@
     <script src="~/app/assets/js/admin.js?v=@Configuration["AppSettings:Version"]"></script>
     <script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
 
+    <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
     <script>
         feather.replace();
     </script>
