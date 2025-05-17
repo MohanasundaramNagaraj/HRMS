@@ -57,7 +57,7 @@ namespace SparkHRMS.Utilities
                 string tableContent = "";
                 foreach (var emp in emps)
                 {
-                    string tr = "<tr><td>" + emp.EmpName + "</td><td>" + emp.BalanceDayscount + "</td></tr>";
+                    string tr = "<tr><td>" + emp.EmpName + "</td><td>"+emp.Destination + "</td><td>" + emp.BalanceDayscount + "</td></tr>";
 
                     tableContent = tableContent + tr;
                     var to = new EmailAddress(emp.EmailId, emp.EmpName);
@@ -72,6 +72,7 @@ namespace SparkHRMS.Utilities
                         <thead style='background-color: #f2f2f2;'>
                             <tr>
                                 <th>Employee Name</th>
+<th> Destination</th>
                                 <th>Timesheet Pending Days</th></tr></thead><tbody>" + tableContent + "</tbody></table><p>Regards,</p><p>HR Team<br/>Spark IT Tech</p>";
 
 
@@ -191,6 +192,8 @@ namespace SparkHRMS.Utilities
                 .Where(date => !holidays.Contains(date))
                 .ToList();
 
+
+
             foreach (var i in employees)
             {
                 var timesheetData = await _context.Timesheets
@@ -206,12 +209,21 @@ namespace SparkHRMS.Utilities
                         TotalHours = g.Sum(x => x.HoursWorked)
                     })
                     .ToListAsync();
+                var checkinDates = await _context.EmployeeAttendance
+              .Where(a =>
+                  a.EmployeeId == i.EmployeeId &&
+                  a.CheckInTime.Month == monthId &&
+                  a.CheckInTime.Year == yearId)
+              .Select(a => a.CheckInTime.Date)
+              .ToListAsync();
+
 
                 var incompleteDays = workingDates
                     .Where(date =>
                     {
+                        bool checkedIn = checkinDates.Contains(date);
                         var entry = timesheetData.FirstOrDefault(d => d.Date == date);
-                        return entry == null || entry.TotalHours < 8;
+                        return checkedIn && (entry == null || entry.TotalHours < 8);
                     })
                     .ToList();
 
@@ -221,7 +233,8 @@ namespace SparkHRMS.Utilities
                 {
                     EmpName = i.Name,         // Assuming Employee model has Name
                     EmailId = i.Email,
-                    BalanceDayscount = incompleteDayCount
+                    BalanceDayscount = incompleteDayCount,
+                    Destination = i.Designation
                 });
             }
 
