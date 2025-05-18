@@ -26,10 +26,10 @@
     </div>
 </div>
 
-<table class="table table-bordered mt-3">
+<table class="table table-bordered mt-3 dataTable">
     <thead >
         <tr>
-            <th>Employee</th>
+            <th >Employee</th>
             <th>Year</th>
             <th>Total Allocated</th>
             <th>Total Used</th>
@@ -41,15 +41,15 @@
         @foreach (var item in Model)
         {
             <tr>
-               
-                <td>@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
-                <td>@UtilityService.GetYearById(item.YearId).Year</td>
-                <td>@item.TotalLeaveAllocated</td>
-                <td>@item.TotalUsedDays</td>
-                <td>@item.TotalLeaveBalance</td>
+
+                <td style="text-align-last: start;">@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
+                <td style="text-align-last: end;">@UtilityService.GetYearById(item.YearId).Year</td>
+                <td style="text-align-last: end;">@item.TotalLeaveAllocated</td>
+                <td style="text-align-last: end;">@item.TotalUsedDays</td>
+                <td style="text-align-last: end;">@item.TotalLeaveBalance</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <button onclick="confirmDelete('@item.Id')" class="btn btn-danger btn-sm">Delete</button>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                    <button onclick="confirmDelete('@item.Id')" class="btn btn-danger">Delete</button>
                 </td>
             </tr>
         }
@@ -57,9 +57,11 @@
 </table>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        $(document).ready(function () {
+            $('.table').DataTable();
+        });
         function confirmDelete(id) {
             Swal.fire({
                 title: 'Are you sure?',

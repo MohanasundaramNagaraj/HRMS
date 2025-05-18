@@ -4,8 +4,6 @@
     ViewData["Title"] = "Index";
 }
 
-<link href="~/app/assets/css/bundles/dataTables.bootstrap5.min.css" rel="stylesheet">
-
 <div class="row mr-0">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <ul class="breadcrumb breadcrumb-style" style="display:inline">
@@ -31,7 +29,7 @@
 
             <div class="body">
                 <div class="table-responsive">
-                    <table id="basicTable"
+                    <table id="employeeListTable" style="width:100%"
                            class="table table-hover table-checkable order-column contact_list">
                         <thead>
                             <tr>
@@ -91,8 +89,6 @@
     </div>
 </div>
 
-
-
-<script src="~/app/assets/js/table.min.js"></script>
-
-<script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
+<script>
+    $('#employeeListTable').DataTable();
+</script>

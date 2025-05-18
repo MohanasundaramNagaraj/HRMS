@@ -4,8 +4,6 @@
     ViewData["Title"] = "Leave Types";
 }
 
-
-
 <div class="row mr-0">
     <div class="col-lg-12 col-md-12 col-sm-12">
         <ul class="breadcrumb breadcrumb-style" style="display:inline">
@@ -43,7 +41,7 @@
         @foreach (var leave in Model)
         {
             <tr>
-                <td>@leave.Code</td>
+                <td >@leave.Code</td>
                 <td>@leave.Name</td>
                 <td>@leave.Description</td>
                 <td>@leave.MaxAllowedDaysPerYear</td>
@@ -51,10 +49,16 @@
                 <td>@leave.MaxConsecutiveLeaveAllowedDaysPerMonth</td>
                 <td>@(leave.IsActive ? "Yes" : "No")</td>
                 <td>
-                    <a class="btn btn-warning btn-sm" href="@Url.Action("Edit", new { id = leave.LeaveTypeId })">Edit</a>
-                    <a class="btn btn-danger btn-sm" href="@Url.Action("Delete", new { id = leave.LeaveTypeId })">Delete</a>
+                    <a class="btn btn-warning" href="@Url.Action("Edit", new { id = leave.LeaveTypeId })">Edit</a>
+                    <a class="btn btn-danger" href="@Url.Action("Delete", new { id = leave.LeaveTypeId })">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    $(document).ready(function () {
+        $('.table').DataTable();
+    });
+</script>

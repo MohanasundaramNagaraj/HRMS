@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Configuration;
 using System.Globalization;
 using Hangfire;
+using System.Collections.Generic;
+using SendGrid.Helpers.Mail;
 
 namespace SparkHRMS.Services
 {
@@ -18,16 +20,18 @@ namespace SparkHRMS.Services
         private readonly IConfiguration Configuration;
         private readonly IEmailSender _emailService;
         private readonly IAutoCheckOut _autoCheckOut;
+        private readonly IAutoTimeSheetMail _autoTimeSheetMail;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IBackgroundJobClient _backgroundJobClient;
-        public EmailQueueManager(IEmailSender emailService,IAutoCheckOut autoCheckOut, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IBackgroundJobClient backgroundJobClient)
+        public EmailQueueManager(IEmailSender emailService,IAutoCheckOut autoCheckOut, IAutoTimeSheetMail autoTimeSheetMail, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IBackgroundJobClient backgroundJobClient)
         {
             _emailService = emailService;
             _context = context;
             _userManager = userManager;
             _backgroundJobClient = backgroundJobClient;
             _autoCheckOut = autoCheckOut;
+            _autoTimeSheetMail = autoTimeSheetMail;
         }
         public async Task SendScheduledEmail(string Event)
         {
@@ -45,15 +49,51 @@ namespace SparkHRMS.Services
         public async Task AutoCheckOutEmail(string Event)
         {
             string html = "";
-            DateTime Yesterday = DateTime.Today.Date.AddDays(-1);
-            //html += await getAutoCheckOutEmailContent(Yesterday);
-            //html += await getAutoCheckOutEmailContent(DateTime.Today);
+            //DateTime Yesterday = DateTime.Today.Date.AddDays(-1);
 
             var adminUsers = await GetAdminsAndSuperAdminsAsync();
             foreach (var user in adminUsers)
             {
                 _backgroundJobClient.Enqueue(() => _autoCheckOut.AutoCheckOutAsync(user.Email, Event, html));
             }
+        }        
+        public async Task AutoTimeSheetEmail(string Event)
+        {
+            string html = "";
+            List<ApplicationUser> users = (await _userManager.GetUsersInRoleAsync("Employee")).ToList();
+            List<ApplicationUser> admins = await GetAdminsAndSuperAdminsAsync();
+            List<EmailAddress> ccs = new List<EmailAddress>();
+            foreach(var i in admins)
+            {
+                EmailAddress cc = new EmailAddress();
+                cc.Email = i.Email;
+                cc.Name = i.UserName;
+                ccs.Add(cc);
+            }
+
+            List<Employee> employees = users
+            .Select(u =>
+            {
+                var employee = _context.Employees.Where(v=>v.IsActive == true).FirstOrDefault(x => x.ApplicationUserId == u.Id);
+                if (employee != null)
+                {
+                    return new Employee
+                    {
+                        EmployeeId = employee.EmployeeId,
+                        Name = employee.Name,
+                        Email = u.Email,
+                        Designation =employee.Designation
+                    };
+                }
+
+                return null; // Return null when no match is found
+            })
+            .Where(e => e != null) // Filter out nulls
+            .ToList();
+
+
+            _backgroundJobClient.Enqueue(() => _autoTimeSheetMail.AutoTimeSheetMailAsync(employees, Event, html, ccs));
+            
         }
         private string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)
         {

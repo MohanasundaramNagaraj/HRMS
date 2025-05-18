@@ -17,22 +17,46 @@ namespace SparkHRMS.Data.Setting
         [MaxLength(500)]
         public string Name { get; set; } // Leave Type Name (e.g., Sick Leave, Casual Leave)
 
+        [Required]
         [MaxLength(1000)]
+        [Display(Name = "Description")]
         public string Description { get; set; } // Optional Description
 
         [Required]
-        public int MaxAllowedDaysPerYear { get; set; } // Maximum leave days allowed per year
-        public int ApplicableAfterWorkingDays { get; set; } // Days after which leave is applicable
-        public int MaxConsecutiveLeaveAllowedDaysPerMonth { get; set; } // Maximum leave days allowed per month
+        [Display(Name = "Maximum Allowed Days Per Year")]
+        public int MaxAllowedDaysPerYear { get; set; }
 
+        [Display(Name = "Applicable After Working Days")]
+        public int ApplicableAfterWorkingDays { get; set; }
+
+        [Display(Name = "Max Consecutive Leave Days Per Month")]
+        public int MaxConsecutiveLeaveAllowedDaysPerMonth { get; set; }
+
+        [Display(Name = "Carry Forward Allowed")]
         public bool IsCarryForward { get; set; } = false;
+
+        [Display(Name = "Leave Without Pay")]
         public bool IsLeaveWithoutPay { get; set; } = false;
+
+        [Display(Name = "Partially Paid Leave")]
         public bool IsPartiallyPaidLeave { get; set; } = false;
+
+        [Display(Name = "Optional Leave")]
         public bool IsOptionalLeave { get; set; } = false;
+
+        [Display(Name = "Allow Negative Balance")]
         public bool AllowNegativeBalance { get; set; } = false;
+
+        [Display(Name = "Include Holidays With Leaves")]
         public bool IncludeHolidaysWithLeaves { get; set; }
+
+        [Display(Name = "Compensatory Leave")]
         public bool IsCompensatory { get; set; } = false;
+
+        [Display(Name = "Encashment Leave")]
         public bool IsEncashmentLeave { get; set; } = false;
+
+        [Display(Name = "Earned Leave")]
         public bool IsEarnedLeave { get; set; } = false;
 
         public bool IsActive { get; set; } = true; // Active status

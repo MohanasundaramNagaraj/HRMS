@@ -3,7 +3,23 @@
 @{
     ViewData["Title"] = "Edit Leave Type";
 }
+<style>
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default),
+    input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default),
+    input[type=tel]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea, input[type=number]:not(.browser-default) {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
+    }
 
+    .form-label {
+        margin-bottom: .5rem;
+        font-weight: bolder;
+    }
+</style>
 
 <ul class="breadcrumb breadcrumb-style ">
     <li class="breadcrumb-item">
@@ -20,38 +36,40 @@
 <form asp-action="Edit" class="card p-5">
     <input type="hidden" asp-for="LeaveTypeId" />
     <div class="row mb-3">
-        <div class="col-md-4">
+        <div class="col-md-2">
             <label asp-for="Code" class="form-label">Code</label>
             <input asp-for="Code" class="form-control" required />
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label asp-for="Name" class="form-label">Name</label>
             <input asp-for="Name" class="form-control" required />
         </div>
-        <div class="col-md-2 mb-3 form-check">
-            <br />
-            <input asp-for="IsActive" class="form-check-input" />
-            <label asp-for="IsActive" class="form-check-label"></label>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label">Description</label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-    </div>
-
-    <div class="row mb-3">
-        <div class="col-md-4">
+        <div class="col-md-2">
             <label asp-for="MaxAllowedDaysPerYear" class="form-label">Max Allowed Days Per Year</label>
             <input asp-for="MaxAllowedDaysPerYear" type="number" class="form-control" required />
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <label asp-for="ApplicableAfterWorkingDays" class="form-label">Applicable After (Working Days)</label>
             <input asp-for="ApplicableAfterWorkingDays" type="number" class="form-control" required />
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <label asp-for="MaxConsecutiveLeaveAllowedDaysPerMonth" class="form-label">Max Consecutive Leaves / Month</label>
             <input asp-for="MaxConsecutiveLeaveAllowedDaysPerMonth" type="number" class="form-control" required />
+        </div>
+
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-10 mb-3 form-check">
+            <label asp-for="Description" class="form-label">Descreption</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="col-md-2 mb-3 form-check">
+            <br />
+            <br />
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
         </div>
     </div>
 

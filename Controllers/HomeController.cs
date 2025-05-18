@@ -24,10 +24,11 @@ namespace SparkHRMS.Controllers
        // private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IEmailSender _emailService;
         private readonly IAutoCheckOut _autoCheckOut;
-      
+        private readonly IAutoTimeSheetMail _autoTimeSheetMail;
+
         public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context, 
            // IBackgroundJobClient backgroundJobClient,
-            IEmailSender emailService,IAutoCheckOut autoCheckOut)
+            IEmailSender emailService,IAutoCheckOut autoCheckOut, IAutoTimeSheetMail IAutoTimeSheetMail)
         {
             _logger = logger;
             _userManager = userManager;
@@ -35,6 +36,7 @@ namespace SparkHRMS.Controllers
            // _backgroundJobClient = backgroundJobClient;
             _emailService = emailService;
             _autoCheckOut = autoCheckOut;
+            _autoTimeSheetMail=IAutoTimeSheetMail;
         }
 
         public async Task<IActionResult> Index()

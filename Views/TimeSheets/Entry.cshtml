@@ -14,7 +14,7 @@
 
 <script>
     var timeSheetData = JSON.parse('@Html.Raw(Json.Serialize(Model.TimeSheetRecords))');
- 
+
     var activities = @Html.Raw(Json.Serialize(ViewBag.Activities));
 </script>
 <style>
@@ -22,6 +22,17 @@
     input::placeholder {
         color: lightgray !important;
         font-style: italic;
+    }
+
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default),
+    input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default),
+    input[type=tel]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea, input[type=number]:not(.browser-default) {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
     }
 </style>
 <ul class="breadcrumb breadcrumb-style ">
@@ -150,7 +161,7 @@
                         </div>
                     </div>
                     <div style="float:right;margin-bottom:10px;    justify-content: flex-end;gap: 10px; display: flex; cursor:marker;">
-                      
+
                         <button class="btn btn-success" onclick="update()"><i class="fa fa-save"></i> Save</button>
                         <button class="btn btn-warning" onclick="exportToExcel('@Model.EmployeeDetails.Name','@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(ViewBag.SelectedMonth)','@ViewBag.SelectedYear')"> <i class="fa fa-file-excel"></i> Export to Excel</button>
                         <button class="btn btn-danger" onclick="exportToPDF('@Model.EmployeeDetails.Name','@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(ViewBag.SelectedMonth)','@ViewBag.SelectedYear')"> <i class="fa fa-file"></i> Export to PDF</button>
@@ -161,28 +172,47 @@
                         <table id="timesheetTable" class="table table-bordered">
                             <thead>
                                 <tr>
-                                   
-                                    <th>Date <br />
-                                        <input type="text" class="column-filter form-control" placeholder="Search Date"></th>
+
                                     <th>
-                                        Day <br />
+                                        Date
+                                    <th>
+                                        Day
+                                    </th>
+                                    <th>
+                                        Task
+                                    </th>
+                                    <th>
+                                        Activity
+                                    <th>
+                                        Description
+                                    <th>
+                                        Hours Worked
+                                    </th>
+                                    <th>
+                                        Actions
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="background:white;">
+                                        <input type="text" class="column-filter form-control" placeholder="Search Date">
+                                    </th>
+                                    <th style="background:white;">
                                         <input type="text" class="column-filter form-control" placeholder="Search Day">
                                     </th>
-                                    <th>
-                                        Task <br />
+                                    <th style="background:white;">
                                         <input type="text" class="column-filter form-control" placeholder="Search Task Id">
                                     </th>
-                                    <th>
-                                        Activity <br />
-                                        <input type="text" class="column-filter form-control" placeholder="Search Activity"></th>
-                                    <th>
-                                        Description <br />
-                                        <input type="text" class="column-filter form-control" placeholder="Search Description"></th>
-                                    <th>
-                                        Hours <br />
-                                        <input type="text" class="column-filter form-control" placeholder="Search Hours"></th>
+                                    <th style="background:white;">
+                                        <input type="text" class="column-filter form-control" placeholder="Search Activity">
+                                    </th>
+                                    <th style="background:white;">
+                                        <input type="text" class="column-filter form-control" placeholder="Search Description">
+                                    </th>
+                                    <th style="background:white;">
+                                        <input type="text" class="column-filter form-control" placeholder="Search Hours">
+                                    </th>
 
-                                    <th>Actions</th>
+                                    <th style="background:white;"></th>
                                 </tr>
                             </thead>
                             <tbody>

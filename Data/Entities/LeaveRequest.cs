@@ -28,14 +28,14 @@ namespace SparkHRMS.Data.Entities
         public DateTime StartDate { get; set; }
 
         [Display(Name = "Is Start Date Half Day")]
-        public bool IsStartDateHalfDay { get; set; }
+        public bool IsStartDateHalfDay { get; set; } = false;
 
         [Required]
         [Display(Name = "End Date")]
         public DateTime EndDate { get; set; }
 
         [Display(Name = "Is End Date Half Day")]
-        public bool IsEndDateHalfDay { get; set; }
+        public bool IsEndDateHalfDay { get; set; } = false;
 
         [Required]
         [Display(Name = "Total Leave Days")]
@@ -46,6 +46,7 @@ namespace SparkHRMS.Data.Entities
         public int LeaveReasonId { get; set; }
 
         [StringLength(500)]
+        [Required]
         public string Comments { get; set; }
 
         [Required]

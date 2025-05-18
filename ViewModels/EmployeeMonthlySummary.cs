@@ -91,4 +91,11 @@ namespace SparkHRMS.ViewModels
         public int PermissionNeededThreshold { get; set; }
         public List<string> WeekendDays { get; set; }
     }
+    public class EmployeeMailVM
+    {
+        public string EmpName { get; set; }
+        public int BalanceDayscount { get; set; }
+        public string EmailId { get; set; }
+        public string Destination { get; set; }
+    }
 }
