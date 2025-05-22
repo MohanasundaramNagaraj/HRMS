@@ -77,6 +77,8 @@ else
 
         $("#LeaveDayCount").on("input", function () {
             calculateEndDate();
+            $('#leaveValidationMessage').hide();
+            
         });
 
         var employeeId = $('#empSelector').val();
