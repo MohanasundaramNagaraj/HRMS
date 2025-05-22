@@ -351,10 +351,10 @@ namespace SparkHRMS.Controllers
             {
                 var user = await _userManager.GetUserAsync(User);
 
-                if(Status == "ACC" || Status == "CAN")
+                if(Status == "ACC" || Status == "CAN-ACC")
                 {
                     var year = _context.Year.Where(x => x.Year == DateTime.Now.Year).FirstOrDefault();
-                    var allocHeader = _context.LeaveAllocations.Where(x => x.EmployeeId == request.EmployeeId && x.YearId == year.Id).FirstOrDefault();
+                    var allocHeader = _context.LeaveAllocations.Where(x => x.EmployeeId == request.EmployeeId && x.YearId == year.Id) .FirstOrDefault();
 
                     var leaveDetail = _context.LeaveRequestDetail.Where(x => x.LeaveRequestId == id).ToList();
                     foreach (var detail in leaveDetail)
@@ -365,7 +365,7 @@ namespace SparkHRMS.Controllers
                         {
                             aloc_detail.UsedDays += detail.RequiredDays;
                         }
-                        else if (request.Status == "ACC" || Status == "CAN")
+                        else if (request.Status == "ACC" || Status == "CAN-ACC")
                         {
                             aloc_detail.UsedDays -= detail.RequiredDays;
                         }

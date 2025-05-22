@@ -1,0 +1,237 @@
+﻿<div class="container mt-4">
+    <h2>User Management</h2>
+    <ul class="nav nav-tabs" id="tabMenu">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#users">Users</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#roles">Roles</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#mapping">User-Role Mapping</a></li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <!-- USERS TAB -->
+        <div id="users" class="tab-pane fade show active">
+            <button class="btn btn-primary mb-2" onclick="openUserModal()">Add User</button>
+            <table class="table table-bordered" id="userTable">
+                <thead><tr><th>UserName</th><th>Email</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- ROLES TAB -->
+        <div id="roles" class="tab-pane fade">
+            <button class="btn btn-primary mb-2" onclick="openRoleModal()">Add Role</button>
+            <table class="table table-bordered" id="roleTable">
+                <thead><tr><th>Role Name</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- MAPPING TAB -->
+        <div id="mapping" class="tab-pane fade">
+            <select id="userSelect" class="form-control mb-2"></select>
+            <select id="roleSelect" class="form-control mb-2"></select>
+            <button class="btn btn-success" onclick="assignRole()">Assign Role</button>
+            <button class="btn btn-danger" onclick="removeRole()">Remove Role</button>
+            <ul id="assignedRolesList" class="mt-3"></ul>
+        </div>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form id="userForm">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="userModalTitle">Add User</h5></div>
+                <div class="modal-body">
+                    <input type="hidden" id="userId" />
+                    <div class="mb-2">
+                        <label>Username</label>
+                        <input type="text" id="userName" class="form-control" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>Email</label>
+                        <input type="email" id="userEmail" class="form-control" required />
+                    </div>
+                    <div class="mb-2" id="passwordField">
+                        <label>Password</label>
+                        <input type="password" id="userPassword" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Role Modal -->
+<div class="modal fade" id="roleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form id="roleForm">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="roleModalTitle">Add Role</h5></div>
+                <div class="modal-body">
+                    <input type="hidden" id="roleId" />
+                    <div class="mb-2">
+                        <label>Role Name</label>
+                        <input type="text" id="roleName" class="form-control" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    const userModal = $('#userModal');
+    const roleModal = $('#roleModal');
+
+    // USERS
+    function loadUsers() {
+        $.get('/UserManagement/GetUsers', function (users) {
+            let rows = '';
+            $('#userSelect').empty();
+            users.forEach(u => {
+                rows += `<tr>
+                            <td>${u.UserName}</td>
+                            <td>${u.Email}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="editUser('${u.Id}', '${u.UserName}', '${u.Email}')">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.Id}')">Delete</button>
+                            </td></tr>`;
+                $('#userSelect').append(`<option value="${u.Id}">${u.UserName}</option>`);
+            });
+            $('#userTable tbody').html(rows);
+        });
+    }
+
+    function openUserModal() {
+        $('#userId').val('');
+        $('#userName').val('');
+        $('#userEmail').val('');
+        $('#userPassword').val('').show().closest('#passwordField').show();
+        $('#userModalTitle').text('Add User');
+        userModal.show();
+    }
+
+    function editUser(id, name, email) {
+        $('#userId').val(id);
+        $('#userName').val(name);
+        $('#userEmail').val(email);
+        $('#userPassword').closest('#passwordField').hide(); // no password change on edit
+        $('#userModalTitle').text('Edit User');
+        userModal.show();
+    }
+
+    $('#userForm').submit(function (e) {
+        e.preventDefault();
+        const id = $('#userId').val();
+        const data = {
+            userName: $('#userName').val(),
+            email: $('#userEmail').val(),
+            password: $('#userPassword').val()
+        };
+
+        if (id) {
+            $.ajax({
+                url: `/UserManagement/UpdateUser?id=${id}&email=${data.email}`,
+                type: 'PUT',
+                success: () => { userModal.hide(); loadUsers(); }
+            });
+        } else {
+            $.post('/UserManagement/CreateUser', data, () => {
+                userModal.hide(); loadUsers();
+            });
+        }
+    });
+
+    function deleteUser(id) {
+        if (confirm('Delete this user?')) {
+            $.ajax({ url: `/UserManagement/DeleteUser?id=${id}`, type: 'DELETE', success: loadUsers });
+        }
+    }
+
+    // ROLES
+    function loadRoles() {
+        $.get('/UserManagement/GetRoles', function (roles) {
+            let rows = '';
+            $('#roleSelect').empty();
+            roles.forEach(r => {
+                rows += `<tr><td>${r.name}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="editRole('${r.id}', '${r.name}')">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteRole('${r.id}')">Delete</button>
+                            </td></tr>`;
+                $('#roleSelect').append(`<option>${r.name}</option>`);
+            });
+            $('#roleTable tbody').html(rows);
+        });
+    }
+
+    function openRoleModal() {
+        $('#roleId').val('');
+        $('#roleName').val('');
+        $('#roleModalTitle').text('Add Role');
+        roleModal.show();
+    }
+
+    function editRole(id, name) {
+        $('#roleId').val(id);
+        $('#roleName').val(name);
+        $('#roleModalTitle').text('Edit Role');
+        roleModal.show();
+    }
+
+    $('#roleForm').submit(function (e) {
+        e.preventDefault();
+        const id = $('#roleId').val();
+        const roleName = $('#roleName').val();
+
+        if (id) {
+            alert("Editing role name not supported via Identity API directly.");
+        } else {
+            $.post('/UserManagement/CreateRole', { roleName }, () => {
+                roleModal.hide(); loadRoles();
+            });
+        }
+    });
+
+    function deleteRole(id) {
+        if (confirm('Delete this role?')) {
+            $.ajax({ url: `/UserManagement/DeleteRole?id=${id}`, type: 'DELETE', success: loadRoles });
+        }
+    }
+
+    // MAPPING
+    function assignRole() {
+        $.post('/UserManagement/AssignRole', {
+            userId: $('#userSelect').val(),
+            roleName: $('#roleSelect').val()
+        }, () => alert("Role assigned"));
+    }
+
+    function removeRole() {
+        $.post('/UserManagement/RemoveRole', {
+            userId: $('#userSelect').val(),
+            roleName: $('#roleSelect').val()
+        }, () => alert("Role removed"));
+    }
+
+    $('#userSelect').change(function () {
+        $.get(`/UserManagement/GetUserRoles?userId=${$(this).val()}`, function (roles) {
+            $('#assignedRolesList').html(roles.map(r => `<li>${r}</li>`).join(''));
+        });
+    });
+
+    $(document).ready(function () {
+        loadUsers();
+        loadRoles();
+    });
+</script>
