@@ -101,6 +101,9 @@ function initCalendar() {
             addEventTitle.style.display = "block";
             editEventTitle.style.display = "none";
 
+            let modalHtml = fn_showModal();
+            $('body').append(modalHtml);
+
             clearModalForm();
             $(".modal").modal("show");
         },
@@ -112,6 +115,9 @@ function initCalendar() {
 
             let startDate = moment(info.event.start).format("YYYY-MM-DD HH:mm:ss");
             let endDate = moment(info.event.end).format("YYYY-MM-DD HH:mm:ss");
+
+            let modalHtml = fn_showModal();
+            $('body').append(modalHtml);
 
             // console.log(info.event.extendedProps.description);
             $(".modal").modal("show");
@@ -135,6 +141,93 @@ function initCalendar() {
         'margin-top': '-50px'
     })
     // $('.fc-header-toolbar').remove();
+}
+
+function fn_changeEntryType() {
+
+}
+
+function fn_showModal() {
+    let uid = generateUUIDv4();
+    $('.requestModal').remove();
+    return `<div class="modal fade requestModal" id="requestModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEventTitle">Add Request</h5>
+                <h5 class="modal-title" id="editEventTitle">View Request</h5>
+                <button type="button" class="close" data-bs-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="">
+                    <input type="hidden" id="id" name="id">
+                   
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <div class="form-group default-select">
+                                <label>Request Type</label>
+                                <select class="form-control" id="entrytype" style="padding-left: 10px;" onchange="fn_changeEntryType(this.value)">
+                                    <option value="" disabled selected>Choose your option</option>
+                                    <option value="@Constants.EntryTypes.Permission">@Constants.EntryTypes.Permission</option>
+                                    <option value="@Constants.EntryTypes.OnDuty">@Constants.EntryTypes.OnDuty</option>
+                                    <option value="@Constants.EntryTypes.Leave">@Constants.EntryTypes.Leave</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6" id="fromDateDiv">
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    <label>From Date</label>
+                                    <input id="from_datetime" type="datetime-local" class="validate form-control" placeholder="From Date">
+                                    <input id="from_date" type="date" class="validate form-control" placeholder="From Date">
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6" id="toDateDiv">
+                            <div class="form-group form-float">
+                                <div class="form-line">
+                                    <label>To Date</label>
+                                    <input id="to_datetime" type="datetime-local" class="validate form-control" placeholder="To Date">
+                                    <input id="to_date" type="date" class="validate form-control" placeholder="To Date">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-group">
+                            <label>Descreption</label>
+                            <textarea id="eventDetails" name="eventDetails" placeholder="Enter Details"
+                                      class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-whitesmoke pr-0">
+                        <button type="button" class="btn btn-primary" id="add-event">
+                            Add
+                            Request
+                        </button>
+                        <button type="button" class="btn btn-round btn-primary" id="edit-event">
+                            Edit
+                            Request
+                        </button>
+                        <button type="button" id="close" class="btn btn-danger"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>`;
 }
 
 function clearModalForm() {

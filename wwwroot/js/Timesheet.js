@@ -44,9 +44,15 @@ function inputOnChangeCallback() {
     //});
 }
 
-function exportToExcel() {
+function exportToExcel(employeeName, month, year) {
     let table = document.getElementById("timesheetTable");
     let data = [];
+    data.push([`Timesheet for the Month ${month} - ${year}`]);
+    data.push([]);
+    
+    data.push([`Employee Name: ${employeeName}`]);
+    data.push([]); 
+
     let rows = table.querySelectorAll("tbody tr");
 
     // Get headers except the last one (Actions)
@@ -85,17 +91,21 @@ function exportToExcel() {
     XLSX.writeFile(wb, "Timesheet.xlsx");
 }
 
-function exportToPDF() {
+
+function exportToPDF(employeeName, month, year) {
     const { jsPDF } = window.jspdf;
     let doc = new jsPDF();
 
-    doc.text("Timesheet Report", 14, 10);
+    doc.text(`Timesheet Report for the month of ${month} - ${year}`, 14, 10);
+
+    doc.text(`Employee Name: ${employeeName}`, 14, 10);
+
+   
 
     let table = document.getElementById("timesheetTable");
     let data = [];
     let rows = table.querySelectorAll("tbody tr");
 
-    // Get headers except the last one (Actions)
     let headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText.trim()).slice(0, -1);
     data.push(headers);
 
@@ -117,7 +127,7 @@ function exportToPDF() {
     doc.autoTable({
         head: [headers],
         body: data.slice(1),
-        startY: 20
+        startY: 40 // Adjust the start position for the table
     });
 
     doc.save("Timesheet.pdf");

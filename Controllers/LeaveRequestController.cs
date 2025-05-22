@@ -354,7 +354,7 @@ namespace SparkHRMS.Controllers
                 if(Status == "ACC" || Status == "CAN-ACC")
                 {
                     var year = _context.Year.Where(x => x.Year == DateTime.Now.Year).FirstOrDefault();
-                    var allocHeader = _context.LeaveAllocations.Where(x => x.EmployeeId == request.EmployeeId && x.YearId == year.Id).FirstOrDefault();
+                    var allocHeader = _context.LeaveAllocations.Where(x => x.EmployeeId == request.EmployeeId && x.YearId == year.Id) .FirstOrDefault();
 
                     var leaveDetail = _context.LeaveRequestDetail.Where(x => x.LeaveRequestId == id).ToList();
                     foreach (var detail in leaveDetail)

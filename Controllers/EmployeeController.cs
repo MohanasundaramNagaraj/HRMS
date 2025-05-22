@@ -57,7 +57,7 @@ namespace SparkHRMS.Controllers
         // GET: Employee/Create
         public IActionResult Create()
         {
-            ViewBag.ActiveUsers = _context.Users.Where(x=>x.IsActive == true).ToList();
+            ViewBag.ActiveUsers = _context.Users.Where(x => x.IsActive == true).ToList();
             return View();
         }
 
@@ -76,7 +76,7 @@ namespace SparkHRMS.Controllers
                     PhoneNumber = employee.PhoneNumber,
                 };
                 var defaultPassword = _configuration["AppSettings:DefaultUserPassword"];
-                var result = await _userManager.CreateAsync(applicationUser, defaultPassword); 
+                var result = await _userManager.CreateAsync(applicationUser, defaultPassword);
 
                 if (result.Succeeded)
                 {
@@ -97,7 +97,14 @@ namespace SparkHRMS.Controllers
                     {
                         employee.ApplicationUserId = applicationUser.Id;
                         employee.ImageUrl = _configuration["AppSettings:ImagePath"] + "/" + employee.EmployeeCode + ".jpg";
-
+                        if (employee.ImageUrl == null)
+                        {
+                            employee.ImageUrl = "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png";
+                        }
+                        if (employee.DateOfJoining == null)
+                        {
+                            employee.DateOfJoining = DateTime.Now;
+                        }
                         _context.Add(employee);
                         await _context.SaveChangesAsync();
 
@@ -153,7 +160,7 @@ namespace SparkHRMS.Controllers
         }
 
         // POST: Employee/Edit/5
-     
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId,ReportingHeadMailID")] Employee employee)
@@ -166,6 +173,11 @@ namespace SparkHRMS.Controllers
             if (ModelState.IsValid)
             {
                 employee.ApplicationUserId = _context.Employees.Where(x => x.EmployeeId == employee.EmployeeId).Select(x => x.ApplicationUserId).FirstOrDefault();
+                if (employee.ImageUrl == null)
+                {
+                    employee.ImageUrl = "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png";
+                }
+                
                 try
                 {
                     _context.Update(employee);

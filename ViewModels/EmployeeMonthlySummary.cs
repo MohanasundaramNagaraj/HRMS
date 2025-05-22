@@ -96,5 +96,6 @@ namespace SparkHRMS.ViewModels
         public string EmpName { get; set; }
         public int BalanceDayscount { get; set; }
         public string EmailId { get; set; }
+        public string Destination { get; set; }
     }
 }

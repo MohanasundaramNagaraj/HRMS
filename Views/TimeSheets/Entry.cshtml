@@ -13,7 +13,6 @@
 }
 
 <script>
-    debugger;
     var timeSheetData = JSON.parse('@Html.Raw(Json.Serialize(Model.TimeSheetRecords))');
 
     var activities = @Html.Raw(Json.Serialize(ViewBag.Activities));
@@ -133,7 +132,7 @@
                                     <div class="row">
                                         <div class="col-lg-3 col-sm-6">
                                             <div class="chat-about">
-                                                <div class="chat-with">@Model.EmployeeDetails.Name</div>
+                                                <div class="chat-with" id="employeeName">@Model.EmployeeDetails.Name</div>
                                                 <div class="chat-num-messages">@Model.EmployeeDetails.Designation</div>
                                             </div>
                                         </div>
@@ -164,9 +163,9 @@
                     <div style="float:right;margin-bottom:10px;    justify-content: flex-end;gap: 10px; display: flex; cursor:marker;">
 
                         <button class="btn btn-success" onclick="update()"><i class="fa fa-save"></i> Save</button>
-                        <button class="btn btn-warning" onclick="exportToExcel()"> <i class="fa fa-file-excel"></i> Export to Excel</button>
-                        <button class="btn btn-danger" onclick="exportToPDF()"> <i class="fa fa-file"></i> Export to PDF</button>
-                        <button class="btn btn-primary" onclick="printTable()"> <i class="fa fa-print"></i> Print</button>
+                        <button class="btn btn-warning" onclick="exportToExcel('@Model.EmployeeDetails.Name','@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(ViewBag.SelectedMonth)','@ViewBag.SelectedYear')"> <i class="fa fa-file-excel"></i> Export to Excel</button>
+                        <button class="btn btn-danger" onclick="exportToPDF('@Model.EmployeeDetails.Name','@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(ViewBag.SelectedMonth)','@ViewBag.SelectedYear')"> <i class="fa fa-file"></i> Export to PDF</button>
+                        @* <button class="btn btn-primary" onclick="printTable()"> <i class="fa fa-print"></i> Print</button> *@
                     </div>
                     <br />
                     <div>
