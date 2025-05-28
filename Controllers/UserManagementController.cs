@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
 
 namespace SparkHRMS.Controllers
@@ -10,48 +12,78 @@ namespace SparkHRMS.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
-        public UserManagementController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public UserManagementController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
+            _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
         }
 
-        // USERS
         [HttpGet]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
-            var users = _userManager.Users.Select(u => new { u.Id, u.UserName, u.Email }).ToList();
+            var users = await _userManager.Users
+                .Select(u => new UserViewModel
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    UserName = u.UserName,
+                    PhoneNumber = u.PhoneNumber,
+                    IsActive = u.IsActive
+                })
+                .ToListAsync();
+
             return Json(users);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUser(string userName, string email, string password)
+        public async Task<IActionResult> SaveUser(UserViewModel model)
         {
-            var user = new ApplicationUser { UserName = userName, Email = email };
-            var result = await _userManager.CreateAsync(user, password);
-            return Json(result);
+            if (model.Id == 0)
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    IsActive = true
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors);
+            }
+            else
+            {
+                var user = await _userManager.FindByIdAsync(model.Id.ToString());
+                if (user == null) return NotFound();
+
+                user.UserName = model.UserName;
+                user.Email = model.Email;
+                user.PhoneNumber = model.PhoneNumber;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors);
+            }
+
+            return Ok();
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateUser(string id, string email)
+        [HttpPost]
+        public async Task<IActionResult> InactivateUser([FromBody] string userId)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return NotFound();
 
-            user.Email = email;
-            var result = await _userManager.UpdateAsync(user);
-            return Json(result);
-        }
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+            user.IsActive = false;
+            await _userManager.UpdateAsync(user);
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteUser(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
-
-            var result = await _userManager.DeleteAsync(user);
-            return Json(result);
+            return Ok();
         }
 
         // ROLES
@@ -104,7 +136,41 @@ namespace SparkHRMS.Controllers
             return Json(roles);
         }
 
+        public async Task<IActionResult> GetUserRolesList()
+        {
+            var userRoles = await (from u in _userManager.Users
+                             join ur in _context.UserRoles on u.Id equals ur.UserId
+                             join r in _roleManager.Roles on ur.RoleId equals r.Id
+                             where ur != null
+                             select new UserRoleViewModel
+                             {
+                                UserName = u.UserName,
+                                RoleName = r.Name
+                             }
+                         ).ToListAsync();
+
+            return Json(userRoles);
+        }
+
         public IActionResult Index() => View();
+
+
     }
 
+}
+
+public class UserViewModel
+{
+    public int Id { get; set; }
+    public string UserName { get; set; }
+    public string Email { get; set; }
+    public string Password { get; set; } // only for new user
+    public string PhoneNumber { get; set; }
+    public bool IsActive { get; set; }
+}
+
+public class UserRoleViewModel
+{
+    public string UserName { get; set; }
+    public string RoleName { get; set; }
 }
