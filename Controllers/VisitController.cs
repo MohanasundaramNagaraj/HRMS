@@ -73,8 +73,6 @@ namespace SparkHRMS.Controllers
                 );
             }
             
-
-            
             var data = query
                 .OrderByDescending(x => x.EntryDate)
                 .Skip(request.Start)
@@ -174,7 +172,6 @@ namespace SparkHRMS.Controllers
             // Update properties
             existing.PassNo = model.PassNo;
             existing.Location = model.Location;
-            existing.EntryDate = model.EntryDate;
             existing.GateInCharge = model.GateInCharge;
             existing.ContactNumber = model.ContactNumber;
             existing.VisitorName = model.VisitorName;

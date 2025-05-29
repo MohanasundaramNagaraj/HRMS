@@ -284,7 +284,13 @@
     // Request webcam access
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => video.srcObject = stream)
-        .catch(err => alert("Webcam access denied: " + err.message));
+        .catch(err =>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "Webcam access denied: " + err.message
+            })
+          );
 
     // Capture from webcam
     captureBtn.addEventListener('click', () => {
@@ -379,7 +385,7 @@
             RecentVisits: parseInt($('input[name="RecentVisits"]').val()) || 0
         };
 
-        if(data.ContactNumber == ""){
+        if (data.ContactNumber == "") {
             Swal.fire({
                 icon: 'warning',
                 title: 'Invalid',
@@ -418,7 +424,7 @@
 
             return false;
         }
-        
+
         if (data.PurposeOfVisit == "") {
             Swal.fire({
                 icon: 'warning',
@@ -438,7 +444,7 @@
 
             return false;
         }
-        
+
         if (data.VisitorImageUrl == "") {
             Swal.fire({
                 icon: 'warning',
@@ -455,12 +461,26 @@
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (res) {
-                alert('Visitor entry saved successfully!');
-                location.href = "/Visit/Index";
+                Swal.fire({
+                    title: 'Updated',
+                    text: "Visitor entry saved successfully!",
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ok'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.href = "/Visit/Index";
+                    }
+                });
             },
             error: function (err) {
-                alert('Error saving visitor entry. ' + err.responseText);
-                console.error(err.responseText);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid',
+                    text: 'Error saving visitor entry. ' + err.responseText
+                });
             }
         });
     }
@@ -493,6 +513,11 @@
             },
             error: function (err) {
                 alert('Error loading visitor data.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid',
+                    text: 'Error loading visitor data.'
+                });
                 console.error(err);
             }
         });
@@ -504,12 +529,11 @@
     }
 
     function upload() {
-        debugger;
         var formData = new FormData();
 
         const imageData = canvas.getAttribute('data-captured');
 
-       // var file = $('input[name="VisitorImage"]')[0].files[0];
+        // var file = $('input[name="VisitorImage"]')[0].files[0];
 
         var company = $('input[name="CompanyName"]').val();
         var visitor = $('input[name="VisitorName"]').val();
@@ -542,23 +566,40 @@
         //     });
         // } else if (imageData) {
 
-            $.ajax({
-                url: '/Visit/SaveCapturedImage',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    base64Image: imageData,
-                    CompanyName: company,
-                    VisitorName: visitor
-                }),
-                success: function (response) {
-                    $('input[name="VisitorImageUrl"]').val(response.imagePath);
-                    alert("Image uploaded successfully.");
-                },
-                error: function () {
-                    alert("Error uploading image.");
-                }
-            });
+        $.ajax({
+            url: '/Visit/SaveCapturedImage',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                base64Image: imageData,
+                CompanyName: company,
+                VisitorName: visitor
+            }),
+            success: function (response) {
+                $('input[name="VisitorImageUrl"]').val(response.imagePath);
+                Swal.fire({
+                    title: 'Uploaded',
+                    text: "Image Uploaded successfully!",
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ok'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                    }
+                });
+            },
+            error: function () {
+                alert("Error uploading image.");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid',
+                    text: 'Error uploading image.'
+                });
+            }
+        });
         // } else {
         //     alert("Please capture or select an image first.");
         // }
@@ -579,8 +620,19 @@
                     url: '/Visit/OutEntry/' + '@Model.Id',
                     type: 'POST',
                     success: function (res) {
-                        alert('Visitor Out entry saved successfully!');
-                        location.href = "/Visit/Index";
+                        Swal.fire({
+                            title: 'Updated',
+                            text: "Visitor Out entry saved successfully!",
+                            icon: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.href = "/Visit/Index";
+                            }
+                        });
                     },
                     error: function (err) {
                         alert('Error saving visitor entry. ' + err.responseText);
