@@ -10,57 +10,54 @@ using SparkHRMS.Data.Setting;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using SparkHRMS.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using SendGrid.Helpers.Mail;
+using Humanizer;
 
 namespace SparkHRMS.Controllers
 {
+    [Authorize]
     public class VisitController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
         private readonly Utility utility;
+        private readonly IWebHostEnvironment _env;
 
         private readonly IBackgroundJobClient _backgroundJobClient;
-        public VisitController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration, Utility utility,  IBackgroundJobClient backgroundJobClient)
+        public VisitController(IWebHostEnvironment env, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration, Utility utility, IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
             _userManager = userManager;
             _configuration = configuration;
             this.utility = utility;
             _backgroundJobClient = backgroundJobClient;
+            _env = env;
         }
 
-        public IActionResult Index(int? YearId, int? MonthId)
+        public IActionResult Index()
         {
-            var data = _context.VisitorEntries.AsQueryable();
-            if (YearId.HasValue)
-                data = data.Where(x => x.EntryDate.Year == YearId);
-            if (MonthId.HasValue)
-                data = data.Where(x => x.EntryDate.Month == MonthId);
-
-            ViewBag.SelectedYearId = YearId;
-            ViewBag.SelectedMonth = MonthId;
-
-            ViewBag.YearList = _context.Year.ToList();
-
-            return View(data.ToList());
+            return View();
         }
 
         [HttpPost]
-        public IActionResult GetVisitors([FromForm] DataTableRequest request, int? YearId, int? MonthId)
+        public IActionResult GetVisitors([FromForm] DataTableRequest request, DateTime? StartDate, DateTime? EndDate)
         {
             var query = _context.VisitorEntries.AsQueryable();
 
-            if (YearId.HasValue)
-                query = query.Where(x => x.EntryDate.Year == YearId);
-
-            if (MonthId.HasValue)
-                query = query.Where(x => x.EntryDate.Month == MonthId);
+            if (StartDate.HasValue && EndDate.HasValue)
+            {
+                DateTime start = StartDate.Value.Date;
+                DateTime end = EndDate.Value.Date.AddDays(1).AddTicks(-1); 
+                query = query.Where(x => x.EntryDate >= start && x.EntryDate <= end);
+            }
 
             var totalRecords = query.Count();
 
             string searchText = request.Search.Value;
-            if (!string.IsNullOrEmpty(searchText)){
+            if (!string.IsNullOrEmpty(searchText))
+            {
                 query = query.Where(x =>
                 x.PassNo.Contains(searchText) ||
                 x.VisitorName.Contains(searchText) ||
@@ -72,13 +69,14 @@ namespace SparkHRMS.Controllers
                 x.OutTime.ToString().Contains(searchText)
                 );
             }
-            
+
             var data = query
                 .OrderByDescending(x => x.EntryDate)
                 .Skip(request.Start)
                 .Take(request.Length)
                 .Select(x => new
                 {
+                    visitorImage = x.VisitorImageUrl,
                     passNo = x.PassNo,
                     visitorName = x.VisitorName,
                     company = x.CompanyName,
@@ -93,7 +91,7 @@ namespace SparkHRMS.Controllers
                                 + (!x.OutTime.HasValue ? $@"
                                 <button class='btn btn-sm btn-warning mr-2' onclick='redirectToMaintanance(""EDIT"", {x.Id})'>Edit</button>
                                 <button class='btn btn-sm btn-danger mr-2' onclick='outEntry({x.Id})'>Out</button> " : "")
-                                + $@" <a class='btn btn-sm btn-success' href='/Visit/Print/{x.Id}' target='_blank'>Print</a>"
+                                + $@" <a class='btn btn-sm btn-info' href='/Visit/Print/{x.Id}' target='_blank' style='padding-top: 10px;'>Print</a>"
 
                 })
                 .ToList();
@@ -118,7 +116,7 @@ namespace SparkHRMS.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null) return NotFound();
                 var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
-                
+
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
                 var isSuperAdmin = await _userManager.IsInRoleAsync(user, "SuperAdmin");
 
@@ -137,7 +135,7 @@ namespace SparkHRMS.Controllers
             ViewBag.EntryID = EntryID;
 
             ViewBag.Locations = _configuration.GetSection("VisitorPassSettings:GateLocationsForVisitorPass").Get<List<string>>();
-            
+
             ViewBag.EmployeeList = _context.Employees.ToList();
             return View(entry);
         }
@@ -154,7 +152,7 @@ namespace SparkHRMS.Controllers
                 await _context.SaveChangesAsync();
                 string documentNumber;
                 utility.GenerateDocumentNumber("Visitor_Pass", true, out documentNumber);
-                return Ok();
+                return Ok(model.Id);
             }
 
             return BadRequest(ModelState);
@@ -193,7 +191,7 @@ namespace SparkHRMS.Controllers
             _context.VisitorEntries.Update(existing);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(existing.Id);
         }
 
         [HttpGet("{id}")]
@@ -224,7 +222,7 @@ namespace SparkHRMS.Controllers
                 return NotFound();
 
             visitor.RecentVisits = _context.VisitorEntries.Where(x => x.ContactNumber == contactNumber).Count();
-               
+
 
             return Json(new
             {
@@ -290,25 +288,40 @@ namespace SparkHRMS.Controllers
         [HttpPost]
         public IActionResult SaveCapturedImage([FromBody] VisitorImageUploadDto dto)
         {
-            if (string.IsNullOrEmpty(dto.Base64Image))
-                return BadRequest("Image data is required.");
+            try
+            {
+                if (string.IsNullOrEmpty(dto.Base64Image))
+                    return BadRequest("Image data is required.");
 
-            string today = DateTime.Now.ToString("yyyy-MM-dd");
-            string folderName = $"{today}_{Sanitize(dto.CompanyName)}_{Sanitize(dto.VisitorName)}";
-            string folderPath = Path.Combine("wwwroot", "VisitorImages", folderName);
+                string today = DateTime.Now.ToString("yyyy-MM-dd");
 
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
+                // Read base upload path from config
+                string rootPath = _configuration["AppSettings:UploadDirectory"]; // e.g., "D:/HR Images"
 
-            string base64 = Regex.Replace(dto.Base64Image, @"^data:image\/[a-zA-Z]+;base64,", "");
-            byte[] imageBytes = Convert.FromBase64String(base64);
-            string fileName = Guid.NewGuid() + ".jpg";
-            string fullPath = Path.Combine(folderPath, fileName);
+                // Create subfolder structure: D:/HR Images/VisitorPass/2025-05-25_Company_Visitor/
+                string subFolder = Path.Combine("VisitorPass", $"{today}_{Sanitize(dto.CompanyName)}_{Sanitize(dto.VisitorName)}");
+                string fullSavePath = Path.Combine(rootPath, subFolder);
 
-            System.IO.File.WriteAllBytes(fullPath, imageBytes);
+                if (!Directory.Exists(fullSavePath))
+                    Directory.CreateDirectory(fullSavePath);
 
-            string publicUrl = $"/VisitorImages/{folderName}/{fileName}";
-            return Ok(new { imagePath = publicUrl });
+                // Decode Base64 image
+                string base64 = Regex.Replace(dto.Base64Image, @"^data:image\/[a-zA-Z]+;base64,", "");
+                byte[] imageBytes = Convert.FromBase64String(base64);
+                string fileName = Guid.NewGuid() + ".jpg";
+                string filePath = Path.Combine(fullSavePath, fileName);
+
+                System.IO.File.WriteAllBytes(filePath, imageBytes);
+
+                // Build relative or full URL if needed
+                string publicUrl = $"{_configuration["AppSettings:ThisSiteUrl"]}uploads/VisitorPass/{today}_{Sanitize(dto.CompanyName)}_{Sanitize(dto.VisitorName)}/{fileName}";
+
+                return Ok(new { imagePath = publicUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         private string Sanitize(string input)

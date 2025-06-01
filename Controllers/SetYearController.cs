@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
 using SparkHRMS.Data.Setting;
 
 namespace SparkHRMS.Controllers
 {
+    [Authorize]
     public class SetYearController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -17,7 +19,7 @@ namespace SparkHRMS.Controllers
         // List All Years
         public async Task<IActionResult> Index()
         {
-            var years = await _context.Year.ToListAsync();
+            var years = await _context.Year.OrderByDescending(x => x.Id).ToListAsync();
             return View(years);
         }
 
@@ -36,7 +38,7 @@ namespace SparkHRMS.Controllers
             {
                 _context.Year.Add(setYear);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "SetYear");
             }
             return View(setYear);
         }
@@ -63,7 +65,7 @@ namespace SparkHRMS.Controllers
             {
                 _context.Update(setYear);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "SetYear");
             }
             return View(setYear);
         }

@@ -33,6 +33,7 @@ namespace SparkHRMS.Controllers
                     PhoneNumber = u.PhoneNumber,
                     IsActive = u.IsActive
                 })
+                .OrderByDescending(x=>x.Id)
                 .ToListAsync();
 
             return Json(users);
@@ -90,7 +91,7 @@ namespace SparkHRMS.Controllers
         [HttpGet]
         public IActionResult GetRoles()
         {
-            var roles = _roleManager.Roles.Select(r => new { r.Id, r.Name }).ToList();
+            var roles = _roleManager.Roles.Select(r => new { r.Id, r.Name }).OrderByDescending(x => x.Id).ToList();
             return Json(roles);
         }
 

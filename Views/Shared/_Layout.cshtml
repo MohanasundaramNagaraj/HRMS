@@ -42,8 +42,19 @@
     <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
 
     <style>
-        body{
-          
+        footer {
+            /* position: fixed; */
+            bottom: -10px;
+            left:-10px;
+            width: 100%;
+            height: 60px; 
+            background-color: #f8f9fa;
+            text-align: center;
+            line-height: 60px;
+        }
+
+        .body-content {
+            min-height: 80vh;
         }
     </style>
 
@@ -65,20 +76,11 @@
         var UserImageUrl = "";
         var emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
 
-        if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
-        {
-            UserImageUrl = Url.Content("~/uploads/" + user.UserName + ".jpg");
-        }
-        else
-        {
-            int lastSlashIndex = emp.ImageUrl.LastIndexOf('/');
-            if (lastSlashIndex >= 0)
-            {
-                UserImageUrl = Url.Content("~/uploads/" + emp.ImageUrl.Substring(lastSlashIndex + 1));
-            }
-        }
-        // var UserImageUrl = Url.Content("~/images/default-user.png"); // Set the default user image URL
+
+
         var UserDesignation = (roles.Contains("Admin") || roles.Contains("SuperAdmin")) ? "Administrator" : roles.Contains("Employee") ? "Employee" : "User";
+        UserImageUrl = Url.Content("~/app/assets//images/user/profile.png");
+
     }
     <!-- Page Loader -->
     <div class="page-loader-wrapper">
@@ -103,7 +105,7 @@
                 <a class="navbar-brand" href="#">
                     <img src="~/uploads/logo.png" alt="" style="height:100%;" />
                     @*  <img src="~/app/assets/images/logo.png" alt="" /> *@
-                    <span class="logo-name">@Configuration["AppSettings:SiteTitle"]</span>
+                    <span class="logo-name" style="font-size: 18px;">@Configuration["AppSettings:SiteTitle"]</span>
                 </a>
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse">
@@ -121,52 +123,56 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
-                    {
-                        <!-- #START# Notifications-->
-                        <li class="dropdown">
-                            <a href="#" onClick="return false;" class="dropdown-toggle" data-bs-toggle="dropdown"
-                               role="button">
-                                <i class="far fa-bell"></i>
-                                <span class="notify"></span>
-                                <span class="heartbeat"></span>
-                            </a>
-                            <ul class="dropdown-menu pullDown">
-                                <li class="header">NOTIFICATIONS</li>
-                                <li class="body">
-                                    <ul class="menu">
-                                        <li>
-                                            <a href="#" onClick="return false;">
-                                                <span class="table-img msg-user">
-                                                    <img src="~/app/assets/images/user/user1.jpg" alt="">
-                                                </span>
-                                                <span class="menu-info">
-                                                    <span class="menu-title">Sarah Smith</span>
-                                                    <span class="menu-desc">
-                                                        <i class="material-icons">access_time</i> 14 mins ago
-                                                    </span>
-                                                    <span class="menu-desc">Please check your email.</span>
-                                                </span>
-                                            </a>
-                                        </li>
-
-                                    </ul>
-                                </li>
-                                @*  <li class="footer">
-                            <a href="#" onClick="return false;">View All Notifications</a>
-                            </li> *@
-                            </ul>
-                        </li>
-                        <!-- #END# Notifications-->
+                    @{
+                        string siteType = Configuration["AppSettings:SiteType"];
                     }
-                    else
+                    @if (siteType == "HR Portal")
                     {
-                        <li>
-                            <button id="checkInBtn" class="btn btn-primary me-2 m-t-10">Check In</button>
-                        </li>
-                        <li>
-                            <button id="checkOutBtn" class="btn btn-danger m-t-10">Check Out</button>
-                        </li>
+                        if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                        {
+                            <!-- START Notifications-->
+                            <li class="dropdown">
+                                <a href="#" onClick="return false;" class="dropdown-toggle" data-bs-toggle="dropdown"
+                                   role="button">
+                                    <i class="far fa-bell"></i>
+                                    <span class="notify"></span>
+                                    <span class="heartbeat"></span>
+                                </a>
+                                <ul class="dropdown-menu pullDown">
+                                    <li class="header">NOTIFICATIONS</li>
+                                    <li class="body">
+                                        <ul class="menu">
+                                            <li>
+                                                <a href="#" onClick="return false;">
+                                                    <span class="table-img msg-user">
+                                                        <img src="~/app/assets/images/user/user1.jpg" alt="">
+                                                    </span>
+                                                    <span class="menu-info">
+                                                        <span class="menu-title">Sarah Smith</span>
+                                                        <span class="menu-desc">
+                                                            <i class="material-icons">access_time</i> 14 mins ago
+                                                        </span>
+                                                        <span class="menu-desc">Please check your email.</span>
+                                                    </span>
+                                                </a>
+                                            </li>
+
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </li>
+                            <!--END Notifications-->
+                        }
+                        else
+                        {
+                            <li>
+                                <button id="checkInBtn" class="btn btn-primary me-2 m-t-10">Check In</button>
+                            </li>
+                            <li>
+                                <button id="checkOutBtn" class="btn btn-danger m-t-10">Check Out</button>
+                            </li>
+                        }
                     }
 
                     <!-- Full Screen Button -->
@@ -248,57 +254,57 @@
                         </div>
                     </li>
 
-                   @*  @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                    @*  @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
                     { *@
-                        <li class="header">Main</li>
-                        @if (await HasAccess("L1_Dashboard"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-monitor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-                                    <span>Dashboard</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="../app/index.html" class="toggled">Dashboard 1</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_VisitorEntry"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
+                    <li class="header">Main</li>
+                    @if (await HasAccess("L1_Dashboard"))
+                    {
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-monitor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                <span>Dashboard</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="../app/index.html" class="toggled">Dashboard 1</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    @if (await HasAccess("L1_VisitorEntry"))
+                    {
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-monitor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                                 <span>Visitor Entry</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="/Visit/Index">List</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Employee"))
-                        {
-                            <li>
-                                <a href="#" onClick="return false;" class="menu-toggle">
-                                    <i data-feather="users"></i>
-                                    <span>Employee</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="/Employee/Index">List</a>
-                                    </li>
-                                    <li>
-                                        <a href="/Employee/Create">Add</a>
-                                    </li>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/Visit/Index">List</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    @if (await HasAccess("L1_Employee"))
+                    {
+                        <li>
+                            <a href="#" onClick="return false;" class="menu-toggle">
+                                <i data-feather="users"></i>
+                                <span>Employee</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/Employee/Index">List</a>
+                                </li>
+                                <li>
+                                    <a href="/Employee/Create">Add</a>
+                                </li>
 
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Attendance"))
-                        {
+                            </ul>
+                        </li>
+                    }
+                    @if (await HasAccess("L1_Attendance"))
+                    {
                         <li>
                             <a href="#" onClick="return false;" class="menu-toggle">
                                 <i data-feather="briefcase"></i>
@@ -314,12 +320,12 @@
                                 <li class="">
                                     <a href="/AdminAttendanceViewer/EmployeeMonthlySummary">Monthly Summary</a>
                                 </li>
-                              
+
                             </ul>
                         </li>
-                        }
-                        @if (await HasAccess("L1_Timesheet"))
-                        {
+                    }
+                    @if (await HasAccess("L1_Timesheet"))
+                    {
                         <li>
                             <a href="#" onClick="return false;" class="menu-toggle">
                                 <i data-feather="clock"></i>
@@ -331,187 +337,25 @@
                                 </li>
                             </ul>
                         </li>
-                        }
-                        @if (await HasAccess("L1_UserManagement"))
-                        {
-                            <li>
-                                <a href="#" onClick="return false;" class="menu-toggle">
-                                    <i data-feather="user"></i>
-                                    <span>User Management</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li class="">
-                                        <a href="/UserManagement/Index">List</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_LeaveManagement"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard">
-                                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
-                                        </path>
-                                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1">
-                                        </rect>
-                                    </svg>
-                                    <span>Leave Management</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="/LeaveRequest/Index">Leave Request</a>
-                                    </li>
-                                    <li>
-                                        <a href="/LeaveAllocation/Index">Leave Allocation & Balance</a>
-                                    </li>
-                                    <li>
-                                        <li>
-                                            <a href="/LeaveType/Index">Leave Types</a>
-                                        </li>
-                                        <li>
-                                            <a href="/LeaveReasons/Index">Leave Reasons</a>
-                                        </li>
-                                </ul>
-
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Holidays"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                    <i data-feather="headphones"></i>
-                                    <span>Holidays</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="/Holidays/Index">List</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Emails"))
-                        {
-
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                    <i data-feather="mail"></i>
-                                    <span>Emails</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="/EmailLogs/Index">List</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Assets"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                    <i data-feather="headphones"></i>
-                                    <span>Assets</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="/AssetMaster/Index">Entry</a>
-                                    </li>
-                                    <li>
-                                        <a href="/AssetAllocation/Index">Allocation</a>
-                                    </li>
-                                    <li>
-                                        <a href="/AssetMaintenance/Index">Manage</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Masters"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                    <i data-feather="briefcase"></i>
-                                    <span>Masters</span>
-                                </a>
-                                <ul class="ml-menu">
-
-                                    <li>
-                                        <a href="/SubStatusMasters/Index">Sub Status</a>
-                                    </li>
-                                    <li>
-                                        <a href="/WorkItemStatus/Index">Work Item Status</a>
-                                    </li>
-                                    <li>
-                                        <a href="/WorkItemType/Index">Work Item Type</a>
-                                    </li>
-
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Settings"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                <i class="material-icons">settings</i>
-                                    <span>Settings</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="/SetYear/Index">Year</a>
-                                    </li>
-                                    <li>
-                                        <a href="/NumberConfig/Index">Number Configuration</a>
-                                    </li>
-                                   @*  <li>
-                                        <a href="/Activity/Index">Activity</a>
-                                    </li> *@
-                                </ul>
-                            </li>
-                        }
-                        @if (await HasAccess("L1_Theme"))
-                        {
-                            <li>
-                                <a href="#" onclick="return false;" class="menu-toggle">
-                                    <i data-feather="headphones"></i>
-                                    <span>Theme</span>
-                                </a>
-                                <ul class="ml-menu">
-                                    <li>
-                                        <a href="app/index.html">Dashboard</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                   @*  }
-                    else
+                    }
+                    @if (await HasAccess("L1_UserManagement"))
                     {
-                        <li class="header">Main</li>
-
                         <li>
                             <a href="#" onClick="return false;" class="menu-toggle">
-                                <i data-feather="briefcase"></i>
-                                <span>Attendance</span>
-                            </a>
-                            <ul class="ml-menu">
-                                <li>
-                                    <a href="/EmployeeAttendance/Index">Employee Attendance</a>
-                                </li>   
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#" onClick="return false;" class="menu-toggle">
-                                <i data-feather="clock"></i>
-                                <span>Timesheet</span>
+                                <i data-feather="user"></i>
+                                <span>User Management</span>
                             </a>
                             <ul class="ml-menu">
                                 <li class="">
-                                    <a href="/TimeSheets/Entry">Entry</a>
+                                    <a href="/UserManagement/Index">List</a>
                                 </li>
                             </ul>
                         </li>
+                    }
+                    @if (await HasAccess("L1_LeaveManagement"))
+                    {
                         <li>
-                            <a href="#" onClick="return false;" class="menu-toggle">
+                            <a href="#" onclick="return false;" class="menu-toggle">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                      viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                      stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard">
@@ -526,11 +370,25 @@
                                 <li>
                                     <a href="/LeaveRequest/Index">Leave Request</a>
                                 </li>
+                                <li>
+                                    <a href="/LeaveAllocation/Index">Leave Allocation & Balance</a>
+                                </li>
+                                <li>
+                                <li>
+                                    <a href="/LeaveType/Index">Leave Types</a>
+                                </li>
+                                <li>
+                                    <a href="/LeaveReasons/Index">Leave Reasons</a>
+                                </li>
                             </ul>
+
                         </li>
+                    }
+                    @if (await HasAccess("L1_Holidays"))
+                    {
                         <li>
                             <a href="#" onclick="return false;" class="menu-toggle">
-                                <i data-feather="briefcase"></i>
+                                <i data-feather="headphones"></i>
                                 <span>Holidays</span>
                             </a>
                             <ul class="ml-menu">
@@ -539,6 +397,154 @@
                                 </li>
                             </ul>
                         </li>
+                    }
+                    @if (await HasAccess("L1_Emails"))
+                    {
+
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i data-feather="mail"></i>
+                                <span>Emails</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/EmailLogs/Index">List</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    @if (await HasAccess("L1_Assets"))
+                    {
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i data-feather="headphones"></i>
+                                <span>Assets</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/AssetMaster/Index">Entry</a>
+                                </li>
+                                <li>
+                                    <a href="/AssetAllocation/Index">Allocation</a>
+                                </li>
+                                <li>
+                                    <a href="/AssetMaintenance/Index">Manage</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    @if (await HasAccess("L1_Masters"))
+                    {
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i data-feather="briefcase"></i>
+                                <span>Masters</span>
+                            </a>
+                            <ul class="ml-menu">
+
+                                <li>
+                                    <a href="/SubStatusMasters/Index">Sub Status</a>
+                                </li>
+                                <li>
+                                    <a href="/WorkItemStatus/Index">Work Item Status</a>
+                                </li>
+                                <li>
+                                    <a href="/WorkItemType/Index">Work Item Type</a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    }
+                    @if (await HasAccess("L1_Settings"))
+                    {
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i class="material-icons">settings</i>
+                                <span>Settings</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="/SetYear/Index">Year</a>
+                                </li>
+                                <li>
+                                    <a href="/NumberConfig/Index">Number Configuration</a>
+                                </li>
+                                @*  <li>
+                            <a href="/Activity/Index">Activity</a>
+                            </li> *@
+                            </ul>
+                        </li>
+                    }
+                    @if (await HasAccess("L1_Theme"))
+                    {
+                        <li>
+                            <a href="#" onclick="return false;" class="menu-toggle">
+                                <i data-feather="headphones"></i>
+                                <span>Theme</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a href="app/index.html">Dashboard</a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    @*  }
+                    else
+                    {
+                    <li class="header">Main</li>
+
+                    <li>
+                    <a href="#" onClick="return false;" class="menu-toggle">
+                    <i data-feather="briefcase"></i>
+                    <span>Attendance</span>
+                    </a>
+                    <ul class="ml-menu">
+                    <li>
+                    <a href="/EmployeeAttendance/Index">Employee Attendance</a>
+                    </li>
+                    </ul>
+                    </li>
+                    <li>
+                    <a href="#" onClick="return false;" class="menu-toggle">
+                    <i data-feather="clock"></i>
+                    <span>Timesheet</span>
+                    </a>
+                    <ul class="ml-menu">
+                    <li class="">
+                    <a href="/TimeSheets/Entry">Entry</a>
+                    </li>
+                    </ul>
+                    </li>
+                    <li>
+                    <a href="#" onClick="return false;" class="menu-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard">
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2">
+                    </path>
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1">
+                    </rect>
+                    </svg>
+                    <span>Leave Management</span>
+                    </a>
+                    <ul class="ml-menu">
+                    <li>
+                    <a href="/LeaveRequest/Index">Leave Request</a>
+                    </li>
+                    </ul>
+                    </li>
+                    <li>
+                    <a href="#" onclick="return false;" class="menu-toggle">
+                    <i data-feather="briefcase"></i>
+                    <span>Holidays</span>
+                    </a>
+                    <ul class="ml-menu">
+                    <li>
+                    <a href="/Holidays/Index">List</a>
+                    </li>
+                    </ul>
+                    </li>
 
                     } *@
 
@@ -628,7 +634,7 @@
         <!-- #END# Right Sidebar -->
     </div>
 
-    <section class="content">
+    <section class="content body-content">
         <div class="container-fluid">
             <div class="block-header">
                 <div class="row">
@@ -640,17 +646,20 @@
         </div>
     </section>
 
-    @*   <footer class="border-top footer text-muted">
-    <div class="container">
-    &copy; 2024 - SparkHRMS
-    </div>
-    </footer> *@
+
+    <footer class="border-top footer text-muted" style="position: relative;">
+        <div class="container">
+            &copy; @DateTime.Now.Year<span>.@Configuration["AppSettings:SiteTitle"] by @Configuration["AppSettings:PoweredBy"]</span>
+        </div>
+    </footer>
 
     @* <script src="~/app/assets/js/common.min.js"></script> *@
     @await RenderSectionAsync("Scripts", required: false)
 
    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/utility/utility.js"></script>
@@ -659,6 +668,9 @@
     <script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
 
     <script src="~/app/assets/js/pages/tables/jquery-datatable.js"></script>
+
+   
+   
     <script>
         feather.replace();
     </script>

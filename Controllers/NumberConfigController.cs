@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data; 
 using SparkHRMS.Data.Setting; 
 using System.Linq;
 using System.Threading.Tasks;
 
+[Authorize]
 public class NumberConfigController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -34,7 +36,9 @@ public class NumberConfigController : Controller
             model.CreatedDate = DateTime.Now;
             _context.SET_NumberConfig.Add(model);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction("Index", "NumberConfig");
+            // return RedirectToAction(nameof(Index));
         }
 
         ViewBag.Mode = "Create";
@@ -61,7 +65,8 @@ public class NumberConfigController : Controller
             model.LastUpdatedDate = DateTime.Now;
             _context.Update(model);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "NumberConfig");
+            //return RedirectToAction(nameof(Index));
         }
 
         ViewBag.Mode = "Edit";

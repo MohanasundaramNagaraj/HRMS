@@ -411,53 +411,53 @@ namespace SparkHRMS.Migrations
                     b.ToTable("EmployeeAttendanceRequest");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Entities.EmployeeTimeSheet", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            //modelBuilder.Entity("SparkHRMS.Data.Entities.EmployeeTimeSheet", b =>
+            //    {
+            //        b.Property<int>("ID")
+            //            .ValueGeneratedOnAdd()
+            //            .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+            //        SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
-                    b.Property<string>("Activity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+            //        b.Property<string>("Activity")
+            //            .IsRequired()
+            //            .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
+            //        b.Property<int>("CreatedBy")
+            //            .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+            //        b.Property<DateTime>("CreatedDate")
+            //            .HasColumnType("datetime2");
 
-                    b.Property<string>("Descreption")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+            //        b.Property<string>("Descreption")
+            //            .IsRequired()
+            //            .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("FromDateTime")
-                        .HasColumnType("datetime2");
+            //        b.Property<DateTime>("FromDateTime")
+            //            .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ToDateTime")
-                        .HasColumnType("datetime2");
+            //        b.Property<DateTime>("ToDateTime")
+            //            .HasColumnType("datetime2");
 
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
+            //        b.Property<int?>("UpdatedBy")
+            //            .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+            //        b.Property<DateTime?>("UpdatedDate")
+            //            .HasColumnType("datetime2");
 
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
+            //        b.Property<int>("UserID")
+            //            .HasColumnType("int");
 
-                    b.Property<int>("WorkItemStatusID")
-                        .HasColumnType("int");
+            //        b.Property<int>("WorkItemStatusID")
+            //            .HasColumnType("int");
 
-                    b.Property<int>("WorkItemTypeID")
-                        .HasColumnType("int");
+            //        b.Property<int>("WorkItemTypeID")
+            //            .HasColumnType("int");
 
-                    b.HasKey("ID");
+            //        b.HasKey("ID");
 
-                    b.ToTable("EmployeeTimeSheet");
-                });
+            //        b.ToTable("EmployeeTimeSheet");
+            //    });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.Holiday", b =>
                 {

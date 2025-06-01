@@ -37,11 +37,11 @@ namespace SparkHRMS.Migrations
                 type: "datetime2",
                 nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "DevOPsID",
-                table: "EmployeeTimeSheet",
-                type: "int",
-                nullable: true);
+            //migrationBuilder.AddColumn<int>(
+            //    name: "DevOPsID",
+            //    table: "EmployeeTimeSheet",
+            //    type: "int",
+            //    nullable: true);
         }
 
         /// <inheritdoc />
@@ -63,9 +63,9 @@ namespace SparkHRMS.Migrations
                 name: "UpdatedDate",
                 table: "SubStatusMaster");
 
-            migrationBuilder.DropColumn(
-                name: "DevOPsID",
-                table: "EmployeeTimeSheet");
+            //migrationBuilder.DropColumn(
+            //    name: "DevOPsID",
+            //    table: "EmployeeTimeSheet");
         }
     }
 }
