@@ -81,7 +81,9 @@ namespace SparkHRMS.ViewModels
         Weekend,
         Holiday,
         PermissionNeeded,
-        PendingCheckOut
+        PendingCheckOut,
+        LeaveRequested,
+        LeaveRequestApproved
     }
 
     public class AttendanceSettings

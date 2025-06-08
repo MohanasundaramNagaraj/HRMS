@@ -85,8 +85,13 @@ namespace SparkHRMS.Controllers
                                 .Select(h => h.Date.Date)
                                 .ToListAsync();
 
+           
             foreach (var date in allDatesInMonth)
             {
+                var leaveRequestedDetails = await _context.LeaveRequest.Where(x => x.EmployeeId == emp.EmployeeId 
+                && x.StartDate.Date >= date.Date
+                && x.EndDate <= date.Date).FirstOrDefaultAsync();
+
                 var attendanceRecord = attendanceRecords.FirstOrDefault(a => a.CheckInTime.Date == date);
                 TimeSpan? workingTime = null;
 
@@ -97,7 +102,7 @@ namespace SparkHRMS.Controllers
                 }
                 else if (date.DayOfWeek == DayOfWeek.Sunday)
                 {
-                    status = AttendanceStatus.Weekend; // If the date is a Sunday
+                    status = AttendanceStatus.Weekend; 
                 }
                 else if (attendanceRecord != null)
                 {

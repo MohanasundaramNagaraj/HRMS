@@ -118,7 +118,7 @@
         $('#userEmail').val('');
         $('#userPassword').val('').show().closest('#passwordField').show();
         $('#userModalTitle').text('Add User');
-        userModal.show();
+        userModal.modal('show');
     }
 
     function editUser(id, name, email) {
@@ -164,10 +164,10 @@
             let rows = '';
             $('#roleSelect').empty();
             roles.forEach(r => {
-                rows += `<tr><td>${r.name}</td>
+                rows += `<tr><td>${r.Name}</td>
                             <td>
-                                <button class="btn btn-sm btn-info" onclick="editRole('${r.id}', '${r.name}')">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteRole('${r.id}')">Delete</button>
+                                <button class="btn btn-sm btn-info" onclick="editRole('${r.Id}', '${r.Name}')">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteRole('${r.Id}')">Delete</button>
                             </td></tr>`;
                 $('#roleSelect').append(`<option>${r.name}</option>`);
             });
