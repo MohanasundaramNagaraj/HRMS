@@ -72,12 +72,12 @@ namespace SparkHRMS.Controllers
                 {
                     string status = (from lr in _context.LeaveRequest
                                      where lr.EmployeeId == attendance.EmployeeId
-                                     && lr.StartDate.Date >= selectedDate.Date
-                                     && lr.EndDate.Date <= selectedDate.Date
+                                     && lr.StartDate.Date <= selectedDate.Date
+                                     && lr.EndDate.Date >= selectedDate.Date
                                      select lr.Status
                                      ).FirstOrDefault();
 
-                    if (status != null && status != "CAN")
+                    if (status != null && status != "CAN-ACC")
                     {
                         status = "Leave Requested";
 

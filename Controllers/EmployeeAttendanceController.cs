@@ -138,7 +138,7 @@ namespace SparkHRMS.Controllers
                     }
                 }
 
-                if(status == AttendanceStatus.Absent && leaveRequestedDetails != null && leaveRequestedDetails.Status == "CAN")
+                if(status == AttendanceStatus.Absent && leaveRequestedDetails != null && leaveRequestedDetails.Status != "CAN-ACC")
                 {
                     status = AttendanceStatus.LeaveRequested;
 
