@@ -5,15 +5,48 @@
     var mode = ViewBag.Mode != null ? ViewBag.Mode : "Create";
     bool isReadOnly = mode == "Detail";
     string title = mode.ToString() + " Number Config";
+    ViewData["Title"] = title;
 }
 
+<style>
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default),
+    input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default),
+    input[type=tel]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea, input[type=number]:not(.browser-default) {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
+    }
+
+    .form-label {
+        margin-bottom: .5rem;
+        font-weight: bolder;
+    }
+</style>
+
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">Number Configuration</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> @ViewBag.Mode
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
 
 <form asp-action="@mode" method="post" class="needs-validation" novalidate>
     <div class="card shadow-sm p-4 rounded-4">
-        <h4 class="mb-4">Number Configuration</h4>
+      
         <input type="hidden" asp-for="NConfigID" />
         <div class="row mb-3">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3">
                 <label class="form-label">Document Type</label>
                 <input asp-for="DocumentType" class="form-control" />
                 <span asp-validation-for="DocumentType" class="text-danger"></span>
@@ -29,20 +62,7 @@
                 <input asp-for="Suffix" class="form-control" />
                 <span asp-validation-for="Suffix" class="text-danger"></span>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Start Number</label>
-                <input asp-for="StartNumber" class="form-control" />
-                <span asp-validation-for="StartNumber" class="text-danger"></span>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label"> End Number </label>
-                <input asp-for="EndNumber" class="form-control" />
-                <span asp-validation-for="EndNumber" class="text-danger"></span>
-            </div>
-            <div class="col-md-4 mb-3">
+               <div class="col-md-3 mb-3">
                 <label class="form-label"> Padding Number </label>
                 <input asp-for="PaddingNumber" class="form-control" />
                 <span asp-validation-for="PaddingNumber" class="text-danger"></span>
@@ -50,28 +70,39 @@
         </div>
 
         <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label">Year</label>
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Start Number</label>
+                <input asp-for="StartNumber" class="form-control" />
+                <span asp-validation-for="StartNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label class="form-label"> End Number </label>
+                <input asp-for="EndNumber" class="form-control" />
+                <span asp-validation-for="EndNumber" class="text-danger"></span>
+            </div>
+            <div class="col-md-2 mb-3">
+                <label class="form-label">Year ID</label>
                 <input asp-for="YearID" class="form-control" />
                 <span asp-validation-for="YearID" class="text-danger"></span>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-2 mb-3">
                 <label class="form-label">Last Number Generated</label>
                 <input asp-for="LastNumberGenerated" class="form-control" />
                 <span asp-validation-for="LastNumberGenerated" class="text-danger"></span>
             </div>
-            <div class="col-md-4 mb-3 form-check">
+            <div class="col-md-2 mb-3 form-check pl-3">
                 <br />
                 <br />
-                <input asp-for="IsActive" class="form-check-input" value="true" checked/>
+                <input asp-for="IsActive" class="form-check-input" value="true" checked />
                 <label class="form-check-label">Is Active</label>
             </div>
+         
         </div>
 
         <div class="col-lg-12 p-t-20 text-center">
             <div class="form-group">
                 <input type="submit" value="Update" class="btn btn-primary waves-effect m-r-15">
-                <a type="button" class="btn btn-danger waves-effect" href="@Url.Action("Index")">Cancel</a>
+                <a type="button" class="btn btn-danger waves-effect" href="/NumberConfig/Index">Cancel</a>
             </div>
         </div>
     </div>

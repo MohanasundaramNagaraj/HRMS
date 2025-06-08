@@ -1,25 +1,77 @@
-﻿<div class="container mt-4">
-    <h2>User Management</h2>
+﻿@{
+    ViewData["Title"] = "User Management";
+}
+
+<style>
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default),
+    input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default),
+    input[type=tel]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea, input[type=number]:not(.browser-default) {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
+    }
+
+    .form-label {
+        margin-bottom: .5rem;
+        font-weight: bolder;
+    }
+</style>
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">User Management </h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> List
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<div>
+
     <ul class="nav nav-tabs" id="tabMenu">
         <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#users">Users</a></li>
         <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#roles">Roles</a></li>
         <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#mapping">User-Role Mapping</a></li>
     </ul>
 
-    <div class="tab-content mt-3">
+    <div class="tab-content">
         <!-- USERS TAB -->
         <div id="users" class="tab-pane fade show active">
-            <button class="btn btn-primary mb-2" onclick="openUserModal()">Add User</button>
-            <table class="table table-bordered" id="userTable">
-                <thead><tr><th>UserName</th><th>Email</th><th>Actions</th></tr></thead>
+            <a class="btn btn-tbl-add btn-success mb-2" onclick="openUserModal()" style="float:right;margin-bottom: 0px !important;">
+                <i class="material-icons">add</i>
+            </a>
+            <br />
+            <table class="table table-bordered datatable" id="userTable">
+                <thead>
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Is Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tbody></tbody>
             </table>
         </div>
 
         <!-- ROLES TAB -->
         <div id="roles" class="tab-pane fade">
-            <button class="btn btn-primary mb-2" onclick="openRoleModal()">Add Role</button>
-            <table class="table table-bordered" id="roleTable">
+
+            <a class="btn btn-tbl-add btn-success mb-2" onclick="openRoleModal()" style="float:right;margin-bottom: 0px !important;">
+                <i class="material-icons">add</i>
+            </a>
+            <br />
+            <table class="table table-bordered dataTable" id="roleTable">
                 <thead><tr><th>Role Name</th><th>Actions</th></tr></thead>
                 <tbody></tbody>
             </table>
@@ -27,38 +79,56 @@
 
         <!-- MAPPING TAB -->
         <div id="mapping" class="tab-pane fade">
-            <select id="userSelect" class="form-control mb-2"></select>
-            <select id="roleSelect" class="form-control mb-2"></select>
-            <button class="btn btn-success" onclick="assignRole()">Assign Role</button>
-            <button class="btn btn-danger" onclick="removeRole()">Remove Role</button>
-            <ul id="assignedRolesList" class="mt-3"></ul>
+            <a class="btn btn-tbl-add btn-success mb-2" onclick="openUserRoleModal()" style="float:right;margin-bottom: 0px !important;">
+               Map User-Role
+            </a>
+            <br />
+            <table class="table table-bordered dataTable" id="userroleMappingTable">
+                <thead><tr><th>User Name</th><th>Role Name</th></tr></thead>
+                <tbody></tbody>
+            </table>
         </div>
+
     </div>
 </div>
 
 <!-- User Modal -->
 <div class="modal fade" id="userModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-full" style="max-width: 800px;">
         <form id="userForm">
             <div class="modal-content">
                 <div class="modal-header"><h5 class="modal-title" id="userModalTitle">Add User</h5></div>
                 <div class="modal-body">
-                    <input type="hidden" id="userId" />
-                    <div class="mb-2">
-                        <label>Username</label>
-                        <input type="text" id="userName" class="form-control" required />
-                    </div>
-                    <div class="mb-2">
-                        <label>Email</label>
-                        <input type="email" id="userEmail" class="form-control" required />
-                    </div>
-                    <div class="mb-2" id="passwordField">
-                        <label>Password</label>
-                        <input type="password" id="userPassword" class="form-control" />
+                    <div id="user-form">
+                        <input type="hidden" id="ID" />
+
+                        <div class="row">
+                            <input type="hidden" id="ID" />
+                            <div class="col-md-4 mb-2">
+                                <label>User Name <span class="text-danger">*</span></label>
+                                <input type="text" id="USERNAME" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input type="email" id="EMAIL" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label>Phone Number <span class="text-danger">*</span></label>
+                                <input type="text" id="PHONENUMBER" class="form-control" />
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label id="passwordLbl">Password (for new user) <span class="text-danger">*</span></label>
+                                <input type="password" id="PASSWORD" class="form-control" />
+                            </div>
+
+                        </div>
+
+
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-success" onclick="saveUser()">SAVE</button>
+                    @* <button type="button" class="btn btn-secondary" onclick="clearForm()">CLEAR</button> *@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -88,74 +158,169 @@
     </div>
 </div>
 
+<!-- User Role Modal -->
+<div class="modal fade" id="userroleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form id="userroleForm">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="userroleModalTitle">Map Role</h5></div>
+                <div class="modal-body" style="padding:0px;">
+
+                    <div class="mb-2 row col-md-12">
+                        <div class="col-md-6">
+                            <label>User</label><br />
+                            <select id="userSelect" class="form-control mb-2"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Role</label><br />
+                            <select id="roleSelect" class="form-control mb-2"></select>
+                        </div>
+                        <div class="col-md-6">
+                            @* <label>Mapped Role</label><br /> *@
+                            <ul id="assignedRolesList" class="mt-3"></ul>
+                        </div>
+                      
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="assignRole()">Assign Role</button>
+                    <button class="btn btn-danger" onclick="removeRole()">Remove Role</button>
+                   
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <script>
+
     const userModal = $('#userModal');
     const roleModal = $('#roleModal');
 
     // USERS
     function loadUsers() {
         $.get('/UserManagement/GetUsers', function (users) {
-            let rows = '';
-            $('#userSelect').empty();
-            users.forEach(u => {
+            var rows = '';
+            $.each(users, function (i, user) {
                 rows += `<tr>
-                            <td>${u.UserName}</td>
-                            <td>${u.Email}</td>
-                            <td>
-                                <button class="btn btn-sm btn-info" onclick="editUser('${u.Id}', '${u.UserName}', '${u.Email}')">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.Id}')">Delete</button>
-                            </td></tr>`;
-                $('#userSelect').append(`<option value="${u.Id}">${u.UserName}</option>`);
+                                            <td>${user.UserName}</td>
+                                            <td>${user.Email}</td>
+                                            <td>${user.PhoneNumber}</td>
+                                            <td>${user.IsActive ? 'Yes' : 'No'}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info" onclick='editUser(${JSON.stringify(user)})'>Edit</button>
+                                                <button class="btn btn-sm btn-danger" onclick='deleteUser("${user.Id}")'>In Active</button>
+                                            </td>
+                                         </tr>`;
             });
             $('#userTable tbody').html(rows);
         });
     }
 
+    function loadUserSelect() {
+        $.get('/UserManagement/GetUsers', function (data) {
+            $('#userSelect').empty();
+            data.forEach(u => {
+                $('#userSelect').append(`<option value="${u.Id}">${u.UserName}</option>`);
+            });
+        });
+    }
+
     function openUserModal() {
-        $('#userId').val('');
-        $('#userName').val('');
-        $('#userEmail').val('');
-        $('#userPassword').val('').show().closest('#passwordField').show();
+        $('#ID').val('');
+        $('#USERNAME').val('');
+        $('#USERNAME').prop('disabled', false);
+        $('#EMAIL').val('');
+        $('#EMAIL').prop('disabled', false);
+        $('#PHONENUMBER').val('');
         $('#userModalTitle').text('Add User');
+
+        $('#PASSWORD').show();
+        $('#passwordLbl').show();
         userModal.modal('show');
     }
 
-    function editUser(id, name, email) {
-        $('#userId').val(id);
-        $('#userName').val(name);
-        $('#userEmail').val(email);
-        $('#userPassword').closest('#passwordField').hide(); // no password change on edit
-        $('#userModalTitle').text('Edit User');
-        userModal.show();
-    }
-
-    $('#userForm').submit(function (e) {
-        e.preventDefault();
-        const id = $('#userId').val();
-        const data = {
-            userName: $('#userName').val(),
-            email: $('#userEmail').val(),
-            password: $('#userPassword').val()
+    function saveUser() {
+        const user = {
+            Id: $('#ID').val(),
+            UserName: $('#USERNAME').val(),
+            Email: $('#EMAIL').val(),
+            PhoneNumber: $('#PHONENUMBER').val(),
+            Password: $('#PASSWORD').val()
         };
 
-        if (id) {
-            $.ajax({
-                url: `/UserManagement/UpdateUser?id=${id}&email=${data.email}`,
-                type: 'PUT',
-                success: () => { userModal.hide(); loadUsers(); }
-            });
-        } else {
-            $.post('/UserManagement/CreateUser', data, () => {
-                userModal.hide(); loadUsers();
-            });
-        }
-    });
+        $.ajax({
+            url: '/UserManagement/SaveUser',
+            type: 'POST',
+            // contentType: 'application/json',
+            data: user,
+            success: function () {
+                Swal.fire({
+                    title: 'Saved',
+                    text: "User saved successfully!",
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ok'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        userModal.modal('hide');
+                        loadUsers();
+                    }
+                });
+             
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid',
+                    text: 'Error:' + xhr.responseText
+                });
+            }
+        });
+    }
+
+    function editUser(user) {
+
+        $('#ID').val(user.Id);
+        $('#USERNAME').val(user.UserName);
+        $('#USERNAME').prop('disabled', true);
+        $('#EMAIL').val(user.Email);
+        $('#EMAIL').prop('disabled', true);
+        $('#PHONENUMBER').val(user.PhoneNumber);
+        $('#PASSWORD').val('');
+        $('#PASSWORD').hide();
+        $('#passwordLbl').hide();
+
+        $('#userModalTitle').text('Edit User');
+
+        userModal.modal('show');
+    }
 
     function deleteUser(id) {
-        if (confirm('Delete this user?')) {
-            $.ajax({ url: `/UserManagement/DeleteUser?id=${id}`, type: 'DELETE', success: loadUsers });
+        if (confirm('Are you sure you want to inactivate this user?')) {
+            $.ajax({
+                url: '/UserManagement/InactivateUser',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(id),
+                success: function () {
+                    alert('User inactivated');
+                    loadUsers();
+                },
+                error: function (xhr) {
+                    alert('Error: ' + xhr.responseText);
+                }
+            });
         }
+    }
+
+    function clearForm() {
+        $('#ID, #USERNAME, #EMAIL, #PHONENUMBER, #PASSWORD').val('');
+
     }
 
     // ROLES
@@ -165,13 +330,15 @@
             $('#roleSelect').empty();
             roles.forEach(r => {
                 rows += `<tr><td>${r.Name}</td>
-                            <td>
-                                <button class="btn btn-sm btn-info" onclick="editRole('${r.Id}', '${r.Name}')">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteRole('${r.Id}')">Delete</button>
-                            </td></tr>`;
-                $('#roleSelect').append(`<option>${r.name}</option>`);
+                                            <td>
+                                                <button class="btn btn-sm btn-info" onclick="editRole('${r.Id}', '${r.Name}')">Edit</button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteRole('${r.Id}')">In Active</button>
+                                            </td></tr>`;
+                $('#roleSelect').append(`<option>${r.Name}</option>`);
             });
             $('#roleTable tbody').html(rows);
+
+
         });
     }
 
@@ -179,14 +346,14 @@
         $('#roleId').val('');
         $('#roleName').val('');
         $('#roleModalTitle').text('Add Role');
-        roleModal.show();
+        roleModal.modal('show');
     }
 
     function editRole(id, name) {
         $('#roleId').val(id);
         $('#roleName').val(name);
         $('#roleModalTitle').text('Edit Role');
-        roleModal.show();
+        roleModal.modal('show');
     }
 
     $('#roleForm').submit(function (e) {
@@ -198,7 +365,9 @@
             alert("Editing role name not supported via Identity API directly.");
         } else {
             $.post('/UserManagement/CreateRole', { roleName }, () => {
-                roleModal.hide(); loadRoles();
+                roleModal.modal('hide');
+                alert('Role Saved Successfully');
+                loadRoles();
             });
         }
     });
@@ -210,6 +379,9 @@
     }
 
     // MAPPING
+    function openUserRoleModal() {
+        $('#userroleModal').modal('show');
+    }
     function assignRole() {
         $.post('/UserManagement/AssignRole', {
             userId: $('#userSelect').val(),
@@ -230,8 +402,28 @@
         });
     });
 
+    function loadUserRoles() {
+        $.get('/UserManagement/GetUserRolesList', function (userroles) {
+            let rows = '';
+           
+            userroles.forEach(r => {
+                rows += `<tr><td>${r.UserName}</td><td>${r.RoleName}</td></tr>`;
+            });
+            $('#userroleMappingTable tbody').html(rows);
+
+
+        });
+    }
+
     $(document).ready(function () {
         loadUsers();
         loadRoles();
+        loadUserSelect();
+        loadUserRoles();
+        setTimeout(function () {
+            $('.table').DataTable();
+            $('#roleTable').css('width', '');
+            $('#userroleMappingTable').css('width', '');
+        }, 100);
     });
 </script>

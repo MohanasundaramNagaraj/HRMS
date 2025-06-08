@@ -11,8 +11,8 @@ namespace SparkHRMS.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "EmployeeTimeSheet");
+            //migrationBuilder.DropTable(
+            //    name: "EmployeeTimeSheet");
 
             migrationBuilder.CreateTable(
                 name: "LeaveRequest",
@@ -75,29 +75,29 @@ namespace SparkHRMS.Migrations
             migrationBuilder.DropTable(
                 name: "LeaveRequest");
 
-            migrationBuilder.CreateTable(
-                name: "EmployeeTimeSheet",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Activity = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Descreption = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DevOPsID = table.Column<int>(type: "int", nullable: true),
-                    FromDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ToDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<int>(type: "int", nullable: true),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    WorkItemStatusID = table.Column<int>(type: "int", nullable: false),
-                    WorkItemTypeID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmployeeTimeSheet", x => x.ID);
-                });
+            //migrationBuilder.CreateTable(
+            //    name: "EmployeeTimeSheet",
+            //    columns: table => new
+            //    {
+            //        ID = table.Column<int>(type: "int", nullable: false)
+            //            .Annotation("SqlServer:Identity", "1, 1"),
+            //        Activity = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            //        CreatedBy = table.Column<int>(type: "int", nullable: false),
+            //        CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        Descreption = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            //        DevOPsID = table.Column<int>(type: "int", nullable: true),
+            //        FromDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        ToDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        UpdatedBy = table.Column<int>(type: "int", nullable: true),
+            //        UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+            //        UserID = table.Column<int>(type: "int", nullable: false),
+            //        WorkItemStatusID = table.Column<int>(type: "int", nullable: false),
+            //        WorkItemTypeID = table.Column<int>(type: "int", nullable: false)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_EmployeeTimeSheet", x => x.ID);
+            //    });
         }
     }
 }

@@ -7,16 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\Configuration\**" />
     <Compile Remove="Views\Years\**" />
     <Compile Remove="wwwroot\assets\**" />
-    <Content Remove="Data\Configuration\**" />
     <Content Remove="Views\Years\**" />
     <Content Remove="wwwroot\assets\**" />
-    <EmbeddedResource Remove="Data\Configuration\**" />
     <EmbeddedResource Remove="Views\Years\**" />
     <EmbeddedResource Remove="wwwroot\assets\**" />
-    <None Remove="Data\Configuration\**" />
     <None Remove="Views\Years\**" />
     <None Remove="wwwroot\assets\**" />
   </ItemGroup>

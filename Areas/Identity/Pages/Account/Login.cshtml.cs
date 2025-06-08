@@ -24,12 +24,14 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IConfiguration _configuration;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _signInManager = signInManager;
             _logger = logger;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -126,18 +128,36 @@ namespace SparkHRMS.Areas.Identity.Pages.Account
                     {
                         var roles = await _userManager.GetRolesAsync(user);
 
-                        if (roles.Contains(Roles.RoleType.Employee.ToString()))
+                        string siteType = _configuration["AppSettings:SiteType"];
+
+                        if(siteType == "HR Portal")
                         {
-                            return LocalRedirect("/EmployeeAttendance/Index");
-                        }
-                        else if (roles.Contains(Roles.RoleType.SuperAdmin.ToString()) || roles.Contains(Roles.RoleType.Admin.ToString()))
-                        {
-                            return LocalRedirect("/AdminAttendanceViewer/Index");
+                            if (roles.Contains(Roles.RoleType.Employee.ToString()))
+                            {
+                                return LocalRedirect("/EmployeeAttendance/Index");
+                            }
+                            else if (roles.Contains(Roles.RoleType.SuperAdmin.ToString()) || roles.Contains(Roles.RoleType.Admin.ToString()))
+                            {
+                                return LocalRedirect("/AdminAttendanceViewer/Index");
+                            }
+                            else
+                            {
+                                return LocalRedirect("/AdminAttendanceViewer/Index");
+                            }
                         }
                         else
                         {
-                            return LocalRedirect("/AdminAttendanceViewer/Index");
+                            if (roles.Contains(Roles.RoleType.SuperAdmin.ToString()) || roles.Contains(Roles.RoleType.Admin.ToString()))
+                            {
+                                return LocalRedirect("/Visit/Index");
+                            }
+                            else
+                            {
+                                return LocalRedirect("/Visit/Maintanance?FMode=ADD");
+                            }
                         }
+
+                       
                     }
 
                     // Fallback in case the user doesn't have roles assigned

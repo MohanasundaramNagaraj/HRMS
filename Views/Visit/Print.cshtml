@@ -1,0 +1,182 @@
+﻿@using SparkHRMS.Data.Entities
+@model VisitorEntry
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Visitor Pass</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        .card {
+            border: 1px solid #000;
+            padding: 20px;
+            width: 600px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .field {
+            margin: 10px 0;
+        }
+
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 150px;
+        }
+
+        .value {
+            display: inline-block;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        td, th {
+            border: 1px solid #000;
+            padding: 6px;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        .header {
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .signature {
+            height: 50px;
+        }
+
+        .photo-barcode {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .photo {
+            height: 80px;
+            width: auto;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <h2 class="center">VISITOR PASS</h2>
+    <table>
+        <tr>
+            <td><strong>Pass No.:</strong></td>
+            <td>@Model.PassNo</td>
+            <td rowspan="7" colspan="2" style="text-align: center;">
+                <div><img src="@Model.VisitorImageUrl" alt="" class="photo" style="height: 200px;"></div>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Name:</strong></td>
+            <td>@Model.VisitorName</td>
+        </tr>
+        <tr>
+            <td><strong>Company Name/ Others:</strong></td>
+            <td>@Model.CompanyName</td>
+        </tr>
+        <tr>
+            <td><strong>Contact No:</strong></td>
+            <td>@Model.ContactNumber</td>
+        </tr>
+        <tr>
+            <td><strong>Meeting Person/Dept:</strong></td>
+            
+            @{
+                string splitter = "";
+                if(Model.PersonToMeet != null && Model.Department != null)
+                {
+                    splitter = " / ";
+                }
+            }
+            <td>@Model.PersonToMeet @splitter @Model.Department</td>
+        </tr>
+        <tr>
+            <td><strong>Purpose of Visit:</strong></td>
+            <td>@Model.PurposeOfVisit</td>
+        </tr>
+        <tr>
+            @*  <td><strong>Appointment:</strong></td>
+            <td>No</td> *@
+            <td><strong>Date</strong></td>
+            <td>@Model.EntryDate.ToString("dd-MM-yyyy hh:mm")</td>
+        </tr>
+        <tr>
+            <td><strong>Additional Visitor(s):</strong></td>
+            <td>@Model.AdditionalVisitorCount</td>
+            <td><strong>Additional Visitor(s) Name:</strong></td>
+            <td>@Model.AdditionalVisitorNames</td>
+        </tr>
+        <tr>
+            <td><strong>Vehicle No:</strong></td>
+            <td>@Model.VehicleNumber</td>
+            <td><strong>No.of Visits in this year:</strong></td>
+            <td>@Model.RecentVisits</td>
+        </tr>
+        <tr>
+            <td><strong>In Time:</strong></td>
+            <td>@Model.InTime.ToString("dd-MM-yyyy hh:mm")</td>
+            <td><strong>Out Time:</strong></td>
+
+            @if (Model.OutTime != null)
+            {
+                <td>@Model.OutTime.Value.ToString("dd-MM-yyyy hh:mm")</td>
+            }
+            else{
+                <td></td>
+            }
+           
+        </tr>
+        <tr>
+            <td class="signature" style="text-align: center;">
+                <br /> <br />
+                <br /> <br />
+                Visitor Sign
+            </td>
+
+            <td class="signature" style="text-align: center;">
+                <br /> <br />
+                <br /> <br />
+                SO Sign
+            </td>
+            <td colspan="2" class="signature" style="text-align: center;">
+                <br /> <br />
+                <br /> <br />
+                HOD Sign
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+
+<script>
+    window.print();
+</script>

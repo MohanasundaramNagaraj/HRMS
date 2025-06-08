@@ -1,0 +1,728 @@
+﻿@using SparkHRMS.Data.Entities
+@model VisitorEntry
+
+@{
+    var isReadOnly = ViewBag.FMode == "VIEW";
+    ViewData["Title"] = "Visitor Entry";
+}
+
+<style>
+    input:not([type]):disabled, input:not([type])[readonly="readonly"], input[type=text]:not(.browser-default):disabled, input[type=text]:not(.browser-default)[readonly="readonly"],
+    input[type=password]:not(.browser-default):disabled, input[type=password]:not(.browser-default)[readonly="readonly"], input[type=email]:not(.browser-default):disabled,
+    input[type=email]:not(.browser-default)[readonly="readonly"], input[type=url]:not(.browser-default):disabled, input[type=url]:not(.browser-default)[readonly="readonly"],
+    input[type=time]:not(.browser-default):disabled, input[type=time]:not(.browser-default)[readonly="readonly"], input[type=date]:not(.browser-default):disabled,
+    input[type=date]:not(.browser-default)[readonly="readonly"], input[type=datetime]:not(.browser-default):disabled, input[type=datetime]:not(.browser-default)[readonly="readonly"],
+    input[type=datetime-local]:not(.browser-default):disabled, input[type=datetime-local]:not(.browser-default)[readonly="readonly"], input[type=tel]:not(.browser-default):disabled,
+    input[type=tel]:not(.browser-default)[readonly="readonly"], input[type=number]:not(.browser-default):disabled, input[type=number]:not(.browser-default)[readonly="readonly"],
+    input[type=search]:not(.browser-default):disabled, input[type=search]:not(.browser-default)[readonly="readonly"], textarea.materialize-textarea:disabled,
+    textarea.materialize-textarea[readonly="readonly"] {
+        background: white;
+        color: black !important;
+    }
+
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default),
+    input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default),
+    input[type=tel]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea, input[type=number]:not(.browser-default) {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
+    }
+
+    .form-label {
+        margin-bottom: .5rem;
+        font-weight: bolder;
+    }
+
+    .section-title {
+        background-color: #007f7f;
+        color: white;
+        padding: 8px 15px;
+        margin: -15px;
+        margin-bottom: 15px;
+        border-radius: 2px;
+        font-weight: bold;
+    }
+
+    .form-section {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+        background-color: #f9f9f9;
+    }
+
+    .btn-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn-purple {
+        background-color: #7b61ff;
+        color: white;
+    }
+
+    .btn-green {
+        background-color: #00b894;
+        color: white;
+    }
+
+    .btn-red {
+        background-color: #ff7675;
+        color: white;
+    }
+</style>
+
+
+<div class="row mr-0">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <ul class="breadcrumb breadcrumb-style" style="display:inline">
+            <li class="breadcrumb-item">
+                <h4 class="page-title">Visitor Entry</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">
+                    <i class="fas fa-add"></i> @ViewBag.FMode
+                </a>
+            </li>
+        </ul>
+
+        <div class="btn-toolbar" style="display: inline;float: inline-end;">
+            <a type="button" class="btn waves-effect m-r-15" style="background: cadetblue;color: white;padding-top: 10px;" href="/Visit/Index">View List</a>
+
+            @if (ViewBag.FMode != "VIEW")
+            {
+                <button class="btn waves-effect m-r-15" style="font-weight: 500;
+                        background: darkgreen;
+                        color: white;" onclick="save()">
+                    Save & Get Print
+                </button>
+            }
+
+            @if (ViewBag.FMode == "EDIT")
+            {
+                <button class="btn btn-primary waves-effect m-r-15" onclick="outEntry()">Out Entry</button>
+            }
+            @if (ViewBag.FMode != "ADD")
+            {
+                <button class="btn btn-info waves-effect m-r-15" onclick="print()">Print</button>
+            }
+        </div>
+    </div>
+
+
+</div>
+
+<div class="card shadow p-4">
+
+    <div class="form-section">
+        <div class="section-title">Pass Details</div>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Pass No</label>
+                <input type="text" id="Id" name="Id" class="form-control" value="@Model.Id" hidden />
+                <input type="text" id="PassNo" name="PassNo" class="form-control" value="@Model.PassNo" readonly placeholder="Auto generated number" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Location <span class="text-danger">*</span></label>
+
+                <select id="Location" name="Location" class="form-control form-select mt-3" disabled="@isReadOnly">
+                    @foreach (var val in ViewBag.Locations)
+                    {
+                        if (Model.Location == val)
+                        {
+                            <option value="@val" selected>@val</option>
+                        }
+                        else
+                        {
+                            <option value="@val">@val</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date and Time of Entry</label>
+                <input type="datetime" id="EntryDate" name="EntryDate" class="form-control" value="@Model.EntryDate.ToString("dd-MM-yyyy hh:mm:ss")" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Gate In-charge</label>
+                <input type="text" id="GateInCharge" name="GateInCharge" class="form-control" value="@Model.GateInCharge" readonly />
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal, Visitor, Additional Details -->
+    <div class="row">
+        <!-- Personal Details -->
+        <div class="col-md-4">
+            <div class="form-section">
+                <div class="section-title">Personal Details</div>
+                <div class="mb-3">
+                    <label class="form-label">Contact Number <span class="text-danger">*</span></label>
+                    <input type="tel" id="ContactNumber" maxlength="10" name="ContactNumber" class="form-control" value="@Model.ContactNumber" disabled="@isReadOnly" />
+
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Visitor Name <span class="text-danger">*</span></label>
+                    <input type="text" id="VisitorName" name="VisitorName" class="form-control" value="@Model.VisitorName" disabled="@isReadOnly" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Gender</label>
+                    @{
+                        List<string> Genders = new List<string>()
+                    {
+                    "Male",
+                    "Female",
+                    "Prefer not to say"
+                    };
+                    }
+                    <select id="Gender" name="Gender" class="form-control form-select" disabled="@isReadOnly">
+                        @foreach (var val in Genders)
+                        {
+                            if (Model.Gender == val)
+                            {
+                                <option value="@val" selected>@val</option>
+                            }
+                            else
+                            {
+                                <option value="@val">@val</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Visitor Category <span class="text-danger">*</span></label>
+                    <input type="text" id="VisitorCategory" name="VisitorCategory" class="form-control" placeholder="e.g., Vendor, Interviewer, Client, etc." value="@Model.VisitorCategory" disabled="@isReadOnly" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Company Name</label>
+                    <input type="text" id="CompanyName" name="CompanyName" class="form-control" value="@Model.CompanyName" disabled="@isReadOnly" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address detail</label>
+                    <textarea type="text" id="Address" rows="3" name="Address" class="form-control" disabled="@isReadOnly">@Model.Address</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visitor Details -->
+        <div class="col-md-4">
+            <div class="form-section">
+                <div class="section-title">Visitor Details</div>
+                <div class="mb-3">
+                    <label class="form-label">Purpose of visit <span class="text-danger">*</span></label>
+                    <input type="text" id="PurposeOfVisit" name="PurposeOfVisit" class="form-control" value="@Model.PurposeOfVisit" disabled="@isReadOnly" placeholder="e.g., Meeting, Interview, Delivery, etc." />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Person to Meet <span class="text-danger">*</span></label>
+                    <input type="text" id="PersonToMeet" name="PersonToMeet" class="form-control" value="@Model.PersonToMeet" disabled="@isReadOnly" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Department <span class="text-danger">*</span></label>
+                    <input type="text" id="Department" name="Department" class="form-control" value="@Model.Department" disabled="@isReadOnly" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ID Proof Type</label>
+                    <input type="text" id="IDProofType" name="IDProofType" placeholder="e.g., Aadhar, Passport, Driving Licence, etc." class="form-control" value="@Model.IDProofType" disabled="@isReadOnly" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ID Proof Number</label>
+                    <input type="text" id="IDProofNumber" name="IDProofNumber" class="form-control" value="@Model.IDProofNumber" disabled="@isReadOnly" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Vehicle No</label>
+                    <input type="text" id="VehicleNumber" name="VehicleNumber" class="form-control" value="@Model.VehicleNumber" disabled="@isReadOnly" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Details -->
+        <div class="col-md-4">
+            <div class="form-section">
+                <div class="section-title">Additional Details</div>
+
+                <div class="mb-3">
+                    <label class="form-label">Visitor Image <span class="text-danger">*</span></label>
+                    <br>
+                    @if (ViewBag.FMode == "ADD")
+                    {
+                        <div id="preview_image" class="mt-3 mb-3"></div>
+                        <br />
+                        <input type="hidden" name="VisitorImageUrl" id="VisitorImageUrl" />
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#webcamModal">
+                            Capture
+                        </button>
+
+                        <button class="btn btn-sm btn-warning" id="uploadBtn" onclick="upload()" style="display:none;">Upload</button>
+                    }
+                    else
+                    {
+                        <img src="@Model.VisitorImageUrl" />
+                        <input type="hidden" name="VisitorImageUrl" id="VisitorImageUrl" value="@Model.VisitorImageUrl" />
+                    }
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="webcamModal" tabindex="-1" aria-labelledby="webcamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="webcamModalLabel">Capture Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <video id="video" autoplay playsinline style="border:1px solid #ccc; width:100%;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <button id="captureBtn" class="btn btn-sm btn-success mt-2">Capture</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Additional Visitors -->
+    <div class="form-section">
+        <div class="section-title">Additional Visitor(s) Details</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">No. of Additional Visitors</label>
+                <input type="number" id="AdditionalVisitorCount" name="AdditionalVisitorCount" class="form-control" value="@Model.AdditionalVisitorCount" disabled="@isReadOnly" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Additional Visitor(s) Name</label>
+                <input type="text" id="AdditionalVisitorNames" name="AdditionalVisitorNames" class="form-control" value="@Model.AdditionalVisitorNames" disabled="@isReadOnly" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Recent visits in Current Year</label>
+                <input type="number" id="RecentVisits" name="RecentVisits" class="form-control" value="@Model.RecentVisits" disabled="true" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    let video = document.getElementById("video");
+    let canvas = document.getElementById("canvas");
+    let preview = document.getElementById("preview_image");
+    let visitorImageUrlInput = document.getElementById("VisitorImageUrl");
+    let stream = null;
+
+    // Start webcam when modal opens
+    document.getElementById('webcamModal').addEventListener('shown.bs.modal', function () {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => {
+                stream = s;
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Webcam error:", err);
+            });
+    });
+
+    // Stop webcam when modal closes
+    document.getElementById('webcamModal').addEventListener('hidden.bs.modal', function () {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+    });
+
+    // Capture button logic
+    document.getElementById("captureBtn").addEventListener("click", function () {
+        let context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        let imageDataUrl = canvas.toDataURL("image/png");
+
+        // Set image preview in main form
+        preview.innerHTML = `<img src="${imageDataUrl}" class="img-thumbnail" style="max-width: 100%;" />`;
+
+        // Store base64 in hidden input
+        visitorImageUrlInput.value = imageDataUrl;
+
+        // Close the modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('webcamModal'));
+        modal.hide();
+
+        $('#uploadBtn').show();
+    });
+
+    function clearForm() {
+        $('#VisitorName').val('');
+        $('#Gender').val('');
+        $('#VisitorCategory').val('');
+        $('#CompanyName').val('');
+        $('#PurposeOfVisit').val('');
+        $('#PersonToMeet').val('');
+        $('#Department').val('');
+        $('#IDProofType').val('');
+        $('#IDProofNumber').val('');
+        $('#Address').text('');
+        $('#VisitorImageUrl').val('');
+        $('#preview_image').attr('src', ''); // clear image preview
+        $('#VehicleNumber').val('');
+        $('#AdditionalVisitorCount').val('');
+        $('#AdditionalVisitorNames').val('');
+        $('#RecentVisits').val('');
+    }
+
+    $(document).ready(function () {
+        $('#ContactNumber').on('input', function () {
+            const contact = $(this).val();
+            if (contact.length == 10) {
+                $.ajax({
+                    url: '/Visit/GetVisitorByContact',
+                    type: 'GET',
+                    data: { contactNumber: contact },
+                    success: function (data) {
+                        if (data) {
+                            $('#VisitorName').val(data.VisitorName);
+                            $('#Gender').val(data.gender);
+                            $('#VisitorCategory').val(data.visitorCategory);
+                            $('#CompanyName').val(data.companyName);
+                            $('#PurposeOfVisit').val(data.purposeOfVisit);
+                            $('#PersonToMeet').val(data.personToMeet);
+                            $('#Department').val(data.department);
+                            $('#IDProofType').val(data.idProofType);
+                            $('#IDProofNumber').val(data.idProofNumber);
+                            $('#Address').text(data.address);
+                            $('#VisitorImageUrl').val(data.visitorImageUrl);
+                            preview.innerHTML = `<img src="${data.visitorImageUrl}" class="img-thumbnail" style="max-width: 100%;" />`;
+                           // $('#preview_image').attr('src', data.visitorImageUrl);
+                            $('#VehicleNumber').val(data.vehicleNumber);
+                            $('#AdditionalVisitorCount').val(data.additionalVisitorCount);
+                            $('#AdditionalVisitorNames').val(data.additionalVisitorNames);
+                            $('#RecentVisits').val(data.recentVisits);
+                        } else {
+                            clearForm();
+                        }
+                    },
+                    error: function () {
+                        clearForm();
+                        console.error('Visitor not found or error occurred.');
+                    }
+                });
+            }
+        });
+    });
+
+
+    function save() {
+        const id = parseInt($('input[name="Id"]').val()) || 0;
+        const data = {
+            Id: id,
+            PassNo: $('input[name="PassNo"]').val(),
+            Location: $('select[name="Location"]').val(),
+            GateInCharge: $('input[name="GateInCharge"]').val(),
+            ContactNumber: $('input[name="ContactNumber"]').val(),
+            VisitorName: $('input[name="VisitorName"]').val(),
+            Gender: $('select[name="Gender"]').val(),
+            VisitorCategory: $('input[name="VisitorCategory"]').val(),
+            CompanyName: $('input[name="CompanyName"]').val(),
+            PurposeOfVisit: $('input[name="PurposeOfVisit"]').val(),
+            PersonToMeet: $('input[name="PersonToMeet"]').val(),
+            Department: $('input[name="Department"]').val(),
+            IDProofType: $('input[name="IDProofType"]').val(),
+            IDProofNumber: $('input[name="IDProofNumber"]').val(),
+            Address: $('input[name="Address"]').text(),
+            VisitorImageUrl: $('input[name="VisitorImageUrl"]').val(),
+            VehicleNumber: $('input[name="VehicleNumber"]').val(),
+            AdditionalVisitorCount: parseInt($('input[name="AdditionalVisitorCount"]').val()) || 0,
+            AdditionalVisitorNames: $('input[name="AdditionalVisitorNames"]').val(),
+            RecentVisits: parseInt($('input[name="RecentVisits"]').val()) || 0
+        };
+
+        if (data.ContactNumber == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please enter Contact Number"
+            });
+
+            return false;
+        }
+
+        if (data.ContactNumber.length != 10 || isNaN(parseInt($('input[name="ContactNumber"]').val()))) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please enter valid Contact Number"
+            });
+
+            return false;
+        }
+
+        if (data.VisitorName == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please enter Visitor Name"
+            });
+
+            return false;
+        }
+
+        if (data.VisitorCategory == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please enter Visitor Category"
+            });
+
+            return false;
+        }
+
+        if (data.PurposeOfVisit == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please enter Purpose Of Visit"
+            });
+
+            return false;
+        }
+
+        if (data.PersonToMeet == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please enter Person to Meet"
+            });
+
+            return false;
+        }
+
+        if (data.Department == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please enter Department"
+            });
+
+            return false;
+        }
+
+        if (data.VisitorImageUrl == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid',
+                text: "Please Upload Visitor Image"
+            });
+
+            return false;
+        }
+        Swal.fire({
+            title: 'Confirmation',
+            text: "Do you wish to save the visitor details?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ok'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: id === 0 ? '/Visit/CreateVisitorEntry' : '/Visit/UpdateVisitorEntry',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (res) {
+
+                        Swal.fire({
+                            title: 'Updated',
+                            text: "Visitor entry updated successfully!",
+                            icon: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.open('/Visit/Print/' + res, '_blank');
+                                location.href = "/Visit/Index";
+                            }
+                        });
+                    },
+                    error: function (err) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Invalid',
+                            text: 'Error saving visitor entry. ' + err.responseText
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // Get by ID (prefill the form)
+    function loadVisitor(id) {
+        $.ajax({
+            url: `/Visit/GetVisitorEntry/${id}`,
+            type: 'GET',
+            success: function (data) {
+                $('input[name="PassNo"]').val(data.PassNo);
+                $('input[name="Location"]').val(data.Location);
+                $('input[name="GateInCharge"]').val(data.GateInCharge);
+                $('input[name="ContactNumber"]').val(data.ContactNumber);
+                $('input[name="VisitorName"]').val(data.VisitorName);
+                $('input[name="Gender"]').val(data.Gender);
+                $('input[name="VisitorCategory"]').val(data.VisitorCategory);
+                $('input[name="CompanyName"]').val(data.CompanyName);
+                $('input[name="PurposeOfVisit"]').val(data.PurposeOfVisit);
+                $('input[name="PersonToMeet"]').val(data.PersonToMeet);
+                $('input[name="Department"]').val(data.Department);
+                $('input[name="IDProofType"]').val(data.IDProofType);
+                $('input[name="IDProofNumber"]').val(data.IDProofNumber);
+                $('input[name="Address"]').val(data.Address);
+                $('input[name="VisitorImageUrl"]').val(data.VisitorImageUrl);
+                $('input[name="VehicleNumber"]').val(data.VehicleNumber);
+                $('input[name="AdditionalVisitorCount"]').val(data.AdditionalVisitorCount);
+                $('input[name="AdditionalVisitorNames"]').val(data.AdditionalVisitorNames);
+                $('input[name="RecentVisits"]').val(data.RecentVisits);
+            },
+            error: function (err) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid',
+                    text: 'Error loading visitor data.'
+                });
+                console.error(err);
+            }
+        });
+    }
+
+
+    function print() {
+        window.open('/Visit/Print/' + '@Model.Id', '_blank');
+    }
+
+    function upload() {
+        var formData = new FormData();
+
+        const imageData = visitorImageUrlInput.value;
+        if (!imageData) {
+            alert("Please capture an image first.");
+            return;
+        }
+        // var file = $('input[name="VisitorImage"]')[0].files[0];
+
+        var company = $('input[name="CompanyName"]').val();
+        var visitor = $('input[name="VisitorName"]').val();
+
+        // if (!file || !company || !visitor) {
+        //     alert("Please fill in all required fields and upload an image.");
+        //     return;
+        // }
+
+        // if (file) {
+        //     // File upload
+        //     var formData = new FormData();
+        //     formData.append("VisitorImage", file);
+        //     formData.append("CompanyName", company);
+        //     formData.append("VisitorName", visitor);
+
+        //     $.ajax({
+        //         url: '/Visit/SaveVisitorImage',
+        //         type: 'POST',
+        //         data: formData,
+        //         processData: false,
+        //         contentType: false,
+        //         success: function (response) {
+        //             $('input[name="VisitorImageUrl"]').val(response.imagePath);
+        //             alert("Image uploaded successfully.");
+        //         },
+        //         error: function () {
+        //             alert("Error uploading image.");
+        //         }
+        //     });
+        // } else if (imageData) {
+
+        $.ajax({
+            url: '/Visit/SaveCapturedImage',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                base64Image: imageData,
+                CompanyName: company,
+                VisitorName: visitor
+            }),
+            success: function (response) {
+                $('input[name="VisitorImageUrl"]').val(response.imagePath);
+                Swal.fire({
+                    title: 'Uploaded',
+                    text: "Image Uploaded successfully!",
+                    icon: 'success',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ok'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                    }
+                });
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid',
+                    text: 'Error uploading image.'
+                });
+            }
+        });
+        // } else {
+        //     alert("Please capture or select an image first.");
+        // }
+    }
+
+    function outEntry() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to update the data?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Visit/OutEntry/' + '@Model.Id',
+                    type: 'POST',
+                    success: function (res) {
+                        Swal.fire({
+                            title: 'Updated',
+                            text: "Visitor Out entry saved successfully!",
+                            icon: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.href = "/Visit/Index";
+                            }
+                        });
+                    },
+                    error: function (err) {
+                        alert('Error saving visitor entry. ' + err.responseText);
+                        console.error(err.responseText);
+                    }
+                });
+            }
+        });
+    }
+</script>

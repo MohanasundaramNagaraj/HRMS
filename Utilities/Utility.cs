@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SparkHRMS.Data;
@@ -20,9 +21,11 @@ namespace SparkHRMS.Utilities
     public class Utility
     {
         private readonly ApplicationDbContext _context;
-        public Utility(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public Utility(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         private readonly HttpClient client = new HttpClient();
@@ -95,13 +98,13 @@ namespace SparkHRMS.Utilities
         public SetYear GetYearById(int YearId)
         {
             return _context.Year.Where(x => x.Id == YearId).Select(x => x).FirstOrDefault();
-        } 
-        
+        }
+
         public LeaveType GetLeaveTypeById(int LeaveTypeId)
         {
             return _context.LeaveTypes.Where(x => x.LeaveTypeId == LeaveTypeId).Select(x => x).FirstOrDefault();
         }
-         public LeaveReasons GetLeaveReasonById(int LeaveReasonId)
+        public LeaveReasons GetLeaveReasonById(int LeaveReasonId)
         {
             return _context.LeaveReasons.Where(x => x.LeaveReasonId == LeaveReasonId).Select(x => x).FirstOrDefault();
         }
@@ -186,6 +189,27 @@ namespace SparkHRMS.Utilities
             }
 
             return documentNumber;
+        }
+
+        public static async Task<bool> GetMenusPermissionAsync(string menuCode, int? userId,IServiceProvider serviceProvider)
+        {
+            if (string.IsNullOrEmpty(menuCode) || userId == null) return false;
+
+            using var scope = serviceProvider.CreateScope();
+            var _db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            int roleId = await _db.UserRoles
+                            .Where(x => x.UserId == userId)
+                            .Select(x => x.RoleId)
+                            .FirstOrDefaultAsync();
+           
+            var result = await (from m in _db.Menu
+                                join mp in _db.MenuPermission on m.MenuCode equals mp.MenuCode
+                                where (mp.UserID == userId || (mp.RoleID != null && mp.RoleID == roleId))
+                                && m.MenuCode == menuCode
+                                select mp.Permission).FirstOrDefaultAsync();
+
+            return result != null ? result.ToUpper() == "GRANT" : false;
         }
 
     }

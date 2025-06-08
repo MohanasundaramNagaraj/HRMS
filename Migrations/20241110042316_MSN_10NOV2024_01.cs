@@ -110,8 +110,8 @@ namespace SparkHRMS.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "EmployeeTimeSheet");
+            //migrationBuilder.DropTable(
+            //    name: "EmployeeTimeSheet");
 
             migrationBuilder.DropTable(
                 name: "MST_WorkItemStatus");

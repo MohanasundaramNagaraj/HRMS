@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SparkHRMS.Data.Configuration;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Data.Logs;
 using SparkHRMS.Data.Masters;
@@ -43,6 +44,11 @@ namespace SparkHRMS.Data
         public DbSet<LeaveRequest> LeaveRequest { get; set; }
         public DbSet<LeaveRequestDetail> LeaveRequestDetail { get; set; }
         public DbSet<LeaveRequestHistory> LeaveRequestHistory { get; set; }
+        public DbSet<VisitorEntry> VisitorEntries { get; set; }
+        public DbSet<Menu> Menu { get; set; }
+        public DbSet<UsersActionRight> UsersActionRight { get; set; }
+        public DbSet<MenuPermission> MenuPermission { get; set; }
+        public DbSet<UsersAction> UsersAction { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -67,6 +73,10 @@ namespace SparkHRMS.Data
            .WithOne()
            .HasForeignKey(d => d.LeaveAllocationId)
            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Menu>()
+                .HasIndex(e => e.MenuCode)
+                .IsUnique();
         }
     }
 }
