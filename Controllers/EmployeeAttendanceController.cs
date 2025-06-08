@@ -89,8 +89,9 @@ namespace SparkHRMS.Controllers
             foreach (var date in allDatesInMonth)
             {
                 var leaveRequestedDetails = await _context.LeaveRequest.Where(x => x.EmployeeId == emp.EmployeeId 
-                && x.StartDate.Date >= date.Date
-                && x.EndDate <= date.Date).FirstOrDefaultAsync();
+                && x.StartDate.Date <= date.Date
+                && x.EndDate.Date >= date.Date
+               ).FirstOrDefaultAsync();
 
                 var attendanceRecord = attendanceRecords.FirstOrDefault(a => a.CheckInTime.Date == date);
                 TimeSpan? workingTime = null;
@@ -137,6 +138,16 @@ namespace SparkHRMS.Controllers
                     }
                 }
 
+                if(status == AttendanceStatus.Absent && leaveRequestedDetails != null && leaveRequestedDetails.Status == "CAN")
+                {
+                    status = AttendanceStatus.LeaveRequested;
+
+                    if(leaveRequestedDetails.Status == "ACC")
+                    {
+                        status = AttendanceStatus.LeaveRequestApproved;
+                    }
+                }
+                
                 // Add attendance record with status
                 dailyAttendanceRecords.Add(new EmployeeAttendanceDto
                 {

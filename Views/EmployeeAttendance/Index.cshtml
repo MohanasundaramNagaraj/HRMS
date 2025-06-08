@@ -277,6 +277,10 @@
                                                             {
                                                                 <div class="badge col-cyan">Holiday</div>
                                                             }
+                                                            else if (record.Status == AttendanceStatus.LeaveRequested)
+                                                            {
+                                                                <div class="badge col-cyan">Leave Requested</div>
+                                                            }
                                                         }
                                                     </td>
                                                     @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))

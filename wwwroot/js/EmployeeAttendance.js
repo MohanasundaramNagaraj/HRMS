@@ -335,6 +335,10 @@ function events() {
             statusClass = "fc-event-warning"; // Holiday
             title = 'Holiday';
         }
+        else if (record.Status == AttendanceStatus.LeaveRequested){
+            statusClass = "fc-event-warning";
+            title = 'Leave Requested';
+        }
         else {
             statusClass = "fc-event-warning";
             title = 'Holiday';

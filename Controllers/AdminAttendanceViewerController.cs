@@ -67,6 +67,27 @@ namespace SparkHRMS.Controllers
             foreach (var attendance in attendances)
             {
                 attendance.WorkingHours = _utilityService.CalculateWorkingHours(attendance.CheckInDateTime, attendance.CheckOutDateTime);
+
+                if(attendance.WorkingHours == string.Empty)
+                {
+                    string status = (from lr in _context.LeaveRequest
+                                     where lr.EmployeeId == attendance.EmployeeId
+                                     && lr.StartDate.Date >= selectedDate.Date
+                                     && lr.EndDate.Date <= selectedDate.Date
+                                     select lr.Status
+                                     ).FirstOrDefault();
+
+                    if (status != null && status != "CAN")
+                    {
+                        status = "Leave Requested";
+
+                        if (status == "ACC")
+                        {
+                            status = "Leave Request Accepted";
+                        }
+                    }
+                    attendance.WorkingHours = status;
+                }
                 attendance.CheckInLocation = await _utilityService.GetLocationFromCoordinates(attendance.CheckInPosition);
                 attendance.CheckOutLocation = await _utilityService.GetLocationFromCoordinates(attendance.CheckOutPosition);
             };

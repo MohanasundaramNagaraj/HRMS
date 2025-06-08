@@ -9,7 +9,9 @@ const AttendanceStatus = {
     Weekend: 3,
     Holiday: 4,
     PermissionNeeded: 5,
-    PendingCheckOut: 6
+    PendingCheckOut: 6,
+    LeaveRequested: 7,
+    LeaveRequestApproved:8
 };
 
 function generateUUIDv4() {
