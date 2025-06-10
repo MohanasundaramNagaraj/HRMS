@@ -19,6 +19,7 @@ using Utility = SparkHRMS.Utilities.Utility;
 
 namespace SparkHRMS.Controllers
 {
+    
     public class LeaveRequestController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -36,7 +37,7 @@ namespace SparkHRMS.Controllers
             _emailService = emailService;
             _backgroundJobClient = backgroundJobClient;
         }
-
+      
         public async Task<IActionResult> Index(int? EmployeeId, int? YearId, int? MonthId, string? Status)
         {
             ViewBag.EmployeeList = _context.Employees.ToList();
@@ -388,7 +389,7 @@ namespace SparkHRMS.Controllers
                 string subject = "Approval Status of Request - " + request.RequestNumber;
                 _backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync(email, subject, getHtmlContent(request.Id)));
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "LeaveRequest");
         }
 
         // Admin or Employee: Cancel request
@@ -418,7 +419,7 @@ namespace SparkHRMS.Controllers
                 }
 
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "LeaveRequest");
         }
 
         public async Task<IActionResult> GetTimeline(int id)

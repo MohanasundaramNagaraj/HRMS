@@ -339,12 +339,18 @@ function events() {
             statusClass = "fc-event-warning";
             title = 'Leave Requested';
         }
-        else {
+        else if (record.Status == AttendanceStatus.LeaveRequestApproved) 
+        {
             statusClass = "fc-event-warning";
-            title = 'Holiday';
+            title = 'Leave Request Approved';
         }
 
-        if (record.Status == AttendanceStatus.Weekend || record.Status == AttendanceStatus.Holiday || new Date(record.Date) < new Date()) {
+        if (record.Status == AttendanceStatus.Weekend
+            || record.Status == AttendanceStatus.Holiday
+            || record.Status == AttendanceStatus.LeaveRequested
+            || record.Status == AttendanceStatus.LeaveRequestApproved
+            || new Date(record.Date) < new Date()
+        ) {
             var eventObj = {
                 id: "event" + (index + 1),
                 // title: formatDate(record.Date),

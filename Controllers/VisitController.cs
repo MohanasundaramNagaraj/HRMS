@@ -194,7 +194,7 @@ namespace SparkHRMS.Controllers
             return Ok(existing.Id);
         }
 
-        [HttpGet("{id}")]
+      
         public async Task<ActionResult<VisitorEntry>> GetVisitorEntry(int id)
         {
             var entry = await _context.VisitorEntries.FindAsync(id);

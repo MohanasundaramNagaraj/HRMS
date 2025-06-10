@@ -1,22 +1,36 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Services;
+using SparkHRMS.Utilities;
 using System;
 
 public class LeaveAllocationController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IConfiguration _configuration;
+    private readonly Utility utility;
 
-    public LeaveAllocationController(ApplicationDbContext context)
+    public LeaveAllocationController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration, Utility utility)
     {
         _context = context;
+        _userManager = userManager;
+        _configuration = configuration;
+        this.utility = utility;
     }
 
     public async Task<IActionResult> Index()
     {
+        var user = await _userManager.GetUserAsync(User);
+        var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+        var isSuperAdmin = await _userManager.IsInRoleAsync(user, "SuperAdmin");
+
+        ViewBag.IsUserAdmin = isAdmin || isSuperAdmin;
+
         var list = await _context.LeaveAllocations.Include(x => x.LeaveDetails).ToListAsync();
         return View(list);
     }
@@ -62,7 +76,7 @@ public class LeaveAllocationController : Controller
             _context.Add(allocation);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "LeaveAllocation");
         }
         return View("Maintanance", allocation);
     }
@@ -149,7 +163,7 @@ public class LeaveAllocationController : Controller
             }).ToList();
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "LeaveAllocation");
         }
         return View("Maintanance", allocation);
     }
@@ -161,6 +175,6 @@ public class LeaveAllocationController : Controller
 
         _context.LeaveAllocations.Remove(allocation);
         await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction("Index", "LeaveAllocation");
     }
 }

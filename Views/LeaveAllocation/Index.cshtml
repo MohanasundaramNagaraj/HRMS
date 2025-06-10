@@ -19,22 +19,27 @@
                 </a>
             </li>
         </ul>
-
-        <a class="btn btn-tbl-add btn-success" href="@Url.Action("Create")" style="float:right;">
-            <i class="material-icons">add</i>
-        </a>
+        @if (ViewBag.IsUserAdmin)
+        {
+            <a class="btn btn-tbl-add btn-success" href="@Url.Action("Create")" style="float:right;">
+                <i class="material-icons">add</i>
+            </a>
+        }
     </div>
 </div>
 
 <table class="table table-bordered mt-3 dataTable">
-    <thead >
+    <thead>
         <tr>
-            <th >Employee</th>
+            <th>Employee</th>
             <th>Year</th>
             <th>Total Allocated</th>
             <th>Total Used</th>
             <th>Total Leave Balance</th>
-            <th>Actions</th>
+            @if (ViewBag.IsUserAdmin)
+            {
+                <th>Actions</th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -47,10 +52,13 @@
                 <td style="text-align-last: end;">@item.TotalLeaveAllocated</td>
                 <td style="text-align-last: end;">@item.TotalUsedDays</td>
                 <td style="text-align-last: end;">@item.TotalLeaveBalance</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                    <button onclick="confirmDelete('@item.Id')" class="btn btn-danger">Delete</button>
-                </td>
+                @if (ViewBag.IsUserAdmin)
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                        <button onclick="confirmDelete('@item.Id')" class="btn btn-danger">Delete</button>
+                    </td>
+                }
             </tr>
         }
     </tbody>

@@ -50,7 +50,6 @@
                 <td>@(leave.IsActive ? "Yes" : "No")</td>
                 <td>
                     <a class="btn btn-warning" href="@Url.Action("Edit", new { id = leave.LeaveTypeId })">Edit</a>
-                    <a class="btn btn-danger" href="@Url.Action("Delete", new { id = leave.LeaveTypeId })">Delete</a>
                 </td>
             </tr>
         }

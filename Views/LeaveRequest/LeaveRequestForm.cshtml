@@ -47,7 +47,12 @@
                 }
             }
 
-            <select style="margin-top: 10px;" asp-for="EmployeeId" class="form-control form-select" disabled="@isSelectReadOnly" id="empSelector" required>
+           <select style="margin-top: 10px;"
+                    asp-for="EmployeeId"
+                    class="form-control @(isSelectReadOnly ? "" : "form-select")"
+                    disabled="@(isSelectReadOnly)"
+                    id="empSelector"
+                     required>
 
                 <option value="">Select All Employee</option>
                 @foreach (var record in employeeList)
@@ -110,7 +115,7 @@
                 }
                 else
                 {
-                    status = "Pending";
+                    status = "Leave Request";
                 }
                 <input asp-for="Status" class="form-control" value="@status" readonly="true" />
             </div>

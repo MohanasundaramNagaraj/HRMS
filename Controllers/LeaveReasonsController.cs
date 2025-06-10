@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
 using SparkHRMS.Data.Masters;
 
 namespace SparkHRMS.Controllers
 {
+    [Authorize(Roles = "SuperAdmin,Admin")]
     public class LeaveReasonsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -37,7 +39,8 @@ namespace SparkHRMS.Controllers
                 reason.CreatedBy = 1; // Replace with actual user id
                 _context.Add(reason);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+              
+                return RedirectToAction("Index", "LeaveReasons");
             }
             return View(reason);
         }
@@ -76,7 +79,7 @@ namespace SparkHRMS.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "LeaveReasons");
             }
             return View(reason);
         }
@@ -92,14 +95,13 @@ namespace SparkHRMS.Controllers
         }
 
         // Delete - POST
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+     
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var reason = await _context.LeaveReasons.FindAsync(id);
             _context.LeaveReasons.Remove(reason);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "LeaveReasons");
         }
     }
 

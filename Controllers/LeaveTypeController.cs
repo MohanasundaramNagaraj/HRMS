@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SparkHRMS.Data;
@@ -6,10 +7,12 @@ using SparkHRMS.Data.Setting;
 using System.Linq;
 using System.Threading.Tasks;
 
+[Authorize(Roles = "SuperAdmin,Admin")]
 public class LeaveTypeController : Controller
 {
+   
     private readonly ApplicationDbContext _context;
-
+   
     public LeaveTypeController(ApplicationDbContext context)
     {
         _context = context;
