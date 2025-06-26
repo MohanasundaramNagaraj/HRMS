@@ -57,7 +57,11 @@
 
                                     <td>@index</td>
                                     <td class="table-img center">
-                                        <img src="@Html.DisplayFor(modelItem => item.ImageUrl)" alt="" style="width: 45px;">
+                                        <img src="@(!string.IsNullOrEmpty(item.ImageUrl) ? item.ImageUrl : Url.Content("~/app/assets/images/user/no-image.png"))"
+                                             alt=""
+                                             style="width: 45px;"
+                                             onerror="this.onerror=null; this.src='@Url.Content("~/app/assets/images/user/no-image.png")';" />
+
                                     </td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.EmployeeCode)</td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.Name)</td>

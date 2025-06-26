@@ -163,7 +163,7 @@ namespace SparkHRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId,ReportingHeadMailID")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId,IsActive")] Employee employee)
         {
             if (id != employee.EmployeeId)
             {
