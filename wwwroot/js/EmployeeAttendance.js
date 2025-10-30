@@ -13,7 +13,7 @@ function getData(obj) {
 }
 
 let calendar;
-var Draggable = FullCalendarInteraction.Draggable;
+//var Draggable = FullCalendarInteraction.Draggable;
 let date_picker;
 
 var containerEl = document.getElementById("external-events");
@@ -47,6 +47,7 @@ $(document).ready(function () {
 });
 
 function initCalendar() {
+    debugger;
     var calendarEl = $("#calendar").get(0);
     calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: ["interaction", "dayGrid", "timeGrid"],

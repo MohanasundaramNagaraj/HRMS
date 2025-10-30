@@ -72,6 +72,11 @@ namespace SparkHRMS.ViewModels
         public string CheckInLocation { get; set; }
         public string CheckOutLocation { get; set; }
 
+        public string CheckInMadeBy { get; set; }
+        public string CheckOutMadeBy { get; set; }
+        public DateTime? CheckInMadeDateTime { get; set; }
+        public DateTime? CheckOutMadeDateTime { get; set; }
+
         public bool IsPermission { get; set; } = false;
         public DateTime? PermissionStartTime { get; set; }
         public DateTime? PermissionEndTime { get; set; }

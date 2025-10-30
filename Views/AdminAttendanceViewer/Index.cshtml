@@ -26,7 +26,7 @@
     <div class="">
         <!-- Date Filter -->
         <div class="col-md-12 mb-3">
-            <form >
+            <form>
                 <div class="row">
                     <input type="date" name="date" value="@selectedDate" class="form-control" style="width:35%;margin-right:10px;" />
                     <button type="submit" class="btn btn-info" style="width:10%;margin-right:10px;">Filter</button>
@@ -45,10 +45,12 @@
                         <thead>
                             <tr>
                                 <th>Employee Name</th>
+                                <th>Permission/Leave/On Duty Details</th>
                                 <th>Working Time</th>
                                 @* <th>Check-Out Time</th> *@
                                 <th>Working Hours</th>
-                                <th>Check In Made System IP</th>
+                                <th>Check In Details</th>
+                                <th>Check Out Details</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -58,70 +60,128 @@
 
                                 string displayText = string.Empty;
                                 string displayTextColor = string.Empty;
+                                string onDutyDisplayText = string.Empty;
+                                string onDutyDisplayTextColor = string.Empty;
 
                                 if (record.IsLeave || record.IsPermission || record.IsOnDuty || record.IsHalfDayLeave)
                                 {
-                                    // No real attendance — show status
                                     if (record.IsLeave)
                                     {
-                                        if (record.IsHalfDayLeave
-                                            //&& record.HalfDayLeave.HasValue
-                                            )
-                                        {
-                                            displayText = $"Half Day Leave";
-                                        }
-                                        else
-                                        {
-                                            displayText = "Leave";
-                                        }
-                                    }
-                                    else if (record.IsPermission)
-                                    {
-                                        displayText = "Permission";
-                                    }
-                                    else if (record.IsOnDuty)
-                                    {
-                                        displayText = "On Duty";
-                                    }
-                                    else
-                                    {
-                                        displayText = "Absent";
+                                        displayText = "\n Leave";
                                     }
 
+                                    if (!record.IsLeave && record.IsHalfDayLeave
+                                    //&& record.HalfDayLeave.HasValue
+                                    )
+                                    {
+                                        displayText += $"\n Half Day Leave";
+                                    }
+
+                                    if (!record.IsLeave && record.IsPermission)
+                                    {
+                                        DateTime? permissionStart = record?.PermissionStartTime as DateTime?;
+                                        DateTime? permissionEnd = record?.PermissionEndTime as DateTime?;
+
+                                        var permissionTime = (permissionStart.HasValue && permissionStart.Value.TimeOfDay != TimeSpan.Zero)
+                                        ? permissionStart.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                        : "";
+
+                                        var permissionEndTime = (permissionEnd.HasValue && permissionEnd.Value.TimeOfDay != TimeSpan.Zero)
+                                        ? permissionEnd.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                        : "";
+
+                                        displayText += "\n Permission on " + $"{permissionTime} - {permissionEndTime}";
+                                    }
                                     displayTextColor = "red";
+
+                                    if (!record.IsLeave && record.IsOnDuty)
+                                    {
+                                        DateTime? Start = record?.DutyStartTime as DateTime?;
+                                        DateTime? End = record?.DutyEndTime as DateTime?;
+
+                                        var StartTime = (Start.HasValue && Start.Value.TimeOfDay != TimeSpan.Zero)
+                                        ? Start.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                        : "";
+
+                                        var EndTime = (End.HasValue && End.Value.TimeOfDay != TimeSpan.Zero)
+                                        ? End.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                        : "";
+
+                                        onDutyDisplayText += "\n On Duty on " + $"{StartTime} - {EndTime}";
+                                        onDutyDisplayTextColor = "black";
+                                    }
+
+
                                 }
-                                else
-                                {
-                                    // Real attendance — show check-in/check-out times
-                                    var checkInTime = record.CheckInDateTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "";
-                                    var checkOutTime = record.CheckOutDateTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "";
-                                    displayText = $"{checkInTime} - {checkOutTime}";
-                                    displayTextColor = "black";
-                                }
+
+                                DateTime? checkIn = record?.CheckInDateTime as DateTime?;
+                                DateTime? checkOut = record?.CheckOutDateTime as DateTime?;
+
+                                var checkInTime = (checkIn.HasValue && checkIn.Value.TimeOfDay != TimeSpan.Zero)
+                                ? checkIn.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                : "";
+
+                                var checkOutTime = (checkOut.HasValue && checkOut.Value.TimeOfDay != TimeSpan.Zero)
+                                ? checkOut.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                : "";
+
+                                var checkIndisplayText = $"{checkInTime} - {checkOutTime}";
+
                                 <tr>
                                     <td>@(record.EmployeeName ?? "N/A")</td>
-                                    <td class="center" style="width: 200px !important;
-                                                                      max-width: 300px !important;
-                                                                      min-width: 200px !important;
-                                                                      word-wrap: anywhere;">
+                                    <td>
                                         <span style=" text-align: center !important; display: block; color:@displayTextColor">
-                                            @displayText
+                                            @displayText<br />
+
                                         </span>
-                                      
+                                        <span style=" text-align: center !important; display: block; color:@onDutyDisplayTextColor">
+                                            @onDutyDisplayText<br />
+
+                                        </span>
+                                    </td>
+                                    <td class="center" style="width: 200px !important;
+                                                                                      max-width: 300px !important;
+                                                                                      min-width: 200px !important;
+                                                                                      word-wrap: anywhere;">
+                                        @checkIndisplayText
                                         <br />
                                         @record.CheckInLocation
                                     </td>
-                                   @*  <td class="center" style="width: 200px !important;
-                                                                      max-width: 300px !important;
-                                                                      min-width: 200px !important;
-                                                                      word-wrap: anywhere;">
-                                        <span style=" text-align: center !important;
-                                                    display: block;">@checkOutTime</span>
-                                        <br />
-                                        @record.CheckOutLocation
-                                    </td> *@
-                                    <td>@( (record.IsLeave || record.IsPermission || record.IsOnDuty || record.IsHalfDayLeave) ? "-" : record.WorkingHours ?? "N/A")</td>
-                                    <td>@record.IP</td>
+
+                                    <td>@( (record.IsLeave) ? "-" : record.WorkingHours ?? "N/A")</td>
+                                    <td>
+                                        @{
+                                            var checkInMadeDateTime = record?.CheckInMadeDateTime as DateTime?;
+                                            var checkInMadeTime = (checkInMadeDateTime.HasValue && checkInMadeDateTime.Value.TimeOfDay != TimeSpan.Zero)
+                                            ? checkInMadeDateTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                            : "";
+                                        }
+                                        @if (checkInMadeTime != string.Empty)
+                                        {
+                                            <span> IP: <b>@record.IP</b> <br /></span>
+                                            <span> Made By: <b>@record.CheckInMadeBy</b> <br /></span>
+                                            <span> Time: <b>@checkInMadeTime </b><br />
+                                            </span>
+                                        }
+
+                                    </td>
+                                    <td>
+                                        @{
+                                            var checkOutMadeDateTime = record?.CheckOutMadeDateTime as DateTime?;
+                                            var checkOutMadeTime = (checkOutMadeDateTime.HasValue && checkOutMadeDateTime.Value.TimeOfDay != TimeSpan.Zero)
+                                            ? checkOutMadeDateTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                                            : "";
+                                        }
+
+                                        @if (checkOutMadeTime != string.Empty)
+                                        {
+                                            <span> IP: <b>@record.IP</b> <br /></span>
+                                            <span> Made By: <b>@record.CheckOutMadeBy</b> <br /></span>
+                                            <span>
+                                                Time: <b>@checkOutMadeTime</b> <br />
+                                            </span>
+                                        }
+                                    </td>
                                     <td>
                                         <a href="@Url.Action("Add", new { EmployeeId = record.EmployeeId, date = ViewBag.SelectedDate })" class="btn btn-warning btn-sm p-t-10">
                                             <i class="material-icons">create</i>

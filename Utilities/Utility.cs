@@ -74,6 +74,16 @@ namespace SparkHRMS.Utilities
             }
         }
 
+        public string GetUserNameById(int? UserId)
+        {
+            if(UserId == null)
+            {
+                return string.Empty;
+            }
+            string name = _userManager.Users.Where(x => x.Id == UserId).Select(x => x.UserName).FirstOrDefault();
+            return name;
+        }
+
         public string GetEmployeeNameById(int EmployeeId)
         {
             string name = _context.Employees.Where(x => x.EmployeeId == EmployeeId).Select(x => x.Name).FirstOrDefault();

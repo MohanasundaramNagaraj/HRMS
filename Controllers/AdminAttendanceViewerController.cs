@@ -74,7 +74,13 @@ namespace SparkHRMS.Controllers
 
                 IsLeave = x.Attendance?.IsLeave ?? false,
                 IsHalfDayLeave = x.Attendance?.IsHalfDayLeave ?? false,
-                
+
+                CheckInMadeBy = x.Attendance != null ? _utilityService.GetUserNameById(x.Attendance.CheckInMadeUserId) : string.Empty,
+                CheckOutMadeBy = x.Attendance != null ? _utilityService.GetUserNameById(x.Attendance.CheckOutMadeUserId) : string.Empty,
+
+                CheckInMadeDateTime = x.Attendance?.CheckInMadeDateTime,
+                CheckOutMadeDateTime = x.Attendance?.CheckOutMadeDateTime,
+
             }).ToList();
 
             foreach (var attendance in attendances)
@@ -354,7 +360,7 @@ namespace SparkHRMS.Controllers
                 _context.EmployeeAttendance.Add(checkIn);
             }
 
-           // await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Ok();
         }
 

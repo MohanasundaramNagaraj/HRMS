@@ -48,11 +48,11 @@
             </div>
 
             <div class="row clearfix">
-                
+
                 <div class="col-sm-12">
                     <div class="form-group form-float">
                         <div class="form-line">
-                            
+
                             <div class="radio">
                                 <input type="checkbox" name="LeaveType" value="Permission" id="isPermission" asp-for="IsPermission" onclick="toggleFields()">
                                 <label for="isPermission">Permission</label>
@@ -61,10 +61,10 @@
                                 <input type="checkbox" name="LeaveType" value="Leave" id="isLeave" asp-for="IsLeave" onclick="toggleFields()">
                                 <label for="isLeave">Leave</label>
                             </div>
-                             <div class="radio">
+                            <div class="radio">
                                 <input type="checkbox" name="LeaveType" value="HalfDay" id="isHalfDayLeave" asp-for="IsHalfDayLeave" onclick="toggleFields()">
                                 <label for="isHalfDayLeave">Half Day Leave</label>
-                            </div> 
+                            </div>
                             <div class="radio">
                                 <input type="checkbox" name="LeaveType" value="OnDuty" id="isOnDuty" asp-for="IsOnDuty" onclick="toggleFields()">
                                 <label for="isOnDuty">On Duty</label>
@@ -77,8 +77,8 @@
                     <div class="form-group form-float">
                         <div class="form-line">
                             <label>From Time</label>
-                            <input id="from_time" type="time" class="validate form-control" placeholder="From Time">
-                            
+                            <input id="from_time" type="time" class="validate form-control" placeholder="From Time" asp-for="PermissionStartTime">
+
                         </div>
                     </div>
                 </div>
@@ -87,8 +87,8 @@
                     <div class="form-group form-float">
                         <div class="form-line">
                             <label>To Time</label>
-                            <input id="to_time" type="time" class="validate form-control" placeholder="To Time">
-                           
+                            <input id="to_time" type="time" class="validate form-control" placeholder="To Time" asp-for="PermissionEndTime">
+
                         </div>
                     </div>
                 </div>
@@ -97,7 +97,7 @@
                     <div class="form-group form-float">
                         <div class="form-line">
                             <label>On Duty From Time</label>
-                            <input id="onDutyfrom_time" type="time" class="validate form-control" placeholder="From Time">
+                            <input id="onDutyfrom_time" type="time" class="validate form-control" placeholder="From Time" asp-for="DutyStartTime">
 
                         </div>
                     </div>
@@ -107,12 +107,12 @@
                     <div class="form-group form-float">
                         <div class="form-line">
                             <label>On Duty To Time</label>
-                            <input id="onDutyto_time" type="time" class="validate form-control" placeholder="To Time">
+                            <input id="onDutyto_time" type="time" class="validate form-control" placeholder="To Time" asp-for="DutyEndTime">
 
                         </div>
                     </div>
                 </div>
-               
+
                 <div class="col-sm-6" id="halfDayLeaveDiv" style="display:none;">
                     <div class="form-group">
                         <div class="form-line">
@@ -130,7 +130,7 @@
                 </div>
             </div>
 
-            
+
 
             <div class="col-lg-12 p-t-20 text-center">
                 <button type="button" class="btn btn-primary waves-effect m-r-15" fdprocessedid="y228pc" onclick="addEmployeeCheckInDetais();">Submit</button>
@@ -144,14 +144,42 @@
 
 <script>
 
-    debugger;
+    //  function toggleFields() {
+    //     // Hide all by default
+    //     $('#fromTimeDiv, #toTimeDiv, #onDutyfromTimeDiv, #onDutytoTimeDiv, #halfDayLeaveDiv').hide();
+
+    //     // Uncheck all other checkboxes when one is clicked (behave like radio)
+    //     $('input[name="LeaveType"]').not(this).prop('checked', false);
+
+    //     // Show fields based on selection
+    //     if ($('#isPermission').is(':checked')) {
+    //         $('#fromTimeDiv, #toTimeDiv').show();
+    //     }
+    //     else if ($('#isOnDuty').is(':checked')) {
+    //         $('#onDutyfromTimeDiv, #onDutytoTimeDiv').show();
+    //     }
+    //     else if ($('#isHalfDayLeave').is(':checked')) {
+    //         $('#halfDayLeaveDiv').show();
+    //     }
+    // }
+
+    // Run on page load for redirected/edit views
+    $(document).ready(function () {
+        toggleFields();
+    });
 
     function getTodayDateTime(time) {
+        debugger;
         if (!time) return null;
 
         let today = new Date();
-        let date = today.toLocaleDateString("en-GB").replace(/\//g, "-"); 
+        let date = today.toLocaleDateString("en-GB").replace(/\//g, "-");
         return `${date} ${time}:00`;
+    }
+
+    function getShortTime(timeStr) {
+        if (!timeStr) return "";
+        return timeStr.split(':').slice(0, 2).join(':');
     }
 
     function addEmployeeCheckInDetais() {
@@ -173,7 +201,7 @@
         var formattedCheckInDate = moment(checkInDate).format("YYYY-MM-DD HH:mm:ss");
         var formattedCheckOutDate = moment(checkOutDate).format("YYYY-MM-DD HH:mm:ss");
 
-        
+
 
         let obj = {
             EmployeeId: @ViewBag.EmployeeId,
@@ -181,12 +209,12 @@
             CheckOutTime: formattedCheckOutDate,
 
             IsPermission: document.getElementById("isPermission").checked,
-            PermissionStartTime: getTodayDateTime(document.getElementById("from_time").value),
-            PermissionEndTime: getTodayDateTime(document.getElementById("to_time").value),
+            PermissionStartTime: getTodayDateTime(getShortTime(document.getElementById("from_time").value)),
+            PermissionEndTime: getTodayDateTime(getShortTime(document.getElementById("to_time").value)),
 
             IsOnDuty: document.getElementById("isOnDuty").checked,
-            DutyStartTime: getTodayDateTime(document.getElementById("onDutyfrom_time").value),
-            DutyEndTime: getTodayDateTime(document.getElementById("onDutyto_time").value),
+            DutyStartTime: getTodayDateTime(getShortTime(document.getElementById("onDutyfrom_time").value)),
+            DutyEndTime: getTodayDateTime(getShortTime(document.getElementById("onDutyto_time").value)),
 
             IsLeave: document.getElementById("isLeave").checked,
             IsHalfDayLeave: document.getElementById("isHalfDayLeave").checked,
@@ -235,26 +263,35 @@
     }
 
     function toggleFields() {
-        
+
         document.getElementById("check_in_out_div").style.display = "";
         document.getElementById("fromTimeDiv").style.display = "none";
+        document.getElementById("onDutyfromTimeDiv").style.display = "none";
+        document.getElementById("onDutytoTimeDiv").style.display = "none";
         document.getElementById("toTimeDiv").style.display = "none";
         document.getElementById("halfDayLeaveDiv").style.display = "none";
 
         if (document.getElementById("isPermission").checked) {
-            document.getElementById("fromTimeDiv").style.display = "block";  
-            document.getElementById("toTimeDiv").style.display = "block"; 
-        } else if (document.getElementById("isLeave").checked) {
-            document.getElementById("check_in_out_div").style.display = "none";  
-            document.getElementById("fromTimeDiv").style.display = "none";  
-            document.getElementById("toTimeDiv").style.display = "none"; 
-        } else if (document.getElementById("isHalfDayLeave").checked) {
-            document.getElementById("halfDayLeaveDiv").style.display = "block"; 
-            document.getElementById("fromTimeDiv").style.display = "none";  
-            document.getElementById("toTimeDiv").style.display = "none"; 
-        } else if (document.getElementById("isOnDuty").checked) {
-            document.getElementById("fromTimeDiv").style.display = "block"; 
-            document.getElementById("toTimeDiv").style.display = "block"; 
+            document.getElementById("fromTimeDiv").style.display = "block";
+            document.getElementById("toTimeDiv").style.display = "block";
+        }
+
+        if (document.getElementById("isLeave").checked) {
+            document.getElementById("check_in_out_div").style.display = "none";
+            document.getElementById("fromTimeDiv").style.display = "none";
+            document.getElementById("toTimeDiv").style.display = "none";
+        }
+
+        // if (document.getElementById("isHalfDayLeave").checked) {
+        //     document.getElementById("halfDayLeaveDiv").style.display = "block";
+        //     document.getElementById("fromTimeDiv").style.display = "none";
+        //     document.getElementById("toTimeDiv").style.display = "none";
+        // }
+
+        if (document.getElementById("isOnDuty").checked) {
+
+             document.getElementById("onDutyfromTimeDiv").style.display = "block";
+             document.getElementById("onDutytoTimeDiv").style.display = "block";
         }
     }
 </script>
