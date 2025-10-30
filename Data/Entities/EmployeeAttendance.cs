@@ -19,6 +19,13 @@ namespace SparkHRMS.Data.Entities
 
         public DateTime? CheckOutTime { get; set; } 
 
+        public int? CheckInMadeUserId { get; set; }
+        public int? CheckOutMadeUserId { get; set; }
+
+        public DateTime? CheckInMadeDateTime { get; set; }
+
+        public DateTime? CheckOutMadeDateTime { get; set; }
+
         public string? CheckinMadeSystemIP { get; set; }
         public string? CheckOutMadeSystemIP { get; set; }
         public bool IsCheckedOut => CheckOutTime.HasValue;
@@ -28,19 +35,19 @@ namespace SparkHRMS.Data.Entities
 
         public bool? IsAutoCheckedOut { get; set; }
 
-        //public bool IsPermission { get; set; }
-        //public DateTime? PermissionStartTime { get; set; }
-        //public DateTime? PermissionEndTime { get; set; }
-        //public bool IsOnDuty { get; set; }
-        //public DateTime? DutyStartTime { get; set; }
-        //public DateTime? DutyEndTime { get; set; }
-        //public bool IsLeave { get; set; }
-        //public bool IsHalfDayLeave { get; set; }
-        //public HalfDay? HalfDayLeave { get; set; }
-        //public enum HalfDay
-        //{
-        //    FirstHalf,  
-        //    SecondHalf  
-        //}
+        public bool IsPermission { get; set; } = false;
+        public DateTime? PermissionStartTime { get; set; }
+        public DateTime? PermissionEndTime { get; set; }
+        public bool IsOnDuty { get; set; } = false;
+        public DateTime? DutyStartTime { get; set; }
+        public DateTime? DutyEndTime { get; set; }
+        public bool IsLeave { get; set; } = false;
+        public bool IsHalfDayLeave { get; set; } = false; 
+        public HalfDay? HalfDayLeave { get; set; }
+        public enum HalfDay
+        {
+            FirstHalf,
+            SecondHalf
+        }
     }
 }

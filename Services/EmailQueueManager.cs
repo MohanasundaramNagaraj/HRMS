@@ -43,6 +43,7 @@ namespace SparkHRMS.Services
             var adminUsers = await GetAdminsAndSuperAdminsAsync();
             foreach (var user in adminUsers)
             {
+                await Task.Delay(5000);
                 _backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync(user.Email, Event, html));
             }
         }

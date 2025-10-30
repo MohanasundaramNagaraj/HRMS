@@ -10,19 +10,19 @@ namespace SparkHRMS.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "IsAutoCheckedOut",
-                table: "EmployeeAttendance",
-                type: "bit",
-                nullable: true);
+            //migrationBuilder.AddColumn<bool>(
+            //    name: "IsAutoCheckedOut",
+            //    table: "EmployeeAttendance",
+            //    type: "bit",
+            //    nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "IsAutoCheckedOut",
-                table: "EmployeeAttendance");
+            //migrationBuilder.DropColumn(
+            //    name: "IsAutoCheckedOut",
+            //    table: "EmployeeAttendance");
         }
     }
 }

@@ -54,19 +54,19 @@
                         <div class="form-line">
                             
                             <div class="radio">
-                                <input type="checkbox" name="LeaveType" value="Permission" id="isPermission" onclick="toggleFields()">
+                                <input type="checkbox" name="LeaveType" value="Permission" id="isPermission" asp-for="IsPermission" onclick="toggleFields()">
                                 <label for="isPermission">Permission</label>
                             </div>
                             <div class="radio">
-                                <input type="checkbox" name="LeaveType" value="Leave" id="isLeave" onclick="toggleFields()">
+                                <input type="checkbox" name="LeaveType" value="Leave" id="isLeave" asp-for="IsLeave" onclick="toggleFields()">
                                 <label for="isLeave">Leave</label>
                             </div>
-                           @*  <div class="radio">
-                                <input type="checkbox" name="LeaveType" value="HalfDay" id="isHalfDayLeave" onclick="toggleFields()">
+                             <div class="radio">
+                                <input type="checkbox" name="LeaveType" value="HalfDay" id="isHalfDayLeave" asp-for="IsHalfDayLeave" onclick="toggleFields()">
                                 <label for="isHalfDayLeave">Half Day Leave</label>
-                            </div> *@
+                            </div> 
                             <div class="radio">
-                                <input type="checkbox" name="LeaveType" value="OnDuty" id="isOnDuty" onclick="toggleFields()">
+                                <input type="checkbox" name="LeaveType" value="OnDuty" id="isOnDuty" asp-for="IsOnDuty" onclick="toggleFields()">
                                 <label for="isOnDuty">On Duty</label>
                             </div>
                         </div>
@@ -143,6 +143,17 @@
 </div>
 
 <script>
+
+    debugger;
+
+    function getTodayDateTime(time) {
+        if (!time) return null;
+
+        let today = new Date();
+        let date = today.toLocaleDateString("en-GB").replace(/\//g, "-"); 
+        return `${date} ${time}:00`;
+    }
+
     function addEmployeeCheckInDetais() {
 
         var checkInDateTimeString = '@ViewBag.Date.ToString("dd-MM-yyyy")' + " " + $('#check_in_time').val();
@@ -162,10 +173,28 @@
         var formattedCheckInDate = moment(checkInDate).format("YYYY-MM-DD HH:mm:ss");
         var formattedCheckOutDate = moment(checkOutDate).format("YYYY-MM-DD HH:mm:ss");
 
+        
+
         let obj = {
             EmployeeId: @ViewBag.EmployeeId,
             CheckInTime: formattedCheckInDate,
-            CheckOutTime: formattedCheckOutDate
+            CheckOutTime: formattedCheckOutDate,
+
+            IsPermission: document.getElementById("isPermission").checked,
+            PermissionStartTime: getTodayDateTime(document.getElementById("from_time").value),
+            PermissionEndTime: getTodayDateTime(document.getElementById("to_time").value),
+
+            IsOnDuty: document.getElementById("isOnDuty").checked,
+            DutyStartTime: getTodayDateTime(document.getElementById("onDutyfrom_time").value),
+            DutyEndTime: getTodayDateTime(document.getElementById("onDutyto_time").value),
+
+            IsLeave: document.getElementById("isLeave").checked,
+            IsHalfDayLeave: document.getElementById("isHalfDayLeave").checked,
+            HalfDayLeave: document.getElementById("halfDayFirstHalf").checked
+                ? "FirstHalf"
+                : document.getElementById("halfDaySecondHalf").checked
+                    ? "SecondHalf"
+                    : null
         };
 
         Swal.fire({

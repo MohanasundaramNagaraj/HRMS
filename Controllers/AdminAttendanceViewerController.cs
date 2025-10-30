@@ -9,6 +9,7 @@ using SparkHRMS.Utilities;
 using Humanizer;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Globalization;
+using SparkHRMS.Services;
 
 namespace SparkHRMS.Controllers
 {
@@ -62,6 +63,18 @@ namespace SparkHRMS.Controllers
                 CheckOutMadeSystemIP = x.Attendance?.CheckOutMadeSystemIP,
                 CheckInPosition = x.Attendance?.CheckInPosition,
                 CheckOutPosition = x.Attendance?.CheckOutPosition,
+               
+                IsPermission = x.Attendance?.IsPermission ?? false,
+                PermissionStartTime = x.Attendance?.PermissionStartTime,
+                PermissionEndTime = x.Attendance?.PermissionEndTime,
+
+                IsOnDuty = x.Attendance?.IsOnDuty ?? false,
+                DutyStartTime = x.Attendance?.DutyStartTime,
+                DutyEndTime = x.Attendance?.DutyEndTime,
+
+                IsLeave = x.Attendance?.IsLeave ?? false,
+                IsHalfDayLeave = x.Attendance?.IsHalfDayLeave ?? false,
+                
             }).ToList();
 
             foreach (var attendance in attendances)
@@ -234,7 +247,17 @@ namespace SparkHRMS.Controllers
                 CheckOutDateTime = attendance == null ? null : attendance.CheckOutTime,
                 WorkingHours = attendance == null ? string.Empty : attendance.CheckOutTime.HasValue
                               ? string.Format("{0:%h} hours {0:%m} mins", attendance.CheckOutTime.Value - attendance.CheckInTime)
-                              : string.Empty
+                              : string.Empty,
+                IsPermission = attendance?.IsPermission ?? false,
+                PermissionStartTime = attendance?.PermissionStartTime,
+                PermissionEndTime = attendance?.PermissionEndTime,
+
+                IsOnDuty = attendance?.IsOnDuty ?? false,
+                DutyStartTime = attendance?.DutyStartTime,
+                DutyEndTime = attendance?.DutyEndTime,
+
+                IsLeave = attendance?.IsLeave ?? false,
+                IsHalfDayLeave = attendance?.IsHalfDayLeave ?? false,
             };
 
             if (attendance?.CheckInTime != null || employeeAttendance.CheckInDateTime != null)
@@ -263,7 +286,7 @@ namespace SparkHRMS.Controllers
 
             var checkInDateTime = Convert.ToDateTime(attendance.CheckInTime);
             isMidnight = checkInDateTime.Hour == 0 && checkInDateTime.Minute == 0 && checkInDateTime.Second == 0;
-            if (isMidnight)
+            if (isMidnight && !attendance.IsLeave && !attendance.IsPermission && !attendance.IsHalfDayLeave && !attendance.IsOnDuty)
             {
                 return BadRequest("Please enter the Check In Details");
             }
@@ -272,7 +295,27 @@ namespace SparkHRMS.Controllers
                 existingCheckIn.CheckInTime = attendance.CheckInTime;
                 existingCheckIn.CheckOutTime = attendance.CheckOutTime;
                 existingCheckIn.CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
-                existingCheckIn.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                
+
+                existingCheckIn.IsPermission = attendance.IsPermission;
+                existingCheckIn.PermissionStartTime = attendance.PermissionStartTime;
+                existingCheckIn.PermissionEndTime = attendance.PermissionEndTime;
+
+                existingCheckIn.IsOnDuty = attendance.IsOnDuty;
+                existingCheckIn.DutyStartTime = attendance.DutyStartTime;
+                existingCheckIn.DutyEndTime = attendance.DutyEndTime;
+
+                existingCheckIn.IsLeave = attendance.IsLeave;
+                existingCheckIn.IsHalfDayLeave = attendance.IsHalfDayLeave;
+                existingCheckIn.HalfDayLeave = attendance.HalfDayLeave;
+
+                if (attendance.CheckOutTime != null)
+                {
+                    existingCheckIn.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                    existingCheckIn.CheckOutMadeDateTime = DateTime.Now;
+                    existingCheckIn.CheckOutMadeUserId = Convert.ToInt32(_userManager.GetUserId(User));
+                }
+
                 _context.Update(existingCheckIn);
                 // return BadRequest("The Employee Already checked in for selected Date.");
             }
@@ -284,13 +327,34 @@ namespace SparkHRMS.Controllers
                     CheckInTime = attendance.CheckInTime,
                     CheckOutTime = attendance.CheckOutTime,
                     CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                    CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    CheckOutMadeSystemIP = null,
+                    IsPermission = attendance.IsPermission,
+                    PermissionStartTime = attendance.PermissionStartTime,
+                    PermissionEndTime = attendance.PermissionEndTime,
+
+                    IsOnDuty = attendance.IsOnDuty,
+                    DutyStartTime = attendance.DutyStartTime,
+                    DutyEndTime = attendance.DutyEndTime,
+
+                    IsLeave = attendance.IsLeave,
+                    IsHalfDayLeave = attendance.IsHalfDayLeave,
+                    HalfDayLeave = attendance.HalfDayLeave,
+                    CheckInMadeDateTime = DateTime.Now,
+                    CheckInMadeUserId = Convert.ToInt32(_userManager.GetUserId(User))
+
                 };
+
+                if (attendance.CheckInTime != null)
+                {
+                    checkIn.CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                    checkIn.CheckInMadeDateTime = DateTime.Now;
+                    checkIn.CheckInMadeUserId = Convert.ToInt32(_userManager.GetUserId(User));
+                }
 
                 _context.EmployeeAttendance.Add(checkIn);
             }
 
-            await _context.SaveChangesAsync();
+           // await _context.SaveChangesAsync();
             return Ok();
         }
 
@@ -334,6 +398,20 @@ namespace SparkHRMS.Controllers
             attendance.CheckInTime = (DateTime)dto.CheckInDateTime;
             attendance.CheckOutTime = dto.CheckOutDateTime;
 
+            // Permission
+            attendance.IsPermission = dto.IsPermission;
+            attendance.PermissionStartTime = dto.PermissionStartTime;
+            attendance.PermissionEndTime = dto.PermissionEndTime;
+
+            // On Duty
+            attendance.IsOnDuty = dto.IsOnDuty;
+            attendance.DutyStartTime = dto.DutyStartTime;
+            attendance.DutyEndTime = dto.DutyEndTime;
+
+            // Leave
+            attendance.IsLeave = dto.IsLeave;
+            attendance.IsHalfDayLeave = dto.IsHalfDayLeave;
+            
             _context.Update(attendance);
             await _context.SaveChangesAsync();
 

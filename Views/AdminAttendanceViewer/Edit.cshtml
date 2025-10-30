@@ -76,7 +76,21 @@
             EmployeeId:@ViewBag.EmployeeId,
             CheckInTime: $('#check_in_time').val(),
             CheckOutTime: $('#check_out_time').val()
+            IsPermission: document.getElementById("isPermission").checked,
+            PermissionStartTime: document.getElementById("from_time").value || null,
+            PermissionEndTime: document.getElementById("to_time").value || null,
 
+            IsOnDuty: document.getElementById("isOnDuty").checked,
+            DutyStartTime: document.getElementById("onDutyfrom_time").value || null,
+            DutyEndTime: document.getElementById("onDutyto_time").value || null,
+
+            IsLeave: document.getElementById("isLeave").checked,
+            IsHalfDayLeave: document.getElementById("isHalfDayLeave").checked,
+            HalfDayLeave: document.getElementById("halfDayFirstHalf").checked
+                ? "FirstHalf"
+                : document.getElementById("halfDaySecondHalf").checked
+                    ? "SecondHalf"
+                    : null
         }
         $.ajax({
             url: "/AdminAttendanceViewer/Add",

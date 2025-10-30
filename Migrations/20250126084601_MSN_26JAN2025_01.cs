@@ -44,28 +44,28 @@ namespace SparkHRMS.Migrations
                     table.PrimaryKey("PK_Set_Year", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Timesheet",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UniqueId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    YearId = table.Column<int>(type: "int", nullable: false),
-                    MonthId = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Day = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    Task = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Activity = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Descreption = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: false),
-                    HoursWorked = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Timesheet", x => x.Id);
-                });
+            //migrationBuilder.CreateTable(
+            //    name: "Timesheet",
+            //    columns: table => new
+            //    {
+            //        Id = table.Column<int>(type: "int", nullable: false)
+            //            .Annotation("SqlServer:Identity", "1, 1"),
+            //        UniqueId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+            //        YearId = table.Column<int>(type: "int", nullable: false),
+            //        MonthId = table.Column<int>(type: "int", nullable: false),
+            //        Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+            //        Day = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+            //        EmployeeId = table.Column<int>(type: "int", nullable: false),
+            //        Task = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+            //        Activity = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+            //        Descreption = table.Column<string>(type: "nvarchar(max)", maxLength: 2147483647, nullable: false),
+            //        HoursWorked = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+            //        IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_Timesheet", x => x.Id);
+            //    });
 
             migrationBuilder.InsertData(
                 table: "Set_Month",

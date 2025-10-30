@@ -68,6 +68,8 @@ namespace SparkHRMS.Data
                 new Month { Id = 12, Name = "December", Number = 12 }
             );
 
+            modelBuilder.Entity<Employee>().HasQueryFilter(e => e.IsActive);
+
             modelBuilder.Entity<LeaveAllocation>()
            .HasMany(x => x.LeaveDetails)
            .WithOne()

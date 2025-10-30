@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SparkHRMS.Data;
 
@@ -11,9 +12,11 @@ using SparkHRMS.Data;
 namespace SparkHRMS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250508102946_VAP_MAY08_V1")]
+    partial class VAP_MAY08_V1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,42 +24,6 @@ namespace SparkHRMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("LeaveRequestDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AllocatedDays")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("BalanceDays")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LeaveRequestId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LeaveTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("RequiredDays")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("UsedDays")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LeaveRequestId");
-
-                    b.ToTable("LeaveRequestDetail");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
@@ -159,64 +126,6 @@ namespace SparkHRMS.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Configuration.MenuPermission", b =>
-                {
-                    b.Property<int>("PermissionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PermissionID"));
-
-                    b.Property<string>("MenuCode")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Permission")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int?>("RoleID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserID")
-                        .HasColumnType("int");
-
-                    b.HasKey("PermissionID");
-
-                    b.ToTable("CFG_MenuPermission");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Configuration.UsersAction", b =>
-                {
-                    b.Property<int>("ActionID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActionID"));
-
-                    b.Property<string>("ActionCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MenuCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PageCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PageName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ActionID");
-
-                    b.ToTable("CFG_UsersAction");
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Entities.ApplicationRole", b =>
@@ -374,19 +283,10 @@ namespace SparkHRMS.Migrations
                     b.Property<int>("ApplicationUserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("DOB")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateOfJoining")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateOfReleving")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Designation")
@@ -407,12 +307,6 @@ namespace SparkHRMS.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastUpdatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -424,9 +318,6 @@ namespace SparkHRMS.Migrations
 
                     b.Property<string>("ReportingHeadMailID")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
 
                     b.HasKey("EmployeeId");
 
@@ -443,26 +334,14 @@ namespace SparkHRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("CheckInMadeDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CheckInMadeUserId")
-                        .HasColumnType("int");
-
                     b.Property<string>("CheckInPosition")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CheckInTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CheckOutMadeDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CheckOutMadeSystemIP")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CheckOutMadeUserId")
-                        .HasColumnType("int");
 
                     b.Property<string>("CheckOutPosition")
                         .HasColumnType("nvarchar(max)");
@@ -473,38 +352,11 @@ namespace SparkHRMS.Migrations
                     b.Property<string>("CheckinMadeSystemIP")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("DutyEndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DutyStartTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("HalfDayLeave")
                         .HasColumnType("int");
 
                     b.Property<bool?>("IsAutoCheckedOut")
                         .HasColumnType("bit");
-
-                    b.Property<bool>("IsHalfDayLeave")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsLeave")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsOnDuty")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPermission")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("PermissionEndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PermissionStartTime")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -631,17 +483,17 @@ namespace SparkHRMS.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("TotalCarriedForwardLeaves")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalCarriedForwardLeaves")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("TotalLeaveAllocated")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalLeaveAllocated")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("TotalLeaveBalance")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalLeaveBalance")
+                        .HasColumnType("int");
 
-                    b.Property<decimal>("TotalUsedDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("TotalUsedDays")
+                        .HasColumnType("int");
 
                     b.Property<int>("YearId")
                         .HasColumnType("int");
@@ -659,8 +511,8 @@ namespace SparkHRMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("AllocatedDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("AllocatedDays")
+                        .HasColumnType("int");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
@@ -690,14 +542,14 @@ namespace SparkHRMS.Migrations
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("RemainingDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("RemainingDays")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("ToDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("UsedDays")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("UsedDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -734,6 +586,9 @@ namespace SparkHRMS.Migrations
                     b.Property<int>("LeaveReasonId")
                         .HasColumnType("int");
 
+                    b.Property<int>("LeaveTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("RequestNumber")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -749,9 +604,6 @@ namespace SparkHRMS.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<decimal>("TotalLeaveDays")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -845,129 +697,6 @@ namespace SparkHRMS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Timesheet");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.VisitorEntry", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AdditionalVisitorCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AdditionalVisitorNames")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ContactNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Department")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("EntryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GateInCharge")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("IDProofNumber")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("IDProofType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("InTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("OutTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PassNo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("PersonToMeet")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("PurposeOfVisit")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("RecentVisits")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VehicleNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("VisitorCategory")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("VisitorImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VisitorName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("VisitorEntries");
                 });
 
             modelBuilder.Entity("SparkHRMS.Data.Logs.Serilog_Logs", b =>
@@ -1407,37 +1136,6 @@ namespace SparkHRMS.Migrations
                     b.ToTable("SET_LeaveType");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Setting.Menu", b =>
-                {
-                    b.Property<int>("MenuID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuID"));
-
-                    b.Property<bool>("IsSubMenu")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MenuCode")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("MenuName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParentMenuId")
-                        .HasColumnType("int");
-
-                    b.HasKey("MenuID");
-
-                    b.HasIndex("MenuCode")
-                        .IsUnique();
-
-                    b.ToTable("SET_Menu");
-                });
-
             modelBuilder.Entity("SparkHRMS.Data.Setting.Month", b =>
                 {
                     b.Property<int>("Id")
@@ -1635,60 +1333,6 @@ namespace SparkHRMS.Migrations
                     b.ToTable("Set_Year");
                 });
 
-            modelBuilder.Entity("SparkHRMS.Data.Setting.UsersActionRight", b =>
-                {
-                    b.Property<int>("RightsID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RightsID"));
-
-                    b.Property<string>("ActionCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(max)");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool?>("IsEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("IsVisible")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("ModifiedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PageCode")
-                        .IsRequired()
-                        .HasColumnType("varchar(max)");
-
-                    b.Property<int?>("RoleID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserID")
-                        .HasColumnType("int");
-
-                    b.HasKey("RightsID");
-
-                    b.ToTable("SET_UsersActionRights");
-                });
-
-            modelBuilder.Entity("LeaveRequestDetail", b =>
-                {
-                    b.HasOne("SparkHRMS.Data.Entities.LeaveRequest", null)
-                        .WithMany("LeaveRequestDetails")
-                        .HasForeignKey("LeaveRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("SparkHRMS.Data.Entities.ApplicationRole", null)
@@ -1796,11 +1440,6 @@ namespace SparkHRMS.Migrations
             modelBuilder.Entity("SparkHRMS.Data.Entities.LeaveAllocation", b =>
                 {
                     b.Navigation("LeaveDetails");
-                });
-
-            modelBuilder.Entity("SparkHRMS.Data.Entities.LeaveRequest", b =>
-                {
-                    b.Navigation("LeaveRequestDetails");
                 });
 #pragma warning restore 612, 618
         }

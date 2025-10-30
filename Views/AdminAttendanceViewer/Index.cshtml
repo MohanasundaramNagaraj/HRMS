@@ -55,26 +55,57 @@
                         <tbody>
                             @foreach (var record in Model)
                             {
-                                var checkInTime = "";
-                                if (record.CheckInDateTime != null)
-                                {
-                                    checkInTime = record.CheckInDateTime.ToString("hh:mm tt", CultureInfo.InvariantCulture);
-                                }
-                                var checkOutTime = "";
-                                if (record.CheckOutDateTime != null)
-                                {
-                                    checkOutTime = record.CheckOutDateTime.ToString("hh:mm tt", CultureInfo.InvariantCulture);
-                                }
 
+                                string displayText = string.Empty;
+                                string displayTextColor = string.Empty;
+
+                                if (record.IsLeave || record.IsPermission || record.IsOnDuty || record.IsHalfDayLeave)
+                                {
+                                    // No real attendance — show status
+                                    if (record.IsLeave)
+                                    {
+                                        if (record.IsHalfDayLeave
+                                            //&& record.HalfDayLeave.HasValue
+                                            )
+                                        {
+                                            displayText = $"Half Day Leave";
+                                        }
+                                        else
+                                        {
+                                            displayText = "Leave";
+                                        }
+                                    }
+                                    else if (record.IsPermission)
+                                    {
+                                        displayText = "Permission";
+                                    }
+                                    else if (record.IsOnDuty)
+                                    {
+                                        displayText = "On Duty";
+                                    }
+                                    else
+                                    {
+                                        displayText = "Absent";
+                                    }
+
+                                    displayTextColor = "red";
+                                }
+                                else
+                                {
+                                    // Real attendance — show check-in/check-out times
+                                    var checkInTime = record.CheckInDateTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "";
+                                    var checkOutTime = record.CheckOutDateTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "";
+                                    displayText = $"{checkInTime} - {checkOutTime}";
+                                    displayTextColor = "black";
+                                }
                                 <tr>
                                     <td>@(record.EmployeeName ?? "N/A")</td>
                                     <td class="center" style="width: 200px !important;
                                                                       max-width: 300px !important;
                                                                       min-width: 200px !important;
                                                                       word-wrap: anywhere;">
-                                        <span style=" text-align: center !important;
-                                                        display: block;">
-                                            @checkInTime - @checkOutTime
+                                        <span style=" text-align: center !important; display: block; color:@displayTextColor">
+                                            @displayText
                                         </span>
                                       
                                         <br />
@@ -89,7 +120,7 @@
                                         <br />
                                         @record.CheckOutLocation
                                     </td> *@
-                                    <td>@(record.WorkingHours ?? "N/A")</td>
+                                    <td>@( (record.IsLeave || record.IsPermission || record.IsOnDuty || record.IsHalfDayLeave) ? "-" : record.WorkingHours ?? "N/A")</td>
                                     <td>@record.IP</td>
                                     <td>
                                         <a href="@Url.Action("Add", new { EmployeeId = record.EmployeeId, date = ViewBag.SelectedDate })" class="btn btn-warning btn-sm p-t-10">

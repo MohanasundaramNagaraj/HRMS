@@ -95,6 +95,7 @@ namespace SparkHRMS.Controllers
 
                     try
                     {
+                        employee.IsActive = true;
                         employee.ApplicationUserId = applicationUser.Id;
                         employee.ImageUrl = _configuration["AppSettings:ImagePath"] + "/" + employee.EmployeeCode + ".jpg";
                         if (employee.ImageUrl == null)
@@ -163,7 +164,7 @@ namespace SparkHRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ApplicationUserId,IsActive")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,Gender,Designation,ImageUrl,Address,ApplicationUserId,IsActive")] Employee employee)
         {
             if (id != employee.EmployeeId)
             {

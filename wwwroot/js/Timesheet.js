@@ -249,7 +249,7 @@ function addRow(row, index) {
     let activityOptions = `<option value="">Select Activity</option>`;
     activities.forEach(function (activity) {
         activityOptions += `<option value="${activity}">${activity}</option>`;
-    });
+    }); debugger;
     newRow.innerHTML = `
                                         <td style="width:10%;"><input id='date_${uid}' onchange="getday('${uid}')" type="date" value="${row.Date}" class="form-control timesheet-input"></td>
                                         <td style="width:7%;"><input id='day_${uid}' type="text" class="form-control timesheet-input" placeholder="Day" value="${row.Day}" disabled></td>
@@ -259,7 +259,10 @@ function addRow(row, index) {
                                                     ${activityOptions}
                                                 </select>
                                             </td>
-                                        <td style="width:42%;"><textarea  type="text" class="form-control timesheet-input description-input" placeholder="Task Description" value="${row.Descreption}"></textarea></td>
+                                        <td style="width:42%;">
+                                           <textarea class="form-control timesheet-input description-input"
+                                                placeholder="Task Description">${row.Descreption}</textarea>
+                                        </td>
                                         <td style="width:5%;"><input type="number" class="form-control timesheet-input hours-worked-input" placeholder="Hours Worked" value="${row.HoursWorked}"></td>
                                         <td style="width:8%;">
                                             <button class="btn btn-success addRow" onclick="addRow(${undefined},${index + 1});"><i class="material-icons">add</i></button>

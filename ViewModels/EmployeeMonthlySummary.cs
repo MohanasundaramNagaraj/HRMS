@@ -71,6 +71,21 @@ namespace SparkHRMS.ViewModels
         public string CheckOutPosition { get; set; }
         public string CheckInLocation { get; set; }
         public string CheckOutLocation { get; set; }
+
+        public bool IsPermission { get; set; } = false;
+        public DateTime? PermissionStartTime { get; set; }
+        public DateTime? PermissionEndTime { get; set; }
+        public bool IsOnDuty { get; set; } = false;
+        public DateTime? DutyStartTime { get; set; }
+        public DateTime? DutyEndTime { get; set; }
+        public bool IsLeave { get; set; } = false;
+        public bool IsHalfDayLeave { get; set; } = false;
+        public HalfDay? HalfDayLeave { get; set; }
+        public enum HalfDay
+        {
+            FirstHalf,
+            SecondHalf
+        }
     }
 
     public enum AttendanceStatus

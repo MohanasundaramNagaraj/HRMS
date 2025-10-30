@@ -166,7 +166,18 @@ namespace SparkHRMS.Controllers
                     WorkingHours = workingTime.HasValue
                                    ? string.Format("{0:%h} hours {0:%m} mins", workingTime.Value)
                                    : string.Empty,
-                    Status = status
+                    Status = status,
+
+                    IsPermission = attendanceRecord?.IsPermission ?? false,
+                    PermissionStartTime = attendanceRecord?.PermissionStartTime,
+                    PermissionEndTime = attendanceRecord?.PermissionEndTime,
+
+                    IsOnDuty = attendanceRecord?.IsOnDuty ?? false,
+                    DutyStartTime = attendanceRecord?.DutyStartTime,
+                    DutyEndTime = attendanceRecord?.DutyEndTime,
+
+                    IsLeave = attendanceRecord?.IsLeave ?? false,
+                    IsHalfDayLeave = attendanceRecord?.IsHalfDayLeave ?? false,
                 });
             }
 
@@ -228,7 +239,9 @@ namespace SparkHRMS.Controllers
                     CheckInTime = DateTime.Now,
                     CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
                     CheckOutMadeSystemIP = null,
-                    CheckInPosition = CheckInPosition
+                    CheckInPosition = CheckInPosition,
+                    CheckInMadeDateTime = DateTime.Now,
+                    CheckInMadeUserId = Convert.ToInt32(_userManager.GetUserId(User)),
                 };
 
                 _context.EmployeeAttendance.Add(checkIn);
@@ -278,6 +291,8 @@ namespace SparkHRMS.Controllers
                 checkInRecord.CheckOutTime = DateTime.Now;
                 checkInRecord.CheckOutPosition = CheckOutPosition;
                 checkInRecord.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+                checkInRecord.CheckOutMadeDateTime = DateTime.Now;
+                checkInRecord.CheckOutMadeUserId = Convert.ToInt32(_userManager.GetUserId(User));
                 await _context.SaveChangesAsync();
 
                 try

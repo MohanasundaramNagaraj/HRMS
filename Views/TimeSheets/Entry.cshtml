@@ -13,7 +13,7 @@
 }
 
 <script>
-    var timeSheetData = JSON.parse('@Html.Raw(Json.Serialize(Model.TimeSheetRecords))');
+    var timeSheetData = @Html.Raw(Json.Serialize(Model.TimeSheetRecords));
 
     var activities = @Html.Raw(Json.Serialize(ViewBag.Activities));
 </script>
