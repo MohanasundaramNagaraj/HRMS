@@ -307,7 +307,7 @@ function events() {
     var employeeAttendanceRecordsArray = JSON.parse(employeeAttendanceRecords);
 
     var formattedEvents = [];
-
+    debugger;
     $.each(employeeAttendanceRecordsArray, function (index, record) {
         var statusClass = "";
         let title = '';
@@ -324,14 +324,16 @@ function events() {
                 description += "<br>CheckIn IP: " + (record.IP || "Not available") +
                     ",<br>CheckOut IP: " + (record.CheckOutMadeSystemIP || "Not available") + ".";
             }
-        } else if (record.Status == AttendanceStatus.Absent) {
+        } else if (record.Status == AttendanceStatus.Absent || record.IsLeave) {
             statusClass = "fc-event-danger"; // Absent
             title = 'Absent';
         } else if (record.Status == AttendanceStatus.Holiday) {
             statusClass = "fc-event-warning"; // Holiday
             title = 'Holiday';
-        } else if (record.Status == AttendanceStatus.PermissionNeeded) {
-            statusClass = "fc-event-success"; // Taken Permission
+        } else if (record.Status == AttendanceStatus.PermissionNeeded || record.IsPermission) {
+            statusClass = "fc-event-warning"; // Taken Permission
+            title = 'Permission';
+            
         } else if (record.Status == AttendanceStatus.Weekend) {
             statusClass = "fc-event-warning"; // Holiday
             title = 'Holiday';
@@ -344,6 +346,15 @@ function events() {
         {
             statusClass = "fc-event-warning";
             title = 'Leave Request Approved';
+        }
+
+        if (record.IsPermission) {
+            statusClass = "fc-event-primary"; 
+            description += '<br>Permission on ' + formatTime(record.PermissionStartTime) + ' to ' + formatTime(record.PermissionEndTime);
+        }
+
+        if (record.IsLeave) {
+            title = 'Leave';
         }
 
         if (record.Status == AttendanceStatus.Weekend
@@ -370,6 +381,14 @@ function events() {
 
     console.log(formattedEvents);
     return formattedEvents;
+}
+
+function formatTime(dateString) {
+    let date = new Date(dateString);
+    let time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    return time; // e.g. "08:45 AM"
+
 }
 
 function formatDate(dateString) {

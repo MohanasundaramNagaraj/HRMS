@@ -161,6 +161,10 @@ namespace SparkHRMS.Controllers
                     {
                         status = AttendanceStatus.Weekend;
                     }
+                    else if(date > DateTime.Now)
+                    {
+                        status = AttendanceStatus.ToBeCheckIn;
+                    }
                     else if (attendanceRecord != null)
                     {
                         if (attendanceRecord.CheckOutTime.HasValue)
@@ -190,6 +194,21 @@ namespace SparkHRMS.Controllers
                         {
                             // If checked in but not checked out
                             status = AttendanceStatus.PendingCheckOut; // Present (Pending Checkout)
+                        }
+
+                        if (attendanceRecord.IsLeave)
+                        {
+                            status = AttendanceStatus.Absent;
+                        }
+
+                        if (attendanceRecord.IsPermission)
+                        {
+                            status = AttendanceStatus.PermissionNeeded;
+                        }
+
+                        if (attendanceRecord.IsHalfDayLeave)
+                        {
+                            status = AttendanceStatus.HalfDay;
                         }
                     }
 
@@ -314,6 +333,17 @@ namespace SparkHRMS.Controllers
                 existingCheckIn.IsLeave = attendance.IsLeave;
                 existingCheckIn.IsHalfDayLeave = attendance.IsHalfDayLeave;
                 existingCheckIn.HalfDayLeave = attendance.HalfDayLeave;
+
+                if (attendance.IsLeave)
+                {
+                    existingCheckIn.IsPermission = false;
+                    existingCheckIn.IsHalfDayLeave = false;
+                }
+
+                if (attendance.IsHalfDayLeave)
+                {
+                    existingCheckIn.IsPermission = false;
+                }
 
                 if (attendance.CheckOutTime != null)
                 {

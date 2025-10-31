@@ -103,7 +103,8 @@ namespace SparkHRMS.ViewModels
         PermissionNeeded,
         PendingCheckOut,
         LeaveRequested,
-        LeaveRequestApproved
+        LeaveRequestApproved,
+        ToBeCheckIn
     }
 
     public class AttendanceSettings

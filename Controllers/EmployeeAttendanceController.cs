@@ -46,6 +46,7 @@ namespace SparkHRMS.Controllers
                 emp = _context.Employees.Where(x => x.EmployeeId == EmployeeID).FirstOrDefault();
             }
 
+            if (emp == null) return NotFound();
             // Fetch Employee Details
             var employeeDetails = new EmployeeDetailsDto
             {
