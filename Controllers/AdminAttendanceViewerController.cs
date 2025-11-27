@@ -156,63 +156,63 @@ namespace SparkHRMS.Controllers
                     if (holidays.Contains(date))
                     {
                         status = AttendanceStatus.Holiday;
+                        statuses.Add(status);
                     }
-                    else if (date.DayOfWeek == DayOfWeek.Sunday)
+                    if (date.DayOfWeek == DayOfWeek.Sunday)
                     {
                         status = AttendanceStatus.Weekend;
+                        statuses.Add(status);
                     }
-                    else if(date > DateTime.Now)
+                    if(date > DateTime.Now)
                     {
                         status = AttendanceStatus.ToBeCheckIn;
+                        statuses.Add(status);
                     }
-                    else if (attendanceRecord != null)
+                    if (attendanceRecord != null)
                     {
                         if (attendanceRecord.CheckOutTime.HasValue)
                         {
                             workingTime = attendanceRecord.CheckOutTime.Value - attendanceRecord.CheckInTime;
                             totalWorkingTime += workingTime.Value;
 
-                            if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:FullDayThreshold"]))
+                            if (workingTime.Value.TotalHours > 0)
                             {
                                 status = AttendanceStatus.Present; // Full Day Present
-                            }
-                            else if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:HalfDayThreshold"]))
-                            {
-                                status = AttendanceStatus.HalfDay; // Half Day Present
-                            }
-                            else if (workingTime.Value.TotalHours >= Convert.ToInt32(_configuration["AttendanceSettings:HalfDayThreshold"])
-                                && workingTime.Value.TotalHours <= Convert.ToInt32(_configuration["AttendanceSettings:PermissionNeededThreshold"]))
-                            {
-                                status = AttendanceStatus.PermissionNeeded; // Permission Needed
                             }
                             else
                             {
                                 status = AttendanceStatus.Absent;
                             }
+                            statuses.Add(status);
                         }
                         else
                         {
                             // If checked in but not checked out
                             status = AttendanceStatus.PendingCheckOut; // Present (Pending Checkout)
-                        }
 
+                            statuses.Add(status);
+                        }
+                       
                         if (attendanceRecord.IsLeave)
                         {
                             status = AttendanceStatus.Absent;
+                            statuses.Add(status);
                         }
 
                         if (attendanceRecord.IsPermission)
                         {
                             status = AttendanceStatus.PermissionNeeded;
+                            statuses.Add(status);
                         }
 
                         if (attendanceRecord.IsHalfDayLeave)
                         {
                             status = AttendanceStatus.HalfDay;
+                            statuses.Add(status);
                         }
                     }
 
-                    statuses.Add(status);
+                   
                 }
 
                 EmployeeMonthlySummaryWithStatusCount EmployeeMonthlySummaryWithStatusCount = new EmployeeMonthlySummaryWithStatusCount();

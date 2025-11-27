@@ -205,23 +205,21 @@ namespace SparkHRMS.Utilities
         {
             if (string.IsNullOrEmpty(menuCode) || userId == null) return false;
 
-            //using var scope = serviceProvider.CreateScope();
-            //var _db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            using var scope = serviceProvider.CreateScope();
+            var _db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            //int roleId = await _context.UserRoles
-            //                .Where(x => x.UserId == userId)
-            //                .Select(x => x.RoleId)
-            //                .FirstOrDefaultAsync();
+            int roleId = await _db.UserRoles
+                            .Where(x => x.UserId == userId)
+                            .Select(x => x.RoleId)
+                            .FirstOrDefaultAsync();
 
-            //var result = await (from m in _context.Menu
-            //                    join mp in _context.MenuPermission on m.MenuCode equals mp.MenuCode
-            //                    where (mp.UserID == userId || (mp.RoleID != null && mp.RoleID == roleId))
-            //                    && m.MenuCode == menuCode
-            //                    select mp.Permission).FirstOrDefaultAsync();
+            var result = await (from m in _db.Menu
+                                join mp in _db.MenuPermission on m.MenuCode equals mp.MenuCode
+                                where (mp.UserID == userId || (mp.RoleID != null && mp.RoleID == roleId))
+                                && m.MenuCode == menuCode
+                                select mp.Permission).FirstOrDefaultAsync();
 
-            //  return result != null ? result.ToUpper() == "GRANT" : false;
-
-            return true;
+            return result != null ? result.ToUpper() == "GRANT" : false;
         }
 
     }

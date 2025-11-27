@@ -62,7 +62,7 @@
             </div>
             <div class="col-lg-12 p-t-20 text-center">
                 <button type="button" class="btn btn-primary waves-effect m-r-15" fdprocessedid="y228pc" onclick="addEmployeeCheckInDetais();">Submit</button>
-                <a type="button" asp-action="Index" class="btn btn-danger waves-effect" fdprocessedid="3tfajj">Cancel</a>
+                <a type="button" asp-action="Index" class="btn btn-danger waves-effect" id="_cancelBtn" fdprocessedid="3tfajj">Cancel</a>
             </div>
            
 
@@ -102,6 +102,8 @@
                     title: 'Added Successful',
                     text: 'Data Added Successfully!'
                 });
+
+                 $('#_cancelBtn').click();
             },
             error: function (xhr) {
                 Swal.fire({

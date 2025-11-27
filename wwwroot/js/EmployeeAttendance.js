@@ -305,7 +305,7 @@ function randomIDGenerate(length, chars) {
 
 function events() {
     var employeeAttendanceRecordsArray = JSON.parse(employeeAttendanceRecords);
-
+    debugger;
     var formattedEvents = [];
     debugger;
     $.each(employeeAttendanceRecordsArray, function (index, record) {
@@ -349,14 +349,20 @@ function events() {
         }
 
         if (record.IsPermission) {
-            statusClass = "fc-event-primary"; 
+            statusClass = "fc-event-info";
             description += '<br>Permission on ' + formatTime(record.PermissionStartTime) + ' to ' + formatTime(record.PermissionEndTime);
+        }
+
+        if (record.IsHalfDayLeave) {
+            statusClass = "fc-event-primary"; 
+            description += '<br>Half Day Leave';
         }
 
         if (record.IsLeave) {
             title = 'Leave';
+            statusClass = "fc-event-danger";
         }
-
+        
         if (record.Status == AttendanceStatus.Weekend
             || record.Status == AttendanceStatus.Holiday
             || record.Status == AttendanceStatus.LeaveRequested
