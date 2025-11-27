@@ -8,6 +8,63 @@
     var employeeName = ViewBag.EmployeeName ?? "";
 }
 
+<style>
+    .table thead tr th {
+        padding: 10px;
+        border-bottom: 2px solid #dee2e6 !important;
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script>
+    function downloadExcel() {
+        var table = document.querySelector("table");
+
+        // Clone to avoid affecting UI
+        var clone = table.cloneNode(true);
+
+        // Remove last column from all rows
+        for (let row of clone.rows) {
+            row.deleteCell(row.cells.length - 1);
+        }
+
+        var title = document.querySelector(".card-header h5").innerText;
+
+        var wb = XLSX.utils.table_to_book(clone, { sheet: "Attendance" });
+        XLSX.writeFile(wb, title.replaceAll(" ", "_") +".xlsx");
+    }
+
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        var doc = new jsPDF('l', 'pt', 'a4');
+
+        // Get dynamic title from your H5
+        var title = document.querySelector(".card-header h5").innerText;
+
+        doc.text(title, 40, 40);
+
+        // Clone table & remove last column
+        var table = document.querySelector("table");
+        var clone = table.cloneNode(true);
+
+        for (let row of clone.rows) {
+            row.deleteCell(row.cells.length - 1);
+        }
+
+        doc.autoTable({
+            html: clone,
+            startY: 60,
+            theme: 'grid',
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [52, 73, 94] }
+        });
+
+        doc.save(title.replaceAll(" ", "_") + ".pdf");
+    }
+</script>
+
 
 
 <div class="container mt-4">
@@ -30,6 +87,10 @@
                 <div class="row">
                     <input type="date" name="date" value="@selectedDate" class="form-control" style="width:35%;margin-right:10px;" />
                     <button type="submit" class="btn btn-info" style="width:10%;margin-right:10px;">Filter</button>
+
+                    <button class="btn btn-success" onclick="downloadExcel()" style="width:10%;margin-right:10px;float:right">Download Excel</button>
+                    <button class="btn btn-danger" onclick="downloadPDF()" style="width:10%;margin-right:10px;float:right">Download PDF</button>
+
                 </div>
             </form>
         </div>
@@ -42,16 +103,29 @@
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered table-striped">
+                      
                         <thead>
                             <tr>
-                                <th>Employee Name</th>
-                                <th>Permission/Leave/On Duty Details</th>
+                                <th rowspan="2">Employee Name</th>
+                                <th rowspan="2">Permission/Leave/On Duty Details</th>
+                                <th colspan="2" class="text-center">Working Details</th>
+                                <th colspan="3" class="text-center">Check In Details</th>
+                                <th colspan="3" class="text-center">Check Out Details</th>
+                                <th rowspan="2">Actions</th>
+                            </tr>
+
+                            <tr>
+                                <!-- Sub Columns -->
                                 <th>Working Time</th>
-                                @* <th>Check-Out Time</th> *@
                                 <th>Working Hours</th>
-                                <th>Check In Details</th>
-                                <th>Check Out Details</th>
-                                <th>Actions</th>
+
+                                <th>Made IP</th>
+                                <th>Made By</th>
+                                <th>Made Time</th>
+
+                                <th>Made IP</th>
+                                <th>Made By</th>
+                                <th>Made Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -140,9 +214,9 @@
                                         </span>
                                     </td>
                                     <td class="center" style="width: 200px !important;
-                                                                                      max-width: 300px !important;
-                                                                                      min-width: 200px !important;
-                                                                                      word-wrap: anywhere;">
+                                                                                              max-width: 300px !important;
+                                                                                              min-width: 200px !important;
+                                                                                              word-wrap: anywhere;">
                                         @checkIndisplayText
                                         <br />
                                         @record.CheckInLocation
@@ -156,14 +230,30 @@
                                             ? checkInMadeDateTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
                                             : "";
                                         }
-                                        @if (checkInMadeTime != string.Empty)
+                                        @* @if (checkInMadeTime != string.Empty)
                                         {
                                             <span> IP: <b>@record.IP</b> <br /></span>
                                             <span> Made By: <b>@record.CheckInMadeBy</b> <br /></span>
                                             <span> Time: <b>@checkInMadeTime </b><br />
                                             </span>
+                                        } *@
+                                        @if (checkInMadeTime != string.Empty)
+                                        {
+                                            <b>@record.IP</b>
                                         }
 
+                                    </td>
+                                    <td>
+                                        @if (checkInMadeTime != string.Empty)
+                                        {
+                                            <b>@record.CheckInMadeBy</b>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (checkInMadeTime != string.Empty)
+                                        {
+                                            <b>@checkInMadeTime </b>
+                                        }
                                     </td>
                                     <td>
                                         @{
@@ -173,13 +263,29 @@
                                             : "";
                                         }
 
-                                        @if (checkOutMadeTime != string.Empty)
+                                       @*  @if (checkOutMadeTime != string.Empty)
                                         {
                                             <span> IP: <b>@record.IP</b> <br /></span>
                                             <span> Made By: <b>@record.CheckOutMadeBy</b> <br /></span>
                                             <span>
                                                 Time: <b>@checkOutMadeTime</b> <br />
                                             </span>
+                                        } *@
+                                        @if (checkOutMadeTime != string.Empty)
+                                        {
+                                            <b>@record.IP</b>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (checkOutMadeTime != string.Empty)
+                                        {
+                                            <b>@record.CheckOutMadeBy</b>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (checkOutMadeTime != string.Empty)
+                                        {
+                                            <b>@checkOutMadeTime </b>
                                         }
                                     </td>
                                     <td>

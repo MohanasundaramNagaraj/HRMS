@@ -12,6 +12,8 @@ using System.Globalization;
 using Hangfire;
 using System.Collections.Generic;
 using SendGrid.Helpers.Mail;
+using SparkHRMS.Utilities;
+
 
 namespace SparkHRMS.Services
 {
@@ -24,7 +26,8 @@ namespace SparkHRMS.Services
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IBackgroundJobClient _backgroundJobClient;
-        public EmailQueueManager(IEmailSender emailService,IAutoCheckOut autoCheckOut, IAutoTimeSheetMail autoTimeSheetMail, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IBackgroundJobClient backgroundJobClient)
+        private readonly Utility _utilityService;
+        public EmailQueueManager(Utility utilityService, IEmailSender emailService,IAutoCheckOut autoCheckOut, IAutoTimeSheetMail autoTimeSheetMail, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IBackgroundJobClient backgroundJobClient)
         {
             _emailService = emailService;
             _context = context;
@@ -32,6 +35,7 @@ namespace SparkHRMS.Services
             _backgroundJobClient = backgroundJobClient;
             _autoCheckOut = autoCheckOut;
             _autoTimeSheetMail = autoTimeSheetMail;
+            _utilityService = utilityService;
         }
         public async Task SendScheduledEmail(string Event)
         {
@@ -127,32 +131,60 @@ namespace SparkHRMS.Services
 
             var attendanceDtos = results.Select(x => new EmployeeAttendanceDto
             {
+                //Id = x.Attendance?.Id ?? 0,
+                //EmployeeName = x.Employee.Name,
+                //CheckInDateTime = x.Attendance?.CheckInTime, // Nullable DateTime
+                //CheckOutDateTime = x.Attendance?.CheckOutTime, // Nullable DateTime
+                WorkingHours = CalculateWorkingHours(x.Attendance?.CheckInTime, x.Attendance?.CheckOutTime),
+                //IP = x.Attendance?.CheckinMadeSystemIP,
+                //CheckOutMadeSystemIP = x.Attendance?.CheckOutMadeSystemIP
+
                 Id = x.Attendance?.Id ?? 0,
+                EmployeeId = x.Employee.EmployeeId,
                 EmployeeName = x.Employee.Name,
                 CheckInDateTime = x.Attendance?.CheckInTime, // Nullable DateTime
                 CheckOutDateTime = x.Attendance?.CheckOutTime, // Nullable DateTime
-                WorkingHours = CalculateWorkingHours(x.Attendance?.CheckInTime, x.Attendance?.CheckOutTime),
                 IP = x.Attendance?.CheckinMadeSystemIP,
-                CheckOutMadeSystemIP = x.Attendance?.CheckOutMadeSystemIP
+                CheckOutMadeSystemIP = x.Attendance?.CheckOutMadeSystemIP,
+                CheckInPosition = x.Attendance?.CheckInPosition,
+                CheckOutPosition = x.Attendance?.CheckOutPosition,
+
+                IsPermission = x.Attendance?.IsPermission ?? false,
+                PermissionStartTime = x.Attendance?.PermissionStartTime,
+                PermissionEndTime = x.Attendance?.PermissionEndTime,
+
+                IsOnDuty = x.Attendance?.IsOnDuty ?? false,
+                DutyStartTime = x.Attendance?.DutyStartTime,
+                DutyEndTime = x.Attendance?.DutyEndTime,
+
+                IsLeave = x.Attendance?.IsLeave ?? false,
+                IsHalfDayLeave = x.Attendance?.IsHalfDayLeave ?? false,
+
+                CheckInMadeBy = x.Attendance != null ? _utilityService.GetUserNameById(x.Attendance.CheckInMadeUserId) : string.Empty,
+                CheckOutMadeBy = x.Attendance != null ? _utilityService.GetUserNameById(x.Attendance.CheckOutMadeUserId) : string.Empty,
+
+                CheckInMadeDateTime = x.Attendance?.CheckInMadeDateTime,
+                CheckOutMadeDateTime = x.Attendance?.CheckOutMadeDateTime,
             }).ToList();
 
 
             string html = @"
     <div style=""width: 100%; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;"">
-        <div style=""max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);"">
+        <div style="" margin: 0 auto; background: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);"">
             <div style=""background-color: #17a2b8; color: #ffffff; padding: 15px; border-top-left-radius: 8px; border-top-right-radius: 8px;"">
                 <h2 style=""margin: 0;"">Employee Attendance for " + selectedDate.ToString("dd MMM yyyy") + @"</h2>
             </div>
-            <div style=""padding: 20px;"">
-                <table style=""width: 100%; border-collapse: collapse;"">
+            <div style=""padding: 20px;overflow: scroll;"">
+                <table style=""overflow: scroll; border-collapse: collapse;"">
                     <thead style=""background-color: #343a40; color: #ffffff;"">
                         <tr>
                             <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Employee Name</th>
+                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Permission/Leave/On Duty Details</th>
                             <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check-In Time</th>
                             <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check-Out Time</th>
                             <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Working Hours</th>
-                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check In Made IP</th>
-                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check Out Made IP</th>
+                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check In Details</th>
+                            <th style=""padding: 10px; border: 1px solid #dee2e6; text-align: left;"">Check Out Details</th>
                         </tr>
                     </thead>
                     <tbody>";
@@ -165,15 +197,112 @@ namespace SparkHRMS.Services
                 var employeeName = record.EmployeeName ?? "";
                 var systemIP = record.IP ?? "";
                 var checkOutIP = record.CheckOutMadeSystemIP ?? "";
+
+
+                string displayText = string.Empty;
+                string displayTextColor = string.Empty;
+                string onDutyDisplayText = string.Empty;
+                string onDutyDisplayTextColor = string.Empty;
+
+                if (record.IsLeave || record.IsPermission || record.IsOnDuty || record.IsHalfDayLeave)
+                {
+                    if (record.IsLeave)
+                    {
+                        displayText = "\n Leave";
+                    }
+
+                    if (!record.IsLeave && record.IsHalfDayLeave
+                    //&& record.HalfDayLeave.HasValue
+                    )
+                    {
+                        displayText += $"\n Half Day Leave";
+                    }
+
+                    if (!record.IsLeave && record.IsPermission)
+                    {
+                        DateTime? permissionStart = record?.PermissionStartTime as DateTime?;
+                        DateTime? permissionEnd = record?.PermissionEndTime as DateTime?;
+
+                        var permissionTime = (permissionStart.HasValue && permissionStart.Value.TimeOfDay != TimeSpan.Zero)
+                        ? permissionStart.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                        : "";
+
+                        var permissionEndTime = (permissionEnd.HasValue && permissionEnd.Value.TimeOfDay != TimeSpan.Zero)
+                        ? permissionEnd.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                        : "";
+
+                        displayText += "\n Permission on " + $"{permissionTime} - {permissionEndTime}";
+                    }
+                    displayTextColor = "red";
+
+                    if (!record.IsLeave && record.IsOnDuty)
+                    {
+                        DateTime? Start = record?.DutyStartTime as DateTime?;
+                        DateTime? End = record?.DutyEndTime as DateTime?;
+
+                        var StartTime = (Start.HasValue && Start.Value.TimeOfDay != TimeSpan.Zero)
+                        ? Start.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                        : "";
+
+                        var EndTime = (End.HasValue && End.Value.TimeOfDay != TimeSpan.Zero)
+                        ? End.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                        : "";
+
+                        onDutyDisplayText += "\n On Duty on " + $"{StartTime} - {EndTime}";
+                        onDutyDisplayTextColor = "black";
+                    }
+
+
+                }
+
+                DateTime? checkIn = record?.CheckInDateTime as DateTime?;
+                DateTime? checkOut = record?.CheckOutDateTime as DateTime?;
+
+               
+                var checkIndisplayText = $"{checkInTime} - {checkOutTime}";
+
+                var checkInMadeDateTime = record?.CheckInMadeDateTime as DateTime?;
+                var checkInMadeTime = (checkInMadeDateTime.HasValue && checkInMadeDateTime.Value.TimeOfDay != TimeSpan.Zero)
+                ? checkInMadeDateTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                : "";
+
+                var checkOutMadeDateTime = record?.CheckOutMadeDateTime as DateTime?;
+                var checkOutMadeTime = (checkOutMadeDateTime.HasValue && checkOutMadeDateTime.Value.TimeOfDay != TimeSpan.Zero)
+                ? checkOutMadeDateTime.Value.ToString("hh:mm tt", CultureInfo.InvariantCulture)
+                : "";
+
+
+                string _html = "";
+
+                if (record != null && (!string.IsNullOrEmpty(checkInMadeTime) || !string.IsNullOrEmpty(checkOutMadeTime)))
+                {
+                    _html +=
+                    @"
+                      <td style=""padding: 10px; border: 1px solid #dee2e6;"">
+                            <span>IP: <b>" + record.IP + @"</b><br /></span>
+                            <span>Made By: <b>" + record.CheckInMadeBy + @"</b><br /></span>
+                            <span>Time: <b>" + checkInMadeTime + @"</b><br /></span>
+                      </td>
+                      <td style=""padding: 10px; border: 1px solid #dee2e6;"">
+                            <span>IP: <b>" + record.IP + @"</b><br /></span>
+                            <span>Made By: <b>" + record.CheckOutMadeBy + @"</b><br /></span>
+                            <span>Time: <b>" + checkOutMadeTime + @"</b><br /></span>
+                      </td>";
+                }
+                else
+                {
+                    _html += @"<td colspan=""2"" style=""padding:10px; border:1px solid #dee2e6; text-align:center;"">No Check-In / Check-Out</td>";
+                }
+
+
                 html += @"
                 <tr>
                     <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + employeeName + @"</td>
+                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + displayText + @"<br />" + onDutyDisplayText + @"</td>
                     <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkInTime + @"</td>
                     <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutTime + @"</td>
                     <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + workingHours + @"</td>
-                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + systemIP + @"</td>
-                    <td style=""padding: 10px; border: 1px solid #dee2e6;"">" + checkOutIP + @"</td>
-                </tr>";
+                   "+ _html + @"</tr>";
             }
 
             html += @"
