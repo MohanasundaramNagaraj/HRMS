@@ -95,9 +95,9 @@
     }
 
     <div class="col-lg-12 col-md-12">
-         <div class="card">
-        <div class="profile-tab-box">
-        <div class="p-l-20">
+        <div class="">
+        <div class="">
+        <div class="">
         <ul class="nav ">
         <li class="nav-item tab-all">
         <a class="nav-link active show" href="#project"
@@ -111,8 +111,8 @@
         </div>
         </div>
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="project" aria-expanded="true">
-                <div class="row clearfix">
+
+            <div class="row clearfix">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="card">
                             <div class="chat">
@@ -159,19 +159,44 @@
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12">
                         <div class="card project_widget">
-                            <div class="header">
-                            </div>
+                          
                             <div class="body">
-                                 <div class="row">
-                                <div class="col-lg-3 col-sm-3">
-                                <div class="text-center">
-                                <h3 class="col-green">@Model.MonthlySummary.TotalWorkingHoursThisMonth</h3>
-                                <div class="text font-15">Total Working Hours</div>
+                                 <div class="row" style="margin-top: 10px;">
+                                    <div class="col-lg-3 col-sm-3">
+                                        <div class="text-center">
+                                            <h3 class="col-green">@ViewBag.TotalWorkingDays Days</h3>
+                                            <div class="text font-15">Total Working Days</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-3">
+                                        <div class="text-center">
+                                           <h3 class="col-green">@ViewBag.TotalPermissionHours Hours</h3>
+                                            <div class="text font-15">Total Permission Hours</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-3">
+                                        <div class="text-center">
+                                            <h3 class="col-green">@ViewBag.TotalAbsentDays Days</h3>
+                                            <div class="text font-15">Total Leave Days</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-3">
+                                        <div class="text-center">
+                                            <h3 class="col-green">@ViewBag.TotalWeekendDays Days</h3>
+                                            <div class="text font-15">Total Holiday</div>
+                                        </div>
+                                    </div>
+                                   @*  <div class="d-flex justify-content-end mb-3 col-lg-9 col-sm-9">
+                                    </div> *@
                                 </div>
-                                </div>
-                                <div class="d-flex justify-content-end mb-3 col-lg-9 col-sm-9">
-                                </div>
-                                </div>
+                                    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <div role="tabpanel" class="tab-pane active" id="project" aria-expanded="true">
+
+              
 
                                 <div class="row">
                                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -190,7 +215,25 @@
                                 <div class="text font-15 m-b-5">Average Working Hours</div>
                                 </div>
                                 </div> *@
-                                <div class="table-responsive" style="display:none;">
+                           
+            </div>
+            <div role="tabpanel" class="tab-pane" id="timeline" aria-expanded="false">
+            </div>
+            <div role="tabpanel" class="tab-pane" id="usersettings" aria-expanded="false">
+                <div class="card">
+                    <div class="header">
+                        <h2>
+                            <strong>Attendance</strong> Report
+                        </h2>
+                    </div>
+                    <div class="body">
+                        <div class="row clearfix">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                <div class="card">
+                                    <div class="body">
+                                       @*  <div id="pieChart"></div> *@
+
+                                        <div class="table-responsive" style="display:none;">
                                     <table class="table table-hover js-basic-example contact_list">
                                         <thead>
                                             <tr>
@@ -300,26 +343,6 @@
 
                                     </table>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div role="tabpanel" class="tab-pane" id="timeline" aria-expanded="false">
-            </div>
-            <div role="tabpanel" class="tab-pane" id="usersettings" aria-expanded="false">
-                <div class="card">
-                    <div class="header">
-                        <h2>
-                            <strong>Attendance</strong> Report
-                        </h2>
-                    </div>
-                    <div class="body">
-                        <div class="row clearfix">
-                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                <div class="card">
-                                    <div class="body">
-                                        <div id="pieChart"></div>
                                     </div>
                                 </div>
                             </div>

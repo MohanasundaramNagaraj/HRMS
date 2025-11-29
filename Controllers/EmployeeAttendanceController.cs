@@ -205,6 +205,12 @@ namespace SparkHRMS.Controllers
             ViewBag.SelectedEmployeeID = employeeDetails.EmployeeId;
             ViewBag.SelectedMonth = startOfMonth.Month;
             ViewBag.SelectedYear = startOfMonth.Year;
+
+            ViewBag.TotalWorkingDays = dailyAttendanceRecords.Where(x => x.WorkingHours != string.Empty).Count();
+            ViewBag.TotalPermissionHours = dailyAttendanceRecords.Where(x => x.IsPermission == true).Count();
+            ViewBag.TotalAbsentDays = dailyAttendanceRecords.Where(x => x.IsLeave == true).Count() + (dailyAttendanceRecords.Where(x => x.IsHalfDayLeave == true).Count() * 0.5);
+            ViewBag.TotalWeekendDays = dailyAttendanceRecords.Where(x => x.Status == AttendanceStatus.Weekend).Count();
+
             return View(response);
         }
 

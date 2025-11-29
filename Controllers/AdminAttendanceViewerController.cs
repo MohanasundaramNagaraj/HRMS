@@ -187,10 +187,14 @@ namespace SparkHRMS.Controllers
                         }
                         else
                         {
-                            // If checked in but not checked out
-                            status = AttendanceStatus.PendingCheckOut; // Present (Pending Checkout)
+                            if (!attendanceRecord.IsLeave)
+                            {
+                                // If checked in but not checked out
+                                status = AttendanceStatus.PendingCheckOut; // Present (Pending Checkout)
 
-                            statuses.Add(status);
+                                statuses.Add(status);
+                            }
+                            
                         }
                        
                         if (attendanceRecord.IsLeave)
