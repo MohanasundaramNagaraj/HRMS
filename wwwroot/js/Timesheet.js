@@ -220,8 +220,8 @@ function update() {
     })
 
     addTimesheet(rowDatas);
-}
-;
+};
+
 function addRow(row, index) {
     debugger;
     let uid;
@@ -251,7 +251,7 @@ function addRow(row, index) {
         activityOptions += `<option value="${activity}">${activity}</option>`;
     }); debugger;
     newRow.innerHTML = `
-                                        <td style="width:10%;"><input id='date_${uid}' onchange="getday('${uid}')" type="date" value="${row.Date}" class="form-control timesheet-input"></td>
+                                        <td style="width:10%;"><input id='date_${uid}' onchange="getday('${uid}')" onkeydown="return false;"  type="date" value="${row.Date}" class="form-control timesheet-input"></td>
                                         <td style="width:7%;"><input id='day_${uid}' type="text" class="form-control timesheet-input" placeholder="Day" value="${row.Day}" disabled></td>
                                         <td style="width:10%;"><input type="text" class="form-control timesheet-input task-input" placeholder="Task Id" value="${row.Task}"></td>
                                         <td style="width:15%;">
@@ -298,8 +298,8 @@ function addRow(row, index) {
         return `${year}-${month}-${day}`;
     };
 
-    datePicker.min = formatDate(firstDay);
-    datePicker.max = formatDate(lastDay);
+    datePicker.min = formatDate(today);
+    datePicker.max = formatDate(today);
     
 };
 
