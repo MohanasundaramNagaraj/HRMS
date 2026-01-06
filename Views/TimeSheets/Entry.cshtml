@@ -62,9 +62,9 @@
                         @* @for (int year = 0; year <= yearList; year++) *@
                         @foreach (var year in yearList)
                         {
-                            if (year.Year == ViewBag.SelectedYear)
+                            if (year.Id == ViewBag.SelectedYear)
                             {
-                                <option value="@year.Year" id="@year.Id" selected>@year.Year</option>
+                                <option value="@year.Id" id="@year.Id" selected>@year.Year</option>
                             }
                             else
                             {

@@ -67,10 +67,11 @@ namespace SparkHRMS.Controllers
             };
 
             var today = DateTime.Today;
-            var year = Year.HasValue ? (int)Year : today.Year;
+            var yearid = _context.Year.Where(x => x.Year == today.Year).Select(x => x.Id).FirstOrDefault();
+            var year = Year.HasValue ? (int)Year : yearid;
 
             var startOfMonth = Month.HasValue ? new DateTime(year, Month.Value, 1) : new DateTime(today.Year, today.Month, 1);
-            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1); 
+            var endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
 
             ViewBag.EmployeeList = _context.Employees.ToList();
             ViewBag.YearList = _context.Year.ToList();
@@ -84,7 +85,7 @@ namespace SparkHRMS.Controllers
             //}
 
             var timeSheetRecords = await _context.Timesheets
-                                    .Where(t => t.MonthId == startOfMonth.Month && t.YearId == 1 && t.EmployeeId == EmployeeID && !t.IsDeleted)
+                                    .Where(t => t.MonthId == startOfMonth.Month && t.YearId == year && t.EmployeeId == EmployeeID && !t.IsDeleted)
                                     .OrderBy(x=>x.Date)
                                     .ToListAsync();
 
@@ -114,7 +115,7 @@ namespace SparkHRMS.Controllers
                     }
                     var uniqueId = updatedTimesheet.UniqueId;
 
-                    var yearid = _context.Year.Where(x => x.Year == updatedTimesheet.YearId).Select(x => x.Id).FirstOrDefault();
+                    var yearid = updatedTimesheet.YearId;
                     var isExistingTimesheet = _context.Timesheets.Where(x => x.UniqueId == uniqueId).Any();
 
                     if (!isExistingTimesheet)

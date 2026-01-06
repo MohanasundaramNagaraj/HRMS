@@ -12,7 +12,7 @@ const attachDeleteEvent = () => {
 
 let apiBaseUrl = "/TimeSheets";
 $(document).ready(function () {
-    debugger;
+    
     console.log(timeSheetData);
 
     if (timeSheetData.length > 0) {
@@ -38,7 +38,7 @@ $(document).ready(function () {
 });
 
 function inputOnChangeCallback() {
-    //debugger;
+    //
     //$('.timesheet-input').on('change', function (event) {
        
     //});
@@ -194,7 +194,7 @@ function update() {
                 empid = parseInt($('#empSelector').val());
             }
 
-            debugger;
+            
             if (row && row.querySelector("input[type='date']")?.value) {
 
                 //const description = row.querySelector(".description-input")?.value || "";
@@ -209,7 +209,7 @@ function update() {
                     Task: row.querySelector(".task-input")?.value || "",
                     Activity: row.querySelector(".activity-input")?.value || "",
                     Descreption: row.querySelector(".description-input")?.value || "",
-                    HoursWorked: parseInt(row.querySelector(".hours-worked-input")?.value) || 0,
+                    HoursWorked: parseFloat(row.querySelector(".hours-worked-input")?.value) || 0,
                     EmployeeId: empid
                 };
                 rowDatas.push(data);
@@ -223,7 +223,7 @@ function update() {
 }
 ;
 function addRow(row, index) {
-    debugger;
+    
     let uid;
     if (row == undefined || row.UniqueId == "") {
         row = {
@@ -249,7 +249,7 @@ function addRow(row, index) {
     let activityOptions = `<option value="">Select Activity</option>`;
     activities.forEach(function (activity) {
         activityOptions += `<option value="${activity}">${activity}</option>`;
-    }); debugger;
+    }); 
     newRow.innerHTML = `
                                         <td style="width:10%;"><input id='date_${uid}' onchange="getday('${uid}')" type="date" value="${row.Date}" class="form-control timesheet-input"></td>
                                         <td style="width:7%;"><input id='day_${uid}' type="text" class="form-control timesheet-input" placeholder="Day" value="${row.Day}" disabled></td>
@@ -325,7 +325,7 @@ function getday(uid) {
 attachDeleteEvent();
 
 function getData(obj) {
-
+   
     var frm = $("<form hidden action='/TimeSheets/Entry' method='get'> </form>");
     $(frm).append("<input type=hidden name=EmployeeID value=" + parseInt($("#empSelector").val()) + " id=EmployeeID>");
     $(frm).append("<input type='hidden' name='Month' value=" + parseInt($("#monthSelector").val()) + " id='Month'>");

@@ -76,8 +76,8 @@ namespace SparkHRMS.Controllers
             var dailyAttendanceRecords = new List<EmployeeAttendanceDto>();
             TimeSpan totalWorkingTime = TimeSpan.Zero;
 
-            var allDatesInMonth = Enumerable.Range(0, DateTime.DaysInMonth(today.Year, Month.HasValue ? Month.Value : today.Month))
-                                   .Select(day => new DateTime(today.Year, Month.HasValue ? Month.Value : today.Month, day + 1))
+            var allDatesInMonth = Enumerable.Range(0, DateTime.DaysInMonth(year, Month.HasValue ? Month.Value : today.Month))
+                                   .Select(day => new DateTime(year, Month.HasValue ? Month.Value : today.Month, day + 1))
                                    .ToList();
 
             // Fetch holidays from the database or your holidays table
