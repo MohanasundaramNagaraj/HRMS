@@ -58,15 +58,14 @@ function initCalendar() {
             //right: "dayGridMonth,timeGridWeek,timeGridDay",
             right: ""
         },
-        editable: false,
-        droppable: false,
+        editable: true,
+        droppable: true,
         navLinks: true,
         eventLimit: true,
         weekNumberCalculation: "ISO",
         displayEventEnd: true,
         lazyFetching: true,
         selectable: true,
-
         eventMouseEnter: function (info) {
             $(info.el).attr("id", info.event.id);
 
@@ -96,11 +95,11 @@ function initCalendar() {
         events: events(),
 
         select: function (start, end) {
-
-            addEvent.style.display = "block";
-            editEvent.style.display = "none";
-            addEventTitle.style.display = "block";
-            editEventTitle.style.display = "none";
+            debugger;
+            //addEvent.style.display = "block";
+            //editEvent.style.display = "none";
+            //addEventTitle.style.display = "block";
+            //editEventTitle.style.display = "none";
 
             let modalHtml = fn_showModal();
             $('body').append(modalHtml);
@@ -109,10 +108,10 @@ function initCalendar() {
             $(".modal").modal("show");
         },
         eventClick: function (info) {
-            addEvent.style.display = "none";
-            editEvent.style.display = "block";
-            addEventTitle.style.display = "none";
-            editEventTitle.style.display = "block";
+            //addEvent.style.display = "none";
+            //editEvent.style.display = "block";
+            //addEventTitle.style.display = "none";
+            //editEventTitle.style.display = "block";
 
             let startDate = moment(info.event.start).format("YYYY-MM-DD HH:mm:ss");
             let endDate = moment(info.event.end).format("YYYY-MM-DD HH:mm:ss");

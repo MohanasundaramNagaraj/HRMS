@@ -95,16 +95,14 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Subject)
                 </td>
-                <td style="width: 200px !important;
+                <td style="width: 50px !important;
                   max-width: 300px !important;
-                  min-width: 200px !important;
-                  text-align: inherit;
                   word-wrap: anywhere;">
                     <span class="truncated-text">
                         @if (item.Body.Length > 200)
                         {
-                            <span>@item.Body.Substring(0, 200) + "..."</span>
-                            <button class="show-more" id="htmlBody" data-fulltext="@item.Body">Show More</button>
+                            @* <span>@item.Body.Substring(0, 10) + "..."</span> *@
+                            <button class="show-more" id="htmlBody" data-fulltext="@item.Body">Show</button>
                         }
                         else
                         {
@@ -118,16 +116,11 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.IsSuccessful)
                 </td>
-                <td style="width: 200px !important;
-                  max-width: 300px !important;
-                  min-width: 200px !important;
-                  text-align: inherit;
-                  word-wrap: anywhere;">
+                <td style="">
                     <span class="truncated-text">
                         @if (item.ErrorMessage.Length > 200)
                         {
-                            <span>@item.ErrorMessage.Substring(0, 200) + "..."</span>
-                            <button class="show-more" data-fulltext="@Html.Raw(item.ErrorMessage)">Show More</button>
+                            <button class="show-more" data-fulltext="@Html.Raw(item.ErrorMessage)">Show</button>
                         }
                         else
                         {
