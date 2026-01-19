@@ -1,18 +1,18 @@
 ﻿
 const attachDeleteEvent = () => {
-  
+
     document.querySelectorAll('.deleteRow').forEach(button => {
         button.addEventListener('click', function () {
             this.closest('tr').remove();
         });
     });
-    
-    
+
+
 };
 
 let apiBaseUrl = "/TimeSheets";
 $(document).ready(function () {
-    
+
     console.log(timeSheetData);
 
     if (timeSheetData.length > 0) {
@@ -40,7 +40,7 @@ $(document).ready(function () {
 function inputOnChangeCallback() {
     //
     //$('.timesheet-input').on('change', function (event) {
-       
+
     //});
 }
 
@@ -49,9 +49,9 @@ function exportToExcel(employeeName, month, year) {
     let data = [];
     data.push([`Timesheet for the Month ${month} - ${year}`]);
     data.push([]);
-    
+
     data.push([`Employee Name: ${employeeName}`]);
-    data.push([]); 
+    data.push([]);
 
     let rows = table.querySelectorAll("tbody tr");
 
@@ -63,11 +63,11 @@ function exportToExcel(employeeName, month, year) {
         let rowData = [];
         let cells = row.querySelectorAll("td");
 
-         //Loop through all cells except the last one (Actions)
+        //Loop through all cells except the last one (Actions)
         for (let i = 0; i < cells.length - 1; i++) {
             let input = cells[i].querySelector("input");
             let select = cells[i].querySelector("select");
-            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text :cells[i].innerText);
+            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text : cells[i].innerText);
         }
 
         data.push(rowData);
@@ -84,7 +84,7 @@ function exportToExcel(employeeName, month, year) {
         //    }
         //}
     });
-    
+
     let ws = XLSX.utils.aoa_to_sheet(data);
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
@@ -100,7 +100,7 @@ function exportToPDF(employeeName, month, year) {
 
     doc.text(`Employee Name: ${employeeName}`, 14, 10);
 
-   
+
 
     let table = document.getElementById("timesheetTable");
     let data = [];
@@ -194,7 +194,7 @@ function update() {
                 empid = parseInt($('#empSelector').val());
             }
 
-            
+
             if (row && row.querySelector("input[type='date']")?.value) {
 
                 //const description = row.querySelector(".description-input")?.value || "";
@@ -213,7 +213,7 @@ function update() {
                     EmployeeId: empid
                 };
                 rowDatas.push(data);
-                
+
 
             }
         }
@@ -223,7 +223,7 @@ function update() {
 };
 
 function addRow(row, index) {
-    
+
     let uid;
     if (row == undefined || row.UniqueId == "") {
         row = {
@@ -243,19 +243,19 @@ function addRow(row, index) {
         row.Date = row.Date.replaceAll('T00:00:00', '');
     }
 
-    const table = document.getElementById('timesheetTable').getElementsByTagName('tbody')[0]; 
+    const table = document.getElementById('timesheetTable').getElementsByTagName('tbody')[0];
     const newRow = table.insertRow(index);
     newRow.id = uid;
     let activityOptions = `<option value="">Select Activity</option>`;
     activities.forEach(function (activity) {
         activityOptions += `<option value="${activity}">${activity}</option>`;
-    }); 
+    });
     newRow.innerHTML = `
                                         <td style="width:10%;"><input id='date_${uid}' onchange="getday('${uid}')" onkeydown="return false;"  type="date" value="${row.Date}" class="form-control timesheet-input"></td>
                                         <td style="width:7%;"><input id='day_${uid}' type="text" class="form-control timesheet-input" placeholder="Day" value="${row.Day}" disabled></td>
                                         <td style="width:10%;"><input type="text" class="form-control timesheet-input task-input" placeholder="Task Id" value="${row.Task}"></td>
                                         <td style="width:15%;">
-                                                <select class="form-control timesheet-input activity-input">
+                                                <select class="form-control timesheet-input activity-input searchable-activity">
                                                     ${activityOptions}
                                                 </select>
                                             </td>
@@ -300,8 +300,270 @@ function addRow(row, index) {
 
     datePicker.min = formatDate(today);
     datePicker.max = formatDate(today);
-    
+
+    setTimeout(function () {
+        $(newRow).find('.searchable-activity').select2({
+            placeholder: "Select Activity",
+            width: '100%'
+        });
+    }, 1000)
+
+
 };
+function loadActivityFilter() {
+    const activitySet = new Set();
+
+    document
+        .querySelectorAll("#timesheetTable .activity-input")
+        .forEach(sel => {
+            if (sel.value) activitySet.add(sel.value);
+        });
+
+    const ddl = document.getElementById("filterActivity");
+    ddl.innerHTML = `<option value="">All Activities</option>`;
+
+    activitySet.forEach(a => {
+        ddl.innerHTML += `<option value="${a}">${a}</option>`;
+    });
+}
+
+let barChart, lineChart, pieChart, stackChart;
+function renderReportTable(reportData) {
+    const table = document.getElementById("reportTable");
+    const thead = table.querySelector("thead tr");
+    const tbody = table.querySelector("tbody");
+
+    const groupBy = getSelectedGrouping();
+
+    // 🔹 Build Header
+    thead.innerHTML = "";
+    if (groupBy.includes("date")) thead.innerHTML += "<th>Date</th>";
+    if (groupBy.includes("task")) thead.innerHTML += "<th>Task</th>";
+    if (groupBy.includes("activity")) thead.innerHTML += "<th>Activity</th>";
+    thead.innerHTML += "<th>Total Hours</th>";
+
+    // 🔹 Rows
+    tbody.innerHTML = "";
+
+    reportData.forEach(r => {
+        let row = "<tr>";
+
+        if (groupBy.includes("date")) row += `<td>${r.date}</td>`;
+        if (groupBy.includes("task")) row += `<td>${r.task}</td>`;
+        if (groupBy.includes("activity")) row += `<td>${r.activity}</td>`;
+
+        row += `<td class="fw-bold text-end">${r.hours.toFixed(2)}</td></tr>`;
+        tbody.innerHTML += row;
+    });
+}
+
+function renderBarChart(dates, seriesMap) {
+    barChart  = echarts.init(document.getElementById('barChart'));
+
+    barChart.setOption({
+        title: { text: 'Hours Worked – Bar Chart' },
+        tooltip: { trigger: 'axis' },
+        legend: { type: 'scroll' },
+        xAxis: { type: 'category', data: dates },
+        yAxis: { type: 'value' },
+        series: Object.keys(seriesMap).map(name => ({
+            name,
+            type: 'bar',
+            data: seriesMap[name]
+        }))
+    });
+}
+function renderLineChart(dates, seriesMap) {
+    lineChart = echarts.init(document.getElementById('lineChart'));
+
+    lineChart.setOption({
+        title: { text: 'Hours Worked – Line Chart' },
+        tooltip: { trigger: 'axis' },
+        legend: { type: 'scroll' },
+        xAxis: { type: 'category', data: dates },
+        yAxis: { type: 'value' },
+        series: Object.keys(seriesMap).map(name => ({
+            name,
+            type: 'line',
+            smooth: true,
+            data: seriesMap[name]
+        }))
+    });
+}
+function renderPieChart(pieMap) {
+    pieChart = echarts.init(document.getElementById('pieChart'));
+
+    pieChart.setOption({
+        title: { text: 'Hours Distribution – Pie Chart', left: 'center' },
+        tooltip: { trigger: 'item' },
+        legend: { bottom: 0, type: 'scroll' },
+        series: [{
+            type: 'pie',
+            radius: '60%',
+            data: Object.keys(pieMap).map(key => ({
+                name: key,
+                value: pieMap[key]
+            }))
+        }]
+    });
+}
+function renderStackChart(dates, seriesMap) {
+    stackChart = echarts.init(document.getElementById('stackChart'));
+
+    stackChart.setOption({
+        title: { text: 'Hours Worked – Stacked Chart' },
+        tooltip: { trigger: 'axis' },
+        legend: { type: 'scroll' },
+        xAxis: { type: 'category', data: dates },
+        yAxis: { type: 'value' },
+        series: Object.keys(seriesMap).map(name => ({
+            name,
+            type: 'bar',
+            stack: 'total',
+            data: seriesMap[name]
+        }))
+    });
+}
+
+function bindFilterEvents() {
+
+    // Date range
+    document.getElementById("filterFromDate")
+        .addEventListener("change", onFilterChange);
+
+    document.getElementById("filterToDate")
+        .addEventListener("change", onFilterChange);
+
+    // Text filters
+    document.getElementById("filterTask")
+        .addEventListener("input", onFilterChange);
+
+    document.getElementById("filterActivity")
+        .addEventListener("input", onFilterChange);
+
+    // Group By checkboxes
+    document.querySelectorAll(".group-by")
+        .forEach(cb => cb.addEventListener("change", onFilterChange));
+}
+
+function onFilterChange() {
+    generateFullReport();
+}
+
+const reportModal = $('#reportModal');
+function generateFullReport() {
+    bindFilterEvents();
+    const reportData = generateTimesheetReport();
+
+    renderReportTable(reportData);
+
+    const { dates, seriesMap, pieMap } = prepareChartData(reportData);
+
+    renderBarChart(dates, seriesMap);
+    renderLineChart(dates, seriesMap);
+    renderPieChart(pieMap);
+    renderStackChart(dates, seriesMap);
+}
+
+function getSelectedGrouping() {
+    return Array.from(document.querySelectorAll(".group-by:checked"))
+        .map(cb => cb.value);
+}
+
+$('#reportModal').on('shown.bs.modal', function () {
+    setTimeout(() => {
+
+        barChart?.resize();
+        lineChart?.resize();
+        pieChart?.resize();
+        stackChart?.resize();
+    }, 300);
+});
+
+window.addEventListener('resize', () => {
+    barChart?.resize();
+    lineChart?.resize();
+    pieChart?.resize();
+    stackChart?.resize();
+});
+
+
+function generateTimesheetReport() {
+    reportModal.modal('show');
+    loadActivityFilter();
+
+    const filterDate = document.getElementById("filterDate")?.value;
+    const filterTask = document.getElementById("filterTask")?.value.toLowerCase();
+    const filterActivity = document.getElementById("filterActivity")?.value;
+    const groupBy = getSelectedGrouping();
+
+    const table = document
+        .getElementById('timesheetTable')
+        .getElementsByTagName('tbody')[0];
+
+    const rows = table.getElementsByTagName('tr');
+    const reportMap = {};
+
+    for (let row of rows) {
+        const date = row.querySelector("input[type='date']")?.value || '';
+        const task = row.querySelector(".task-input")?.value || '';
+        const activity = row.querySelector(".activity-input")?.value || '';
+        const hours = parseFloat(
+            row.querySelector(".hours-worked-input")?.value
+        ) || 0;
+
+        // 🔹 FILTERS
+        if (filterDate && date !== filterDate) continue;
+        if (filterTask && !task.toLowerCase().includes(filterTask)) continue;
+        if (filterActivity && activity !== filterActivity) continue;
+
+        // 🔹 DYNAMIC GROUP KEY
+        const keyParts = [];
+        if (groupBy.includes("date")) keyParts.push(date);
+        if (groupBy.includes("task")) keyParts.push(task);
+        if (groupBy.includes("activity")) keyParts.push(activity);
+
+        const key = keyParts.join("|");
+
+        if (!reportMap[key]) {
+            reportMap[key] = {
+                date: groupBy.includes("date") ? date : "All Dates",
+                task: groupBy.includes("task") ? task : "All Tasks",
+                activity: groupBy.includes("activity") ? activity : "All Activities",
+                hours: 0
+            };
+        }
+
+        reportMap[key].hours += hours;
+    }
+
+    return Object.values(reportMap);
+}
+
+
+
+function prepareChartData(reportData) {
+    const dates = [...new Set(reportData.map(r => r.date))].sort();
+
+    const seriesMap = {};
+    const pieMap = {};
+
+    reportData.forEach(r => {
+        const key = `${r.task} - ${r.activity}`;
+
+        if (!seriesMap[key]) {
+            seriesMap[key] = new Array(dates.length).fill(0);
+        }
+
+        const dateIndex = dates.indexOf(r.date);
+        seriesMap[key][dateIndex] += r.hours;
+
+        pieMap[key] = (pieMap[key] || 0) + r.hours;
+    });
+
+    return { dates, seriesMap, pieMap };
+}
+
 
 
 function getday(uid) {
@@ -325,7 +587,7 @@ function getday(uid) {
 attachDeleteEvent();
 
 function getData(obj) {
-   
+
     var frm = $("<form hidden action='/TimeSheets/Entry' method='get'> </form>");
     $(frm).append("<input type=hidden name=EmployeeID value=" + parseInt($("#empSelector").val()) + " id=EmployeeID>");
     $(frm).append("<input type='hidden' name='Month' value=" + parseInt($("#monthSelector").val()) + " id='Month'>");
@@ -351,7 +613,7 @@ function addTimesheet(timesheetData) {
                 title: 'Updated Successful',
                 text: 'Updated Successfully!'
             });
-           // alert("Updated Successfully");
+            // alert("Updated Successfully");
         },
         error: function (error) {
             alert('error');
@@ -361,21 +623,21 @@ function addTimesheet(timesheetData) {
 
 function deleteTimesheet(timesheetId) {
     $.ajax({
-            url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
-            type: "POST",
-            success: function (response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted Successful',
-                    text: 'Deleted Successfully!'
-                });
+        url: `${apiBaseUrl}/Delete?uniqueId=${timesheetId}`,
+        type: "POST",
+        success: function (response) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Deleted Successful',
+                text: 'Deleted Successfully!'
+            });
 
-            },
-            error: function (error) {
-                alert('error');
-            },
-        });
-    
+        },
+        error: function (error) {
+            alert('error');
+        },
+    });
+
 }
 const table = document.getElementById('timesheetTable');
 const filters = table.querySelectorAll('.column-filter');
@@ -397,19 +659,19 @@ filters.forEach((input, colIndex) => {
                 const inputElement = cell.querySelector('input');
 
                 if (inputElement && inputElement.type === 'date') {
-                   
+
                     const raw = inputElement.value.trim();
 
-                    
+
                     const [y, m, d] = raw.split("-");
-                    cellText = `${d}-${m}-${y}`; 
+                    cellText = `${d}-${m}-${y}`;
                 } else if (inputElement) {
                     cellText = inputElement.value.toLowerCase().trim();
                 } else {
                     cellText = cell.textContent.toLowerCase().trim();
                 }
 
-            
+
                 if (!cellText.includes(val)) {
                     showRow = false;
                 }
