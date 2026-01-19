@@ -91,19 +91,16 @@ function exportToExcel(employeeName, month, year) {
     XLSX.writeFile(wb, "Timesheet.xlsx");
 }
 
-
-function exportToPDF(employeeName, month, year) {
-    const { jsPDF } = window.jspdf;
-    let doc = new jsPDF();
-
-    doc.text(`Timesheet Report for the month of ${month} - ${year}`, 14, 10);
-
-    doc.text(`Employee Name: ${employeeName}`, 14, 10);
-
-   
+function exportToExcel(employeeName, month, year) {
 
     let table = document.getElementById("timesheetTable");
     let data = [];
+    data.push([`Timesheet for the Month ${month} - ${year}`]);
+    data.push([]);
+
+    data.push([`Employee Name: ${employeeName}`]);
+    data.push([]);
+
     let rows = table.querySelectorAll("tbody tr");
 
     let headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText.trim()).slice(0, -1);
@@ -113,25 +110,73 @@ function exportToPDF(employeeName, month, year) {
         let rowData = [];
         let cells = row.querySelectorAll("td");
 
-        // Loop through all cells except the last one (Actions)
         for (let i = 0; i < cells.length - 1; i++) {
-            let input = cells[i].querySelector("input");
-            let select = cells[i].querySelector("select");
-            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text : cells[i].innerText);
+            const cell = cells[i];
 
+            const control = cell.querySelector("input, select, textarea");
+
+            if (control) {
+                if (control.tagName === "SELECT") {
+                    rowData.push(control.options[control.selectedIndex].text);
+                } else {
+                    rowData.push(control.value);
+                }
+            } else {
+                rowData.push(cell.innerText.trim());
+            }
         }
 
+
         data.push(rowData);
+
     });
 
-    doc.autoTable({
-        head: [headers],
-        body: data.slice(1),
-        startY: 40 // Adjust the start position for the table
-    });
-
-    doc.save("Timesheet.pdf");
+    let ws = XLSX.utils.aoa_to_sheet(data);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Timesheet" + '_' + month);
+    XLSX.writeFile(wb, employeeName + '_' + month + '_' + year + '_' + "Timesheet.xlsx");
 }
+
+//function exportToPDF(employeeName, month, year) {
+//    const { jsPDF } = window.jspdf;
+//    let doc = new jsPDF();
+
+//    doc.text(`Timesheet Report for the month of ${month} - ${year}`, 14, 10);
+
+//    doc.text(`Employee Name: ${employeeName}`, 14, 10);
+
+   
+
+//    let table = document.getElementById("timesheetTable");
+//    let data = [];
+//    let rows = table.querySelectorAll("tbody tr");
+
+//    let headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText.trim()).slice(0, -1);
+//    data.push(headers);
+
+//    rows.forEach(row => {
+//        let rowData = [];
+//        let cells = row.querySelectorAll("td");
+
+//        // Loop through all cells except the last one (Actions)
+//        for (let i = 0; i < cells.length - 1; i++) {
+//            let input = cells[i].querySelector("input");
+//            let select = cells[i].querySelector("select");
+//            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text : cells[i].innerText);
+
+//        }
+
+//        data.push(rowData);
+//    });
+
+//    doc.autoTable({
+//        head: [headers],
+//        body: data.slice(1),
+//        startY: 40 // Adjust the start position for the table
+//    });
+
+//    doc.save("Timesheet.pdf");
+//}
 
 function printTable() {
     let printWindow = window.open("", "", "width=800,height=600");
@@ -159,7 +204,7 @@ function update() {
             getday(row.id);
             let year = '';
             if (isNaN(parseInt($('#yearSelector').val()))) {
-                year = new Date().getFullYear()
+                year = new Date().getFullYear() - 2024;
             }
             else {
                 year = parseInt($('#yearSelector').val());
