@@ -1,0 +1,281 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SparkHRMS.Data.Entities
+@using SparkHRMS.Utilities
+@using SparkHRMS.ViewModels
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+@{
+    ViewData["Title"] = "Time Sheet Report";
+    var user = await UserManager.GetUserAsync(User);
+    var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
+}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+
+<script>
+    var timeSheetData = @Html.Raw(Json.Serialize(Model.TimeSheetRecords));
+
+    var activities = @Html.Raw(Json.Serialize(ViewBag.Activities));
+</script>
+<style>
+
+    input::placeholder {
+        color: lightgray !important;
+        font-style: italic;
+    }
+
+    input:not([type]), input[type=text]:not(.browser-default), input[type=password]:not(.browser-default), input[type=email]:not(.browser-default), input[type=url]:not(.browser-default),
+    input[type=time]:not(.browser-default), input[type=date]:not(.browser-default), input[type=datetime]:not(.browser-default), input[type=datetime-local]:not(.browser-default),
+    input[type=tel]:not(.browser-default), input[type=search]:not(.browser-default), textarea.materialize-textarea, input[type=number]:not(.browser-default) {
+        border: 1px solid #afafaf;
+        padding-left: 5px;
+        border-radius: 5px;
+        height: 30px;
+        font-size: small;
+        margin-top: 10px;
+    }
+</style>
+<ul class="breadcrumb breadcrumb-style ">
+    <li class="breadcrumb-item">
+        <h4 class="page-title">Timesheet Report</h4>
+    </li>
+    <li class="breadcrumb-item bcrumb-1">
+        <a href="#" id="employeeName">
+            @Model.EmployeeDetails.Name
+            @* - <span id="tsRptMonYear"></span> *@
+        </a>
+    </li>
+</ul>
+
+<div class="col-md-12 mb-3">
+    <div>
+        <div class="">
+            @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+            {
+                <div style="width:25%;margin-right:10px;display:inline-block">
+                    <label>Employee Name</label>
+                    <select id="empSelector" class="form-control">
+                        @{
+                            var employeeList = ViewBag.EmployeeList;
+                        }
+
+                        @foreach (var record in employeeList)
+                        {
+                            if (ViewBag.SelectedEmployeeID == record.EmployeeId)
+                            {
+                                <option value="@record.EmployeeId" selected>@record.EmployeeCode - @record.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@record.EmployeeId">@record.EmployeeCode - @record.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            }
+
+            <div style="width:20%;margin-right:10px;display:inline-block">
+                <label>From Date</label>
+                <input type="date" id="filterFromDate" class="form-control" value="@ViewBag.SelectedFromDate.ToString("yyyy-MM-dd")">
+            </div>
+
+            <div style="width:20%;margin-right:10px;display:inline-block">
+                <label>To Date</label>
+                <input type="date" id="filterToDate" class="form-control" value="@ViewBag.SelectedToDate.ToString("yyyy-MM-dd")">
+            </div>
+
+            <button onclick="getData()" class="btn btn-info" style="margin-left:25px;display:inline-block">
+                Filter
+            </button>
+            <button class="btn btn-warning" style="margin-left:25px;display:inline-block" onclick="exportExcel()">
+                <i class="fa fa-file-excel"></i>
+                Export to Excel
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-lg-12 col-md-12">
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="project" aria-expanded="true">
+            <div class="row clearfix">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="display:none">
+                    <div class="card">
+                        <div class="chat">
+                            <div class="chat-header clearfix">
+                                @{
+                                    var UserImageUrl = "";
+                                    int lastSlashIndex = @Model.EmployeeDetails.ImageUrl.LastIndexOf('/');
+                                    if (lastSlashIndex >= 0)
+                                    {
+                                        UserImageUrl = Url.Content("~/uploads/" + Model.EmployeeDetails.ImageUrl.Substring(lastSlashIndex + 1));
+                                    }
+                                }
+                                <img src="@UserImageUrl" alt="avatar" style="    height: 45px;">
+                                <div class="row">
+                                    <div class="col-lg-3 col-sm-6">
+                                        <div class="chat-about">
+                                            <div class="chat-with" id="employeeName">@Model.EmployeeDetails.Name</div>
+                                            <div class="chat-num-messages">@Model.EmployeeDetails.Designation</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <div class="chat-about">
+                                            <div class="chat-with">Employee ID</div>
+                                            <div class="chat-num-messages">@Model.EmployeeDetails.EmpCode</div>
+                                            <div style="display:none;">@Model.EmployeeDetails.EmployeeId</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <div class="chat-about">
+                                            <div class="chat-with">Joining Date</div>
+                                            <div class="chat-num-messages">@Model.EmployeeDetails.DateOfJoining?.ToString("dd MMM yyyy")</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-sm-6">
+                                        <div class="chat-about">
+                                            <div class="chat-with">Email</div>
+                                            <div class="chat-num-messages">@Model.EmployeeDetails.Email</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="userForm">
+                    <div>
+                        <div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="d-flex">
+                                        <div class="col-md-3">
+                                            <label class="fw-bold">Group By</label>
+                                            <br />    <br />
+                                            <div class="d-flex gap-4">
+                                                <label>
+                                                    <input type="checkbox" class="group-by" value="date" checked> Date
+                                                </label>
+                                                <label>
+                                                    <input type="checkbox" class="group-by" value="task" checked> Task
+                                                </label>
+                                                <label>
+                                                    <input type="checkbox" class="group-by" value="activity" checked> Activity
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Task</label>
+                                            <input type="text" id="filterTask" class="form-control" placeholder="Task Id">
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <label>Activity</label>
+                                            <input type="text" id="filterActivity" class="form-control" placeholder="Activity">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="project_widget">
+
+                                    <div class="body">
+                                        <div class="row" style="margin-top: 10px;">
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="text-center">
+                                                    <h3 class="col-green" id="totalWorkingHours">0</h3>
+                                                    <div class="text font-15">Total Working Hours</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="text-center">
+                                                    <h3 class="col-green" id="totalPermissionHours">0</h3>
+                                                    <div class="text font-15">Total Permission Hours</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="text-center">
+                                                    <h3 class="col-green" id="totalLeaveDays">0</h3>
+                                                    <div class="text font-15">Total Leave Days</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-3">
+                                                <div class="text-center">
+                                                    <h3 class="col-green">0</h3>
+                                                    <div class="text font-15">Total </div>
+                                                </div>
+                                            </div>
+                                            @*  <div class="d-flex justify-content-end mb-3 col-lg-9 col-sm-9">
+                                    </div> *@
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row col-md-12">
+                                <div class="col-md-4" style="max-height: 500px; overflow-y: scroll;">
+                                 
+                                    <div class="table-responsive mb-4">
+                                        <table class="table table-bordered" id="reportTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>Task</th>
+                                                    <th>Activity</th>
+                                                    <th>Total Hours</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class=" col-md-8">
+                                    <div id="pieChart" style="height:400px;"></div>
+                                    @*<div id="barChart" ></div>
+                                    <div id="lineChart"></div> 
+                                    <div id="stackChart"></div> *@
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+
+    <script src="~/js/utility/utility.js"></script>
+    <script src="~/js/TimesheetReport.js"></script>
+}
+

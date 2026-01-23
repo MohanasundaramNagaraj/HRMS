@@ -44,55 +44,191 @@ function inputOnChangeCallback() {
     //});
 }
 
-function exportToExcel(employeeName, month, year) {
-    let table = document.getElementById("timesheetTable");
-    let data = [];
-    data.push([`Timesheet for the Month ${month} - ${year}`]);
-    data.push([]);
+//function exportToExcel(employeeName, month, year) {
+//    const table = document.getElementById("timesheetTable");
+//    const data = [];
 
-    data.push([`Employee Name: ${employeeName}`]);
-    data.push([]);
+//    const headers = Array.from(
+//        table.querySelectorAll("thead th")
+//    ).map(th => th.innerText.trim()).slice(0, -1);
 
-    let rows = table.querySelectorAll("tbody tr");
+//    const totalColumns = headers.length;
 
-    // Get headers except the last one (Actions)
-    let headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText.trim()).slice(0, -1);
-    data.push(headers);
+//    data.push([`Timesheet for the Month ${month} - ${year}`]);
+//    data.push([]);
 
-    rows.forEach(row => {
-        let rowData = [];
-        let cells = row.querySelectorAll("td");
+//    data.push([`Employee Name: ${employeeName}`]);
+//    data.push([]);
 
-        //Loop through all cells except the last one (Actions)
+//    data.push(headers);
+
+//    let rows = table.querySelectorAll("tbody tr");
+
+//    rows.forEach(row => {
+//        let rowData = [];
+//        let cells = row.querySelectorAll("td");
+
+//        for (let i = 0; i < cells.length - 1; i++) {
+//            const cell = cells[i];
+
+//            const control = cell.querySelector("input, select, textarea");
+
+//            if (control) {
+//                if (control.tagName === "SELECT") {
+//                    rowData.push(control.options[control.selectedIndex]?.text);
+//                } else {
+//                    rowData.push(control.value);
+//                }
+//            } else {
+//                rowData.push(cell.innerText.trim());
+//            }
+//        }
+
+
+//        data.push(rowData);
+
+//    });
+
+//    const ws = XLSX.utils.aoa_to_sheet(data);
+
+//    ws["!merges"] = [
+//        { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns - 1 } },
+//        { s: { r: 2, c: 0 }, e: { r: 2, c: totalColumns - 1 } }
+//    ];
+
+//    const greenStyle = {
+//        fill: { fgColor: { rgb: "92D050" } },
+//        font: { bold: true },
+//        alignment: { horizontal: "center", vertical: "center" }
+//    };
+
+//    const headerStyle = {
+//        fill: { fgColor: { rgb: "92D050" } },
+//        font: { bold: true },
+//        alignment: { horizontal: "center" },
+//        border: {
+//            top: { style: "thin" },
+//            bottom: { style: "thin" },
+//            left: { style: "thin" },
+//            right: { style: "thin" }
+//        }
+//    };
+
+//    ws["A1"].s = greenStyle;
+//    ws["A3"].s = {
+//        fill: { fgColor: { rgb: "92D050" } },
+//        font: { bold: true }
+//    };
+
+//    headers.forEach((_, i) => {
+//        const cellRef = XLSX.utils.encode_cell({ r: 4, c: i });
+//        ws[cellRef].s = headerStyle;
+//    });
+
+//    ws["!cols"] = headers.map(h => ({ wch: Math.max(h.length + 5, 15) }));
+
+//    const wb = XLSX.utils.book_new();
+//    XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
+
+//    XLSX.writeFile(
+//        wb,
+//        `${employeeName}_${month}_${year}_Timesheet.xlsx`
+//    );
+//}
+
+async function exportToExcel(employeeName, month, year) {
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Timesheet");
+
+    const table = document.getElementById("timesheetTable");
+
+    const headers = Array.from(
+        table.querySelectorAll("thead th")
+    ).map(th => th.innerText.trim()).slice(0, 6);
+    debugger;
+    const greenFill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF92D050" }
+    };
+
+    worksheet.mergeCells(1, 1, 1, headers.length);
+    worksheet.getCell(1, 1).value = `Timesheet for the Month ${month} - ${year}`;
+    worksheet.getCell(1, 1).alignment = { horizontal: "center", vertical: "middle" };
+    worksheet.getCell(1, 1).font = { bold: true };
+    worksheet.getCell(1, 1).fill = greenFill;
+    worksheet.getCell(1, 1).border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" }
+    };
+
+    worksheet.mergeCells(2, 1, 2, headers.length);
+    worksheet.getCell(2, 1).value = `Employee Name: ${employeeName}`;
+    worksheet.getCell(2, 1).font = { bold: true };
+    worksheet.getCell(2, 1).fill = greenFill;
+    worksheet.getCell(2, 1).border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" }
+    };
+
+    // worksheet.addRow([]);
+    const headerRow = worksheet.addRow(headers);
+
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center" };
+        cell.fill = greenFill;
+        cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" }
+        };
+    });
+    let rowCount = 4;
+    table.querySelectorAll("tbody tr").forEach(row => {
+        const rowData = [];
+        const cells = row.querySelectorAll("td");
+
         for (let i = 0; i < cells.length - 1; i++) {
-            let input = cells[i].querySelector("input");
-            let select = cells[i].querySelector("select");
-            rowData.push(input ? input.value : select ? select.options[select.selectedIndex].text : cells[i].innerText);
+            const control = cells[i].querySelector("input, select, textarea");
+            rowData.push(
+                control
+                    ? (control.tagName === "SELECT"
+                        ? control.options[control.selectedIndex]?.text
+                        : control.value)
+                    : cells[i].innerText.trim()
+            );
         }
 
-        data.push(rowData);
-        //for (let i = 0; i < cells.length - 1; i++) {
-        //    let input = cells[i].querySelector("input");
-        //    let select = cells[i].querySelector("select");
+        worksheet.addRow(rowData);
 
-        //    if (input) {
-        //        rowData.push(input.value);
-        //    } else if (select) {
-        //        rowData.push(select.options[select.selectedIndex].text); // or select.value if you want the value
-        //    } else {
-        //        rowData.push(cells[i].innerText.trim());
-        //    }
-        //}
+        for (let i = 0; i < cells.length - 1; i++) {
+            worksheet.getCell(rowCount, i + 1).border = {
+                top: { style: "thin" },
+                left: { style: "thin" },
+                bottom: { style: "thin" },
+                right: { style: "thin" }
+            };
+        }
+        rowCount++;
     });
 
-    let ws = XLSX.utils.aoa_to_sheet(data);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Timesheet");
-    XLSX.writeFile(wb, "Timesheet.xlsx");
+    worksheet.columns.forEach(col => {
+        col.width = 18;
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(
+        new Blob([buffer]),
+        `${employeeName}_${month}_${year}_Timesheet.xlsx`
+    );
 }
-
-function exportToExcel(employeeName, month, year) {
-
 function exportToPDF(employeeName, month, year) {
     const { jsPDF } = window.jspdf;
     let doc = new jsPDF();
@@ -155,7 +291,7 @@ function exportToPDF(employeeName, month, year) {
 
 //    doc.text(`Employee Name: ${employeeName}`, 14, 10);
 
-   
+
 
 //    let table = document.getElementById("timesheetTable");
 //    let data = [];
@@ -301,7 +437,7 @@ function addRow(row, index) {
     const table = document.getElementById('timesheetTable').getElementsByTagName('tbody')[0];
     const newRow = table.insertRow(index);
     newRow.id = uid;
-    let activityOptions = `<option value="">Select Activity</option>`;
+    let activityOptions = `<option value=""></option>`;
     activities.forEach(function (activity) {
         activityOptions += `<option value="${activity}">${activity}</option>`;
     });
@@ -353,12 +489,12 @@ function addRow(row, index) {
         return `${year}-${month}-${day}`;
     };
 
-    datePicker.min = formatDate(today);
-    datePicker.max = formatDate(today);
+    //datePicker.min = formatDate(today);
+    //datePicker.max = formatDate(today);
 
     setTimeout(function () {
         $(newRow).find('.searchable-activity').select2({
-            placeholder: "Select Activity",
+            placeholder: "",
             width: '100%'
         });
     }, 1000)
@@ -413,7 +549,7 @@ function renderReportTable(reportData) {
 }
 
 function renderBarChart(dates, seriesMap) {
-    barChart  = echarts.init(document.getElementById('barChart'));
+    barChart = echarts.init(document.getElementById('barChart'));
 
     barChart.setOption({
         title: { text: 'Hours Worked – Bar Chart' },
@@ -486,8 +622,8 @@ function bindFilterEvents() {
     document.getElementById("filterFromDate")
         .addEventListener("change", onFilterChange);
 
-    document.getElementById("filterToDate")
-        .addEventListener("change", onFilterChange);
+    //document.getElementById("filterToDate")
+    //    .addEventListener("change", onFilterChange);
 
     // Text filters
     document.getElementById("filterTask")
@@ -514,10 +650,10 @@ function generateFullReport() {
 
     const { dates, seriesMap, pieMap } = prepareChartData(reportData);
 
-    renderBarChart(dates, seriesMap);
-    renderLineChart(dates, seriesMap);
+   // renderBarChart(dates, seriesMap);
+    // renderLineChart(dates, seriesMap);
     renderPieChart(pieMap);
-    renderStackChart(dates, seriesMap);
+    // renderStackChart(dates, seriesMap);
 }
 
 function getSelectedGrouping() {
@@ -527,6 +663,7 @@ function getSelectedGrouping() {
 
 $('#reportModal').on('shown.bs.modal', function () {
     setTimeout(() => {
+        $('#employeeNameText').text(employeeName.textContent);
 
         barChart?.resize();
         lineChart?.resize();
@@ -547,16 +684,54 @@ function generateTimesheetReport() {
     reportModal.modal('show');
     loadActivityFilter();
 
-    const filterDate = document.getElementById("filterDate")?.value;
+    const table = document
+        .getElementById('timesheetTable')
+        .getElementsByTagName('tbody')[0];
+    const rows = table.getElementsByTagName('tr');
+    let firstDate = rows[0].querySelector("input[type='date']")?.value;
+
+
+    const _filterFromDate = document.getElementById("filterFromDate");
+    if (firstDate) {
+        const dateObj = new Date(firstDate);
+
+        const monthYear = dateObj.toLocaleString('en-US', {
+            month: 'long',
+            year: 'numeric'
+        });
+
+        $('#tsRptMonYear').text(monthYear);
+
+
+
+        if (_filterFromDate) {
+
+            // Min = firstDate
+            _filterFromDate.min = firstDate;
+
+            // Max = last day of the same month
+            const lastDateOfMonth = new Date(
+                dateObj.getFullYear(),
+                dateObj.getMonth() + 1,
+                0
+            );
+
+            // Convert to YYYY-MM-DD
+            const maxDate = lastDateOfMonth.toISOString().split('T')[0];
+
+            _filterFromDate.max = maxDate;
+
+            // Optional: set default value
+          //  _filterFromDate.value = firstDate;
+        }
+    }
+
+    const filterFromDate = _filterFromDate?.value;
+    // const filterToDate = document.getElementById("filterToDate")?.value;
     const filterTask = document.getElementById("filterTask")?.value.toLowerCase();
     const filterActivity = document.getElementById("filterActivity")?.value;
     const groupBy = getSelectedGrouping();
 
-    const table = document
-        .getElementById('timesheetTable')
-        .getElementsByTagName('tbody')[0];
-
-    const rows = table.getElementsByTagName('tr');
     const reportMap = {};
 
     for (let row of rows) {
@@ -568,7 +743,8 @@ function generateTimesheetReport() {
         ) || 0;
 
         // 🔹 FILTERS
-        if (filterDate && date !== filterDate) continue;
+        if (filterFromDate && date !== filterFromDate) continue;
+        // if (filterToDate && date < filterFromDate) continue;
         if (filterTask && !task.toLowerCase().includes(filterTask)) continue;
         if (filterActivity && activity !== filterActivity) continue;
 
@@ -582,9 +758,9 @@ function generateTimesheetReport() {
 
         if (!reportMap[key]) {
             reportMap[key] = {
-                date: groupBy.includes("date") ? date : "All Dates",
-                task: groupBy.includes("task") ? task : "All Tasks",
-                activity: groupBy.includes("activity") ? activity : "All Activities",
+                date: groupBy.includes("date") ? date : "All",
+                task: groupBy.includes("task") ? task : "All",
+                activity: groupBy.includes("activity") ? activity : "All",
                 hours: 0
             };
         }

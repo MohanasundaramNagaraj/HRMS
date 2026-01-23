@@ -166,12 +166,16 @@
                     <div style="float:right;margin-bottom:10px;    justify-content: flex-end;gap: 10px; display: flex; cursor:marker;">
 
                         <button class="btn btn-success" onclick="update()"><i class="fa fa-save"></i> Save</button>
-                        <button class="btn btn-warning" onclick="exportToExcel('@Model.EmployeeDetails.Name','@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(ViewBag.SelectedMonth)','@ViewBag.SelectedYear')"> <i class="fa fa-file-excel"></i> Export to Excel</button>
+                        <button class="btn btn-warning"
+                                onclick="exportToExcel('@Model.EmployeeDetails.Name','@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(ViewBag.SelectedMonth)','@ViewBag.SelectedYear')">
+                            <i class="fa fa-file-excel"></i>
+                            Export to Excel
+                        </button>
                         <button class="btn btn-danger" onclick="exportToPDF('@Model.EmployeeDetails.Name','@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(ViewBag.SelectedMonth)','@ViewBag.SelectedYear')"> <i class="fa fa-file"></i> Export to PDF</button>
 
-                        <button class="btn btn-primary" onclick="generateFullReport()">
+                        @*   <button class="btn btn-primary" onclick="generateFullReport()">
                             Report
-                        </button>
+                        </button> *@
 
                         @* <button class="btn btn-primary" onclick="printTable()"> <i class="fa fa-print"></i> Print</button> *@
                     </div>
@@ -241,18 +245,23 @@
     <div class="modal-dialog modal-xl">
         <form id="userForm">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title" id="userModalTitle">Timesheet Report</h5></div>
+                <div class="modal-header"><h5 class="modal-title" id="userModalTitle">Timesheet Report - <span id="employeeNameText"></span> - <span id="tsRptMonYear"></span></h5></div>
                 <div class="modal-body">
+
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <label>From Date</label>
+                            <label><b>Filter By:</b></label>
+
+                        </div>
+                        <div class="col-md-3">
+                            <label>Date</label>
                             <input type="date" id="filterFromDate" class="form-control">
                         </div>
 
-                        <div class="col-md-3">
+                        @*    <div class="col-md-3">
                             <label>To Date</label>
                             <input type="date" id="filterToDate" class="form-control">
-                        </div>
+                        </div> *@
 
                         <div class="col-md-3">
                             <label>Task</label>
@@ -267,8 +276,8 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <label class="fw-bold">Group By</label>
                             <div class="d-flex gap-4">
+                                <label class="fw-bold">Group By</label>
                                 <label>
                                     <input type="checkbox" class="group-by" value="date" checked> Date
                                 </label>
@@ -282,7 +291,7 @@
                         </div>
                     </div>
                     <div class="row col-md-12">
-                        <div class="col-md-6">
+                        <div class="col-md-6" style="    max-height: 500px; overflow-y: scroll;">
                             <div class="table-responsive mb-4">
                                 <table class="table table-bordered" id="reportTable">
                                     <thead class="table-light">
@@ -297,11 +306,11 @@
                                 </table>
                             </div>
                         </div>
-                        <div class=" col-md-6">
-                            <div id="barChart" style="height:400px;"></div>
-                            <div id="lineChart" style="height:400px;"></div>
+                        <div class=" col-md-6" style="max-height: 500px; overflow-y: scroll;">
+                            @* <div id="barChart" ></div> *@
+                            @*  <div id="lineChart" style="height:400px;"></div> *@
                             <div id="pieChart" style="height:400px;"></div>
-                            <div id="stackChart" style="height:400px;"></div>
+                            @*  <div id="stackChart" style="height:400px;"></div> *@
 
                         </div>
                     </div>
@@ -324,12 +333,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
 
     <script src="~/js/utility/utility.js"></script>
     <script src="~/js/timesheet.js"></script>
-
-
-
 
 }
 

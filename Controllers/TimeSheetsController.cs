@@ -30,6 +30,74 @@ namespace SparkHRMS.Controllers
         {
             return View();
         }
+        public async Task<ActionResult> Report(int? EmployeeID, DateTime? FromDate, DateTime? ToDate)
+        {
+            var emp = new Employee();
+            if (EmployeeID == null)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return NotFound();
+                emp = _context.Employees.Where(x => x.ApplicationUserId == user.Id).FirstOrDefault();
+
+                if (emp == null)
+                {
+                    emp = _context.Employees.FirstOrDefault();
+                }
+                EmployeeID = emp.EmployeeId;
+            }
+            else
+            {
+                emp = _context.Employees.Where(x => x.EmployeeId == EmployeeID).FirstOrDefault();
+            }
+
+            var employeeDetails = new EmployeeDetailsDto
+            {
+                EmployeeId = emp.EmployeeId,
+                Name = emp.Name,
+                PhoneNumber = emp.PhoneNumber,
+                Email = emp.Email,
+                ImageUrl = emp.ImageUrl,
+                DateOfJoining = emp.DateOfJoining,
+                Address = emp.Address,
+                Designation = emp.Designation,
+                EmpCode = emp.EmployeeCode
+            };
+
+            var today = DateTime.Today;
+
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+
+            if (!FromDate.HasValue)
+            {
+                FromDate = new DateTime(today.Year, today.Month, 1);
+            }
+
+            if (!ToDate.HasValue)
+            {
+                ToDate = startOfMonth.AddMonths(1).AddDays(-1);
+            }
+
+            ViewBag.EmployeeList = _context.Employees.ToList();
+            ViewBag.YearList = _context.Year.ToList();
+            ViewBag.SelectedEmployeeID = employeeDetails.EmployeeId;
+
+            ViewBag.SelectedFromDate = FromDate;
+            ViewBag.SelectedToDate = ToDate;
+
+            ViewBag.Activities = getActivityData();
+
+            var timeSheetRecords = await _context.Timesheets
+                                    .Where(t => t.Date >= FromDate && t.Date <= ToDate && t.EmployeeId == EmployeeID && !t.IsDeleted)
+                                    .OrderBy(x => x.Date)
+                                    .ToListAsync();
+
+            var response = new EmployeeTimeSheetViewModel
+            {
+                EmployeeDetails = employeeDetails,
+                TimeSheetRecords = timeSheetRecords
+            };
+            return View(response);
+        }
 
         // GET: TimeSheetsController/Create
         public async Task<ActionResult> EntryAsync(int? EmployeeID, int? Month, int? Year)
