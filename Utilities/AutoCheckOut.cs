@@ -1,29 +1,30 @@
 ﻿
+using Hangfire.Logging;
 using Humanizer;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MimeKit;
-using SparkHRMS.ViewModels;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using Serilog;
+using SparkHRMS.Data;
+using SparkHRMS.Data.Entities;
 using SparkHRMS.Interfaces;
+using SparkHRMS.Services;
+using SparkHRMS.ViewModels;
+using System.Globalization;
 using System.Net;
 using System.Net.Mail;
-using IAutoCheckOut = SparkHRMS.Interfaces.IAutoCheckOut;
-using SparkHRMS.Data.Entities;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using SparkHRMS.Data;
-using Microsoft.EntityFrameworkCore;
-using Hangfire.Logging;
-using SendGrid.Helpers.Mail;
-using SendGrid;
-using Serilog;
-using SparkHRMS.Services;
-using System.Globalization;
-using static System.Net.Mime.MediaTypeNames;
-using System.Security.Cryptography.Xml;
 using System.Reflection.Metadata;
+using System.Security.Cryptography.Xml;
+using static MailKit.Telemetry;
+using static System.Net.Mime.MediaTypeNames;
+using IAutoCheckOut = SparkHRMS.Interfaces.IAutoCheckOut;
 namespace SparkHRMS.Utilities
 {
     public class AutoCheckOut : IAutoCheckOut
@@ -55,7 +56,7 @@ namespace SparkHRMS.Utilities
                 var employeeAttendance = (from emp in _context.EmployeeAttendance
                                           join employee in _context.Employees on emp.EmployeeId equals employee.EmployeeId
                                           where emp.CheckInTime != null &&
-                                                emp.CheckInTime.Date == today 
+                                                emp.CheckInTime.Date == today
                                                 //|| emp.CheckInTime.Date == yesterday
                                                 && emp.CheckOutTime == null
                                           select new
@@ -64,21 +65,20 @@ namespace SparkHRMS.Utilities
                                               Employee = employee
                                           }).ToList();
 
-                foreach (var emplyoee in employeeAttendance)
+                try
                 {
-
-                    try
+                    foreach (var emplyoee in employeeAttendance)
                     {
                         var empAttendance = (from em in _context.EmployeeAttendance
                                              where em.EmployeeId == emplyoee.Employee.EmployeeId &&
-                                                   (em.CheckInTime != null &&  em.CheckInTime.Date == today && em.CheckOutTime == null
+                                                   (em.CheckInTime != null && em.CheckInTime.Date == today && em.CheckOutTime == null
                                                    //|| em.CheckInTime.Date == yesterday
                                                    )
                                              select em).FirstOrDefault();
 
                         if (empAttendance != null)
                         {
-                            empAttendance.CheckOutTime = emplyoee.EmployeeAttendance.CheckInTime.AddHours(9); 
+                            empAttendance.CheckOutTime = emplyoee.EmployeeAttendance.CheckInTime.AddHours(9);
                             empAttendance.IsAutoCheckedOut = true;
                             empAttendance.CheckinMadeSystemIP = IPAddress.Loopback.ToString();
                         }
@@ -103,7 +103,7 @@ namespace SparkHRMS.Utilities
                         var designation = emplyoee.Employee.Designation;
                         var checkOutType = emplyoee.EmployeeAttendance.IsAutoCheckedOut;
                         string siteUrl = Configuration["AppSettings:ThisSiteUrl"];
-                        
+
                         htmlMessage = $@"
                                         <p>Hi,</p>
                                         <p>Our system has detected that you did not check out properly. As a result, the system has automatically checked you out. Please note that this may affect your timesheet working hours.</p>
@@ -125,82 +125,96 @@ namespace SparkHRMS.Utilities
                                         <p>Regards,</p>
                                         <p>HR Team<br/>Spark IT Tech</p>
                                         <p>Please visit <a href='{siteUrl}' style='color: #007bff; text-decoration: none;'>{Configuration["AppSettings:SiteTitle"]}</a> for more information.</p>";
+                    }
+                    //htmlMessage += await getAutoCheckOutEmailContent(DateTime.Today);
+                    subject = Configuration["EmailSenderSettings:Subject:AutoCheckOut"] + " on " + dateTimeForCheckinCheckoutSubject;
+
+                    var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
+                    var client = new SendGridClient(apiKey);
+                    var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
+                    //var mailTo = (from emp in _context.Users);
+                    //var to = new EmailAddress(emplyoee.Employee.Email);
+                    // var to = new EmailAddress(email, email);
+                    var plainTextContent = "";
+                    var htmlContent = htmlMessage;
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
+                        Subject = subject,
+                        Body = htmlMessage,
+                        IsBodyHtml = true,
+                    };
+                    mailMessage.To.Add(email);
+
+                    var emailLogs = new EmailLogs
+                    {
+                        Recipient = email,
+                        Cc = string.Empty,
+                        Subject = subject,
+                        Body = htmlMessage,
+                        SentDate = DateTime.Now,
+                        IsSuccessful = false,
+                        ErrorMessage = string.Empty
+                    };
+
+                    _context.EmailLogs.Add(emailLogs);
+                    _context.SaveChanges();
+
+                    int logId = emailLogs.Id;
+                    var smtpClient = new System.Net.Mail.SmtpClient(Configuration["EmailSenderSettings:SmtpServer"])
+                    {
+                        Port = 587,
+                        Credentials = new NetworkCredential(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:Password"]),
+                        EnableSsl = true,
+                        UseDefaultCredentials = false,
+                        DeliveryMethod = SmtpDeliveryMethod.Network
+                    };
+                    try
+                    {
+                        //var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                        //var response = await client.SendEmailAsync(msg);
 
 
+                        await smtpClient.SendMailAsync(mailMessage);
+                        await Task.Delay(500);
 
-                        //htmlMessage += await getAutoCheckOutEmailContent(DateTime.Today);
-                        subject = Configuration["EmailSenderSettings:Subject:AutoCheckOut"] + " on " + dateTimeForCheckinCheckoutSubject;
 
-                        var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
-                        var client = new SendGridClient(apiKey);
-                        var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
-                        //var mailTo = (from emp in _context.Users);
-                        var to = new EmailAddress(emplyoee.Employee.Email);
-                        // var to = new EmailAddress(email, email);
-                        var plainTextContent = "";
-                        var htmlContent = htmlMessage;
+                        var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
+                        //if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                        //{
 
-                        var emailLogs = new EmailLogs
-                        {
-                            Recipient = email,
-                            Cc = string.Empty,
-                            Subject = subject,
-                            Body = htmlMessage,
-                            SentDate = DateTime.Now,
-                            IsSuccessful = false,
-                            ErrorMessage = string.Empty
-                        };
+                        log.IsSuccessful = true;
+                        //}
+                        //else
+                        //{
+                        //    string responseBody = await response.Body.ReadAsStringAsync();
+                        //    log.IsSuccessful = false;
+                        //    log.ErrorMessage = responseBody;
+                        //}
 
-                        _context.EmailLogs.Add(emailLogs);
+                        _context.Entry(log).State = EntityState.Modified;
                         _context.SaveChanges();
-
-                        int logId = emailLogs.Id;
-                        try
-                        {
-                            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                            var response = await client.SendEmailAsync(msg);
-                            await Task.Delay(500); // Delay in milliseconds
-
-                            var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
-                            if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
-                            {
-
-                                log.IsSuccessful = true;
-                            }
-                            else
-                            {
-                                string responseBody = await response.Body.ReadAsStringAsync();
-                                log.IsSuccessful = false;
-                                log.ErrorMessage = responseBody;
-                            }
-
-                            _context.Entry(log).State = EntityState.Modified;
-                            _context.SaveChanges();
-
-                        }
-                        catch (Exception ex)
-                        {
-                            var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
-
-                            log.IsSuccessful = false;
-                            log.ErrorMessage = ex.ToString();
-                            _context.Entry(log).State = EntityState.Modified;
-                            _context.SaveChanges();
-                            // log an error message or throw an exception or both.
-                            _logger.LogError(ex.Message);
-                            throw;
-                        }
 
                     }
                     catch (Exception ex)
                     {
-                        // Log the exception or handle it as necessary
-                        Console.WriteLine($"An error occurred while processing EmployeeId {emplyoee.Employee.EmployeeId}: {ex.Message}");
-                        // Optionally log the stack trace if required:
-                        // Console.WriteLine(ex.StackTrace);
-                    }
-                }
+                        var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
 
+                        log.IsSuccessful = false;
+                        log.ErrorMessage = ex.ToString();
+                        _context.Entry(log).State = EntityState.Modified;
+                        _context.SaveChanges();
+                        // log an error message or throw an exception or both.
+                        _logger.LogError(ex.Message);
+                        throw;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                }
             }
             catch (Exception ex)
             {

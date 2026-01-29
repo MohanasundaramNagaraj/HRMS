@@ -1,32 +1,33 @@
 ﻿
+using Hangfire.Logging;
 using Humanizer;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MimeKit;
-using SparkHRMS.ViewModels;
+using Org.BouncyCastle.Ocsp;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using Serilog;
+using SparkHRMS.Data;
+using SparkHRMS.Data.Entities;
+using SparkHRMS.Data.Setting;
 using SparkHRMS.Interfaces;
+using SparkHRMS.Services;
+using SparkHRMS.ViewModels;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Net.Mail;
-using IAutoCheckOut = SparkHRMS.Interfaces.IAutoCheckOut;
-using SparkHRMS.Data.Entities;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using SparkHRMS.Data;
-using Microsoft.EntityFrameworkCore;
-using Hangfire.Logging;
-using SendGrid.Helpers.Mail;
-using SendGrid;
-using Serilog;
-using SparkHRMS.Services;
-using System.Globalization;
-using static System.Net.Mime.MediaTypeNames;
-using System.Security.Cryptography.Xml;
 using System.Reflection.Metadata;
-using SparkHRMS.Data.Setting;
-using Org.BouncyCastle.Ocsp;
-using System.Collections.Generic;
+using System.Security.Cryptography.Xml;
+using static MailKit.Telemetry;
+using static System.Net.Mime.MediaTypeNames;
+using IAutoCheckOut = SparkHRMS.Interfaces.IAutoCheckOut;
 namespace SparkHRMS.Utilities
 {
     public class TimeSheetAutoMail : IAutoTimeSheetMail
@@ -72,7 +73,7 @@ namespace SparkHRMS.Utilities
                         <thead style='background-color: #f2f2f2;'>
                             <tr>
                                 <th>Employee Name</th>
-<th> Destination</th>
+                                <th> Destination</th>
                                 <th>Timesheet Pending Days</th></tr></thead><tbody>" + tableContent + "</tbody></table><p>Regards,</p><p>HR Team<br/>Spark IT Tech</p>";
 
 
@@ -89,8 +90,18 @@ namespace SparkHRMS.Utilities
                 var plainTextContent = "";
                 var htmlContent = htmlMessage;
 
-             
-               // var singleRecipient = tos.FirstOrDefault();
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
+                    Subject = subject,
+                    Body = htmlMessage,
+                    IsBodyHtml = true,
+                };
+                tos.ForEach(t => mailMessage.To.Add(t.Email));
+                ccs.ForEach(cc => mailMessage.CC.Add(cc.Email));
+               
+
+                // var singleRecipient = tos.FirstOrDefault();
                 var emailLogs = new EmailLogs
                 {
                     Recipient = string.Join(",", tos.Select(t => t.Email)), // multiple recipients
@@ -107,6 +118,15 @@ namespace SparkHRMS.Utilities
                 _context.SaveChanges();
 
                 int logId = emailLogs.Id;
+
+                var smtpClient = new System.Net.Mail.SmtpClient(Configuration["EmailSenderSettings:SmtpServer"])
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:Password"]),
+                    EnableSsl = true,
+                    UseDefaultCredentials = false,
+                    DeliveryMethod = SmtpDeliveryMethod.Network
+                };
                 try
                 {
 
@@ -124,21 +144,23 @@ namespace SparkHRMS.Utilities
 
                     msg.Personalizations[0].Ccs = ccs;
 
-                    var response = await client.SendEmailAsync(msg);
-                    await Task.Delay(500); // Delay in milliseconds
+                    //  var response = await client.SendEmailAsync(msg);
 
+                    await smtpClient.SendMailAsync(mailMessage); 
+                    await Task.Delay(500); // Delay in milliseconds
+                  
                     var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
-                    if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
-                    {
+                    //if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
+                    //{
 
                         log.IsSuccessful = true;
-                    }
-                    else
-                    {
-                        string responseBody = await response.Body.ReadAsStringAsync();
-                        log.IsSuccessful = false;
-                        log.ErrorMessage = responseBody;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    string responseBody = await response.Body.ReadAsStringAsync();
+                    //    log.IsSuccessful = false;
+                    //    log.ErrorMessage = responseBody;
+                    //}
 
                     _context.Entry(log).State = EntityState.Modified;
                     _context.SaveChanges();
@@ -223,7 +245,9 @@ namespace SparkHRMS.Utilities
                     {
                         bool checkedIn = checkinDates.Contains(date);
                         var entry = timesheetData.FirstOrDefault(d => d.Date == date);
-                        return checkedIn && (entry == null || entry.TotalHours < 8);
+                        return checkedIn && (entry == null 
+                            //|| entry.TotalHours < 8
+                        );
                     })
                     .ToList();
 

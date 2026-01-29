@@ -71,6 +71,7 @@ namespace SparkHRMS.Utilities
             };
 
             mailMessage.To.Add(email);
+            
 
             //var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
             //var client = new SendGridClient(apiKey);
