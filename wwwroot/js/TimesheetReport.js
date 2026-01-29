@@ -43,9 +43,9 @@ function exportExcel() {
         { wch: 15 }
     ];
 
-    XLSX.utils.book_append_sheet(wb, ws, 'Timesheet');
+    XLSX.utils.book_append_sheet(wb, ws, 'Report');
 
-    XLSX.writeFile(wb, 'Timesheet_Report.xlsx');
+    XLSX.writeFile(wb, 'Report.xlsx');
 }
 
 generateFullReport();
@@ -75,13 +75,13 @@ function renderReportTable(reportData) {
 
         row += `<td class="fw-bold text-end">${r.hours.toFixed(2)}</td></tr>`;
         tbody.innerHTML += row;
-        if (r.activity == "Leave") {
+        if (r.activity.toLowerCase() == "leave") {
             totalLeaveDays += 1;
         }
-        if (r.activity == "Permission") {
+        if (r.activity.toLowerCase() == "permission") {
             totalPermissionHours += 1;
         }
-        if (r.activity != "Leave" && r.activity != "Permission") {
+        if (r.activity.toLowerCase() != "leave" && r.activity.toLowerCase() != "permission") {
             totalWorkingHours += r.hours;
         }
        

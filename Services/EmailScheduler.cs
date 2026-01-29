@@ -22,15 +22,15 @@ public class EmailScheduler
             checkInCron);
 
 
-        //RecurringJob.AddOrUpdate<EmailQueueManager>(
-        //   "AutoCheckOutJob",
-        //   job => job.AutoCheckOutEmail("CheckOut"),
-        //   checkInCron);
+        RecurringJob.AddOrUpdate<EmailQueueManager>(
+           "AutoCheckOutJob",
+           job => job.AutoCheckOutEmail("CheckOut"),
+           autoCheckOutCron);
 
-        //RecurringJob.AddOrUpdate<EmailQueueManager>(
-        // "AutoMailTimeSheetJob",
-        // job => job.AutoTimeSheetEmail("TimeSheet"),
-        // autoTimeSheetCron);
+        RecurringJob.AddOrUpdate<EmailQueueManager>(
+         "AutoMailTimeSheetJob",
+         job => job.AutoTimeSheetEmail("TimeSheet"),
+         autoTimeSheetCron);
 
 
     }

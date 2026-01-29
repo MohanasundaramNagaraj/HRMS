@@ -97,7 +97,7 @@ namespace SparkHRMS.Services
             .ToList();
 
 
-            //_backgroundJobClient.Enqueue(() => _autoTimeSheetMail.AutoTimeSheetMailAsync(employees, Event, html, ccs));
+            _backgroundJobClient.Enqueue(() => _autoTimeSheetMail.AutoTimeSheetMailAsync(employees, Event, html, ccs));
             
         }
         private string CalculateWorkingHours(DateTime? checkInTime, DateTime? checkOutTime)

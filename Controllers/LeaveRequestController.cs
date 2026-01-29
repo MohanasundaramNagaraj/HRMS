@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.IdentityModel.Tokens;
-using SparkHRMS.Data; 
+using SparkHRMS.Data;
 using SparkHRMS.Data.Entities;
 using SparkHRMS.Data.Setting;
 using SparkHRMS.Interfaces;
@@ -19,7 +19,7 @@ using Utility = SparkHRMS.Utilities.Utility;
 
 namespace SparkHRMS.Controllers
 {
-    
+
     public class LeaveRequestController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -37,7 +37,7 @@ namespace SparkHRMS.Controllers
             _emailService = emailService;
             _backgroundJobClient = backgroundJobClient;
         }
-      
+
         public async Task<IActionResult> Index(int? EmployeeId, int? YearId, int? MonthId, string? Status)
         {
             ViewBag.EmployeeList = _context.Employees.ToList();
@@ -74,7 +74,7 @@ namespace SparkHRMS.Controllers
                 var month = _context.Month.Where(x => x.Id == MonthId).FirstOrDefault();
                 query = query.Where(x => x.RequestedDate.Month == month.Number);
             }
-            
+
             if (!Status.IsNullOrEmpty())
             {
                 query = query.Where(x => x.Status == Status);
@@ -95,9 +95,9 @@ namespace SparkHRMS.Controllers
                 new SelectListItem { Value = "REJ", Text = "Rejected" }
             }, "Value", "Text", ViewBag.SelectedStatus);
 
-            var requests = await query.OrderByDescending(x=>x.RequestedDate).ToListAsync();
+            var requests = await query.OrderByDescending(x => x.RequestedDate).ToListAsync();
 
-         
+
             return View(requests);
         }
 
@@ -121,7 +121,7 @@ namespace SparkHRMS.Controllers
                 request.Status = "Pending";
                 request.RequestNumber = documentNumber;
 
-                
+
                 var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
                 var isSuperAdmin = await _userManager.IsInRoleAsync(user, "SuperAdmin");
 
@@ -185,7 +185,7 @@ namespace SparkHRMS.Controllers
             model.Comments = model.Comments == null ? "" : model.Comments;
             if (ModelState.IsValid)
             {
-                if(model.EmployeeId == 0)
+                if (model.EmployeeId == 0)
                 {
                     var user = await _userManager.GetUserAsync(User);
                     if (user == null) return NotFound();
@@ -202,7 +202,7 @@ namespace SparkHRMS.Controllers
                 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
                 model.Status = "PEN";
-                 _context.LeaveRequest.Add(model);
+                _context.LeaveRequest.Add(model);
                 await _context.SaveChangesAsync();
                 var currentUserId = Convert.ToInt32(_userManager.GetUserId(User));
                 _context.LeaveRequestHistory.Add(new LeaveRequestHistory
@@ -240,7 +240,7 @@ namespace SparkHRMS.Controllers
 
                 return BadRequest(errors);
             }
-            
+
         }
 
         private string getHtmlContent(int LeaveRequestID)
@@ -284,14 +284,14 @@ namespace SparkHRMS.Controllers
             }
 
             var leaveRequestDetails = (from det in _context.LeaveRequestDetail
-                                      join type in _context.LeaveTypes on det.LeaveTypeId equals type.LeaveTypeId
-                                      where det.LeaveRequestId == LeaveRequestID
-                                      select new
-                                      {
-                                          type.Name,
-                                          type.Code,
-                                          det.RequiredDays
-                                      }).Distinct().ToList();
+                                       join type in _context.LeaveTypes on det.LeaveTypeId equals type.LeaveTypeId
+                                       where det.LeaveRequestId == LeaveRequestID
+                                       select new
+                                       {
+                                           type.Name,
+                                           type.Code,
+                                           det.RequiredDays
+                                       }).Distinct().ToList();
 
             string siteUrl = _configuration["AppSettings:ThisSiteUrl"] + "/LeaveRequest";
 
@@ -345,24 +345,55 @@ namespace SparkHRMS.Controllers
             return result;
         }
         // Admin: Approve request
-        public async Task<IActionResult> Approve(int id, string Status, string Comments, List<LeaveRequestDetail> LeaveRequestDetails)
+        public async Task<IActionResult> Approve(int id, string Status, string Comments)
         {
-            var request = await _context.LeaveRequest.FindAsync(id);
-            if (request != null)
+            try
             {
+                var request = await _context.LeaveRequest.FindAsync(id);
+                if (request == null)
+                    return NotFound("Leave request not found");
+
                 var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                    return Unauthorized();
 
-                if(Status == "ACC" || Status == "CAN-ACC")
+                if (Status == "ACC" || Status == "CAN-ACC")
                 {
-                    var year = _context.Year.Where(x => x.Year == DateTime.Now.Year).FirstOrDefault();
-                    var allocHeader = _context.LeaveAllocations.Where(x => x.EmployeeId == request.EmployeeId && x.YearId == year.Id) .FirstOrDefault();
+                    var year = _context.Year
+                        .FirstOrDefault(x => x.Year == DateTime.Now.AddYears(-1).Year);
 
-                    var leaveDetail = _context.LeaveRequestDetail.Where(x => x.LeaveRequestId == id).ToList();
-                    foreach (var detail in leaveDetail)
+                    if(DateTime.Now.Month > 3)
                     {
-                        var aloc_detail = _context.LeaveAllocationDetails.Where(x => x.LeaveAllocationId == allocHeader.Id && x.LeaveTypeId == detail.LeaveTypeId).FirstOrDefault();
+                        year = _context.Year
+                        .FirstOrDefault(x => x.Year == DateTime.Now.Year);
+                    }
 
-                        if(Status == "ACC")
+                    if (year == null)
+                        return BadRequest("Year master not found");
+
+                    var allocHeader = _context.LeaveAllocations
+                        .FirstOrDefault(x =>
+                            x.EmployeeId == request.EmployeeId &&
+                            x.YearId == year.Id);
+
+                    if (allocHeader == null)
+                        return BadRequest("Leave allocation not found");
+
+                    var leaveDetails = _context.LeaveRequestDetail
+                        .Where(x => x.LeaveRequestId == id)
+                        .ToList();
+
+                    foreach (var detail in leaveDetails)
+                    {
+                        var aloc_detail = _context.LeaveAllocationDetails
+                            .FirstOrDefault(x =>
+                                x.LeaveAllocationId == allocHeader.Id &&
+                                x.LeaveTypeId == detail.LeaveTypeId);
+
+                        if (aloc_detail == null)
+                            continue; 
+
+                        if (Status == "ACC")
                         {
                             aloc_detail.UsedDays += detail.RequiredDays;
                         }
@@ -370,10 +401,13 @@ namespace SparkHRMS.Controllers
                         {
                             aloc_detail.UsedDays -= detail.RequiredDays;
                         }
+
                         _context.Entry(aloc_detail).State = EntityState.Modified;
                     }
                 }
+
                 request.Status = Status;
+
                 _context.LeaveRequestHistory.Add(new LeaveRequestHistory
                 {
                     LeaveRequestId = request.Id,
@@ -385,12 +419,29 @@ namespace SparkHRMS.Controllers
 
                 await _context.SaveChangesAsync();
 
-                var email = _context.Employees.FirstOrDefault(x => x.EmployeeId == request.EmployeeId).Email;
-                string subject = "Approval Status of Request - " + request.RequestNumber;
-                _backgroundJobClient.Enqueue(() => _emailService.SendEmailAsync(email, subject, getHtmlContent(request.Id)));
+                var emp = _context.Employees
+                    .FirstOrDefault(x => x.EmployeeId == request.EmployeeId);
+
+                if (emp != null && !string.IsNullOrEmpty(emp.Email))
+                {
+                    string subject = "Approval Status of Request - " + request.RequestNumber;
+
+                    _backgroundJobClient.Enqueue(() =>
+                        _emailService.SendEmailAsync(
+                            emp.Email,
+                            subject,
+                            getHtmlContent(request.Id)
+                        ));
+                }
+
+                return RedirectToAction("Index", "LeaveRequest");
             }
-            return RedirectToAction("Index", "LeaveRequest");
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.ToString());
+            }
         }
+
 
         // Admin or Employee: Cancel request
         public async Task<IActionResult> Cancel(int id, int changedBy, string Comments)

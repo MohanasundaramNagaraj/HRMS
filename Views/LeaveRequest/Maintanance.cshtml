@@ -420,7 +420,7 @@ else
             if (result.isConfirmed && result.value.trim() !== "") {
                 let LeaveRequestDetails = getLeaveRequestDetails();
                 const comments = encodeURIComponent(result.value);
-                window.location.href = `/LeaveRequest/Approve?id=${id}&Status=${status}&Comments=${comments}&LeaveRequestDetails=${LeaveRequestDetails}`;
+                window.location.href = `/LeaveRequest/Approve?id=${id}&Status=${status}&Comments=${comments}`;
             }
         });
     }
