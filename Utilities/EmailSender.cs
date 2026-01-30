@@ -64,7 +64,11 @@ namespace SparkHRMS.Utilities
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
+                From = new MailAddress(
+                                        Configuration["EmailSenderSettings:From"],
+                                        Configuration["EmailSenderSettings:UserName"],
+                                        System.Text.Encoding.UTF8
+                                    ), 
                 Subject = subject,
                 Body = htmlMessage,
                 IsBodyHtml = true,

@@ -36,13 +36,14 @@ namespace SparkHRMS.Utilities
         private readonly SmtpSettings _smtpSettings;
         private IConfiguration Configuration { get; }
         private readonly ILogger<AutoCheckOut> _logger;
-
-        public TimeSheetAutoMail(ApplicationDbContext context, ILogger<AutoCheckOut> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
+        private readonly Interfaces.IEmailSender _emailService;
+        public TimeSheetAutoMail(ApplicationDbContext context, Interfaces.IEmailSender emailService, ILogger<AutoCheckOut> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
         {
             _context = context;
             Configuration = configuration;
             _logger = logger;
             _smtpSettings = smtpSettings.Value;
+            _emailService = emailService;
         }
         public async Task AutoTimeSheetMailAsync(List<Employee> employees, string subject, string htmlMessage,List<EmailAddress> ccs)
         {
@@ -51,7 +52,6 @@ namespace SparkHRMS.Utilities
             {
                 List<EmployeeMailVM> emps = await getEmployeeBalanceDayCountAsync(employees);
                 var today = DateTime.Today;
-
 
                 string siteUrl = Configuration["AppSettings:ThisSiteUrl"];
                 List<EmailAddress> tos = new List<EmailAddress>();
@@ -78,7 +78,7 @@ namespace SparkHRMS.Utilities
 
 
                 string dateTimeForSubject = DateTime.Now.ToString("dd MMM yyyy");
-                //htmlMessage += await getAutoCheckOutEmailContent(DateTime.Today);
+              
                 subject = Configuration["EmailSenderSettings:Subject:AutoTimeSheetMailOut"] + " on " + dateTimeForSubject;
 
                 var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
@@ -92,7 +92,11 @@ namespace SparkHRMS.Utilities
 
                 var mailMessage = new MailMessage
                 {
-                    From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
+                    From = new MailAddress(
+                                        Configuration["EmailSenderSettings:From"],
+                                        Configuration["EmailSenderSettings:UserName"],
+                                        System.Text.Encoding.UTF8
+                                    ), 
                     Subject = subject,
                     Body = htmlMessage,
                     IsBodyHtml = true,
@@ -139,8 +143,6 @@ namespace SparkHRMS.Utilities
                         htmlContent,
                         false
                     );
-
-
 
                     msg.Personalizations[0].Ccs = ccs;
 

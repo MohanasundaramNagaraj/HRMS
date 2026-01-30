@@ -33,22 +33,20 @@ namespace SparkHRMS.Utilities
         private readonly SmtpSettings _smtpSettings;
         private IConfiguration Configuration { get; }
         private readonly ILogger<AutoCheckOut> _logger;
-
-        public AutoCheckOut(ApplicationDbContext context, ILogger<AutoCheckOut> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
+        private readonly Interfaces.IEmailSender _emailService;
+        public AutoCheckOut(ApplicationDbContext context, Interfaces.IEmailSender emailService, ILogger<AutoCheckOut> logger, IConfiguration configuration, IOptions<SmtpSettings> smtpSettings)
         {
             _context = context;
             Configuration = configuration;
             _logger = logger;
             _smtpSettings = smtpSettings.Value;
+            _emailService = emailService;
         }
         public async Task AutoCheckOutAsync(string email, string subject, string htmlMessage)
         {
             string dateTimeForCheckinCheckoutSubject = "";
-            if (subject == "CheckIn" || subject == "CheckOut")
-            {
-                dateTimeForCheckinCheckoutSubject = DateTime.Now.ToString("dd MMM yyyy");
-            }
-
+           
+            subject = Configuration["EmailSenderSettings:Subject:AutoCheckOut"] + " on " + dateTimeForCheckinCheckoutSubject;
             try
             {
                 var today = DateTime.Today;
@@ -126,89 +124,8 @@ namespace SparkHRMS.Utilities
                                         <p>HR Team<br/>Spark IT Tech</p>
                                         <p>Please visit <a href='{siteUrl}' style='color: #007bff; text-decoration: none;'>{Configuration["AppSettings:SiteTitle"]}</a> for more information.</p>";
                     }
-                    //htmlMessage += await getAutoCheckOutEmailContent(DateTime.Today);
-                    subject = Configuration["EmailSenderSettings:Subject:AutoCheckOut"] + " on " + dateTimeForCheckinCheckoutSubject;
-
-                    var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
-                    var client = new SendGridClient(apiKey);
-                    var from = new EmailAddress(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:UserName"]);
-                    //var mailTo = (from emp in _context.Users);
-                    //var to = new EmailAddress(emplyoee.Employee.Email);
-                    // var to = new EmailAddress(email, email);
-                    var plainTextContent = "";
-                    var htmlContent = htmlMessage;
-
-                    var mailMessage = new MailMessage
-                    {
-                        From = new MailAddress(Configuration["EmailSenderSettings:From"]), // Update the sender email here
-                        Subject = subject,
-                        Body = htmlMessage,
-                        IsBodyHtml = true,
-                    };
-                    mailMessage.To.Add(email);
-
-                    var emailLogs = new EmailLogs
-                    {
-                        Recipient = email,
-                        Cc = string.Empty,
-                        Subject = subject,
-                        Body = htmlMessage,
-                        SentDate = DateTime.Now,
-                        IsSuccessful = false,
-                        ErrorMessage = string.Empty
-                    };
-
-                    _context.EmailLogs.Add(emailLogs);
-                    _context.SaveChanges();
-
-                    int logId = emailLogs.Id;
-                    var smtpClient = new System.Net.Mail.SmtpClient(Configuration["EmailSenderSettings:SmtpServer"])
-                    {
-                        Port = 587,
-                        Credentials = new NetworkCredential(Configuration["EmailSenderSettings:From"], Configuration["EmailSenderSettings:Password"]),
-                        EnableSsl = true,
-                        UseDefaultCredentials = false,
-                        DeliveryMethod = SmtpDeliveryMethod.Network
-                    };
-                    try
-                    {
-                        //var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                        //var response = await client.SendEmailAsync(msg);
-
-
-                        await smtpClient.SendMailAsync(mailMessage);
-                        await Task.Delay(500);
-
-
-                        var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
-                        //if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
-                        //{
-
-                        log.IsSuccessful = true;
-                        //}
-                        //else
-                        //{
-                        //    string responseBody = await response.Body.ReadAsStringAsync();
-                        //    log.IsSuccessful = false;
-                        //    log.ErrorMessage = responseBody;
-                        //}
-
-                        _context.Entry(log).State = EntityState.Modified;
-                        _context.SaveChanges();
-
-                    }
-                    catch (Exception ex)
-                    {
-                        var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
-
-                        log.IsSuccessful = false;
-                        log.ErrorMessage = ex.ToString();
-                        _context.Entry(log).State = EntityState.Modified;
-                        _context.SaveChanges();
-                        // log an error message or throw an exception or both.
-                        _logger.LogError(ex.Message);
-                        throw;
-                    }
+                   
+                    _emailService.SendEmailAsync(email, subject, htmlMessage);
 
                 }
                 catch (Exception ex)

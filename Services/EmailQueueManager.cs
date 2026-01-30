@@ -37,7 +37,7 @@ namespace SparkHRMS.Services
             _autoTimeSheetMail = autoTimeSheetMail;
             _utilityService = utilityService;
         }
-        public async Task SendScheduledEmail(string Event)
+        public async Task SendAttendanceEmail(string Event)
         {
             string html = "";
             DateTime Yesterday = DateTime.Today.Date.AddDays(-1);

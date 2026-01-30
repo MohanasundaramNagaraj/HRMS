@@ -18,7 +18,7 @@ public class EmailScheduler
 
         RecurringJob.AddOrUpdate<EmailQueueManager>(
             "CheckInJob",
-            job => job.SendScheduledEmail("CheckIn"),
+            job => job.SendAttendanceEmail("CheckIn"),
             checkInCron);
 
 
