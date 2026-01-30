@@ -24,6 +24,7 @@ namespace SparkHRMS.Data.Entities
         public DateTime DOB { get; set; } 
         public string Gender { get; set; }
 
+        public string FatherName { get; set; }
         public string Designation { get; set; }
 
         [DataType(DataType.Upload)]
