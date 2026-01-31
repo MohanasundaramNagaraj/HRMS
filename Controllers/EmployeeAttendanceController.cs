@@ -291,13 +291,13 @@ namespace SparkHRMS.Controllers
                 return BadRequest("You have not checked in today or have already checked out.");
             }
 
-            var timeSheet = _context.Timesheets
-                            .Where(t => t.EmployeeId == emp.EmployeeId && t.Date.Date == today)
-                            .FirstOrDefault();
-            if(timeSheet != null)
-            {
-                return BadRequest("You have not update your timesheet. Please update and proceed.");
-            }
+            //var timeSheet = _context.Timesheets
+            //                .Where(t => t.EmployeeId == emp.EmployeeId && t.Date.Date == today.Date)
+            //                .Any();
+            //if(!timeSheet)
+            //{
+            //    return BadRequest("You have not update your timesheet. Please update and proceed.");
+            //}
 
             var machineService = new MachineIDService();
             string? machineId = machineService.GetMachineId();

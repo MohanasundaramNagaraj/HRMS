@@ -57,6 +57,8 @@ namespace SparkHRMS.Controllers
                 Id = x.Attendance?.Id ?? 0,
                 EmployeeId = x.Employee.EmployeeId,
                 EmployeeName = x.Employee.Name,
+                EmployeeCode = x.Employee.EmployeeCode,
+                Designation = x.Employee.Designation,
                 CheckInDateTime = x.Attendance?.CheckInTime, // Nullable DateTime
                 CheckOutDateTime = x.Attendance?.CheckOutTime, // Nullable DateTime
                 IP = x.Attendance?.CheckinMadeSystemIP,

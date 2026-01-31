@@ -56,7 +56,9 @@ namespace SparkHRMS.ViewModels
         public int Id { get; set; }
         public DateTime? Date { get; set; }
         public int EmployeeId { get; set; }
+        public string EmployeeCode { get; set; }
         public string EmployeeName { get; set; }
+        public string Designation { get; set; }
         public TimeOnly CheckInTime { get; set; }
         public TimeOnly CheckOutTime { get; set; }
         public string CheckInTimeInString { get; set; }

@@ -67,7 +67,7 @@
 
 
 
-<div class="container mt-4">
+<div class="mt-4">
     <ul class="breadcrumb breadcrumb-style ">
         <li class="breadcrumb-item">
             <h4 class="page-title"> Attendance</h4>
@@ -97,7 +97,7 @@
 
         <!-- Attendance Data Table -->
         <div>
-            <div class="card">
+            <div class="card" style="width: auto;overflow: scroll;">
                 <div class="card-header bg-secondary text-white">
                     <h5>Employee Attendance for @ViewBag.SelectedDate.ToString("dd MMM yyyy")</h5>
                 </div>
@@ -202,15 +202,16 @@
                                 var checkIndisplayText = $"{checkInTime} - {checkOutTime}";
 
                                 <tr>
-                                    <td>@(record.EmployeeName ?? "N/A")</td>
+                                    <td>
+                                        @(record.EmployeeCode - record.EmployeeName ?? "N/A")  <br />
+                                        @(record.Designation ?? "N/A")
+                                    </td>
                                     <td>
                                         <span style=" text-align: center !important; display: block; color:@displayTextColor">
                                             @displayText<br />
-
                                         </span>
                                         <span style=" text-align: center !important; display: block; color:@onDutyDisplayTextColor">
                                             @onDutyDisplayText<br />
-
                                         </span>
                                     </td>
                                     <td class="center" style="width: 200px !important;
