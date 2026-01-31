@@ -30,6 +30,9 @@ namespace SparkHRMS.Data.Entities
 
         [Required]
         [StringLength(500)]
+        public string TaskType { get; set; } = string.Empty;
+
+        [StringLength(500)]
         public string Task { get; set; } = string.Empty;
 
         [Required]

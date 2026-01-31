@@ -319,7 +319,7 @@ namespace SparkHRMS.Controllers
 
                         <tr><td style='padding: 8px 15px; background: #f7f7f7; width: 40%;'>Request Number</td><td style='padding: 8px 15px;'>{leave.RequestNumber}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Employee Name</td><td style='padding: 8px 15px;'>{utility.GetEmployeeCodeById(leave.EmployeeId)} - {utility.GetEmployeeNameById(leave.EmployeeId)}</td></tr>
-                        <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Designation</td><td style='padding: 8px 15px;'>{utility.GetEmployeeById(leave.EmployeeId)}</td></tr>
+                        <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Designation</td><td style='padding: 8px 15px;'>{utility.GetEmployeeById(leave.EmployeeId).Designation}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Requested Date</td><td style='padding: 8px 15px;'>{leave.RequestedDate:dd MMM yyyy}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>Start Date</td><td style='padding: 8px 15px;'>{leave.StartDate:dd MMM yyyy} {(leave.IsStartDateHalfDay ? "(Half Day)" : "")}</td></tr>
                         <tr><td style='padding: 8px 15px; background: #f7f7f7;'>End Date</td><td style='padding: 8px 15px;'>{leave.EndDate:dd MMM yyyy} {(leave.IsEndDateHalfDay ? "(Half Day)" : "")}</td></tr>

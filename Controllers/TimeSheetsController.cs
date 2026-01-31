@@ -147,6 +147,7 @@ namespace SparkHRMS.Controllers
             ViewBag.SelectedMonth = startOfMonth.Month;
             ViewBag.SelectedYear = startOfMonth.Year;
             ViewBag.Activities = getActivityData();
+            ViewBag.ItemType = _context.WorkItemType.Where(v => v.IsActive == true).Select(c => c.WorkItemTypeName).ToList();
             //if(EmployeeID == null)
             //{
             //    EmployeeID = _context.Employees.FirstOrDefault().EmployeeId;
@@ -202,6 +203,7 @@ namespace SparkHRMS.Controllers
                             existingTimesheet.Date = updatedTimesheet.Date;
                             existingTimesheet.Day = updatedTimesheet.Day;
                             existingTimesheet.EmployeeId = updatedTimesheet.EmployeeId;
+                            existingTimesheet.TaskType = updatedTimesheet.TaskType;
                             existingTimesheet.Task = updatedTimesheet.Task;
                             existingTimesheet.Activity = updatedTimesheet.Activity;
                             existingTimesheet.Descreption = updatedTimesheet.Descreption;

@@ -145,7 +145,7 @@ async function exportToExcel(employeeName, month, year) {
 
     const headers = Array.from(
         table.querySelectorAll("thead th")
-    ).map(th => th.innerText.trim()).slice(0, 6);
+    ).map(th => th.innerText.trim()).slice(0, 7);
     debugger;
     const greenFill = {
         type: "pattern",
@@ -398,6 +398,7 @@ function update() {
                     Date: row.querySelector("input[type='date']")?.value || new Date(),
                     Day: row.querySelector("input[placeholder='Day']")?.value || "",
                     Task: row.querySelector(".task-input")?.value || "",
+                    TaskType: row.querySelector(".task-type-input")?.value || "",
                     Activity: row.querySelector(".activity-input")?.value || "",
                     Descreption: row.querySelector(".description-input")?.value || "",
                     HoursWorked: parseFloat(row.querySelector(".hours-worked-input")?.value) || 0,
@@ -441,10 +442,23 @@ function addRow(row, index) {
     activities.forEach(function (activity) {
         activityOptions += `<option value="${activity}">${activity}</option>`;
     });
+
+    let taskOptions = `<option value=""></option>`;
+    itemTypes.forEach(function (item) {
+        taskOptions += `<option value="${item}">${item}</option>`;
+    });
+
     newRow.innerHTML = `
-                                        <td style="width:10%;"><input id='date_${uid}' onchange="getday('${uid}')" onkeydown="return false;"  type="date" value="${row.Date}" class="form-control timesheet-input"></td>
-                                        <td style="width:7%;"><input id='day_${uid}' type="text" class="form-control timesheet-input" placeholder="Day" value="${row.Day}" disabled></td>
-                                        <td style="width:10%;"><input type="text" class="form-control timesheet-input task-input" placeholder="Task Id" value="${row.Task}"></td>
+                                        <td style="width:5%;"><input id='date_${uid}' onchange="getday('${uid}')" onkeydown="return false;"  type="date" value="${row.Date}" class="form-control timesheet-input"></td>
+                                        <td style="width:5%;"><input id='day_${uid}' type="text" class="form-control timesheet-input" placeholder="Day" value="${row.Day}" disabled></td>
+
+                                         <td style="width:10%;">
+                                           
+                                              <select class="form-control timesheet-input task-type-input">
+                                                    ${taskOptions}
+                                                </select>
+                                         </td>
+                                        <td style="width:5%;"><input type="text" class="form-control timesheet-input task-input" placeholder="Item Id" value="${row.Task}"></td>
                                         <td style="width:15%;">
                                                 <select class="form-control timesheet-input activity-input searchable-activity">
                                                     ${activityOptions}
@@ -463,6 +477,7 @@ function addRow(row, index) {
     attachDeleteEvent();
     inputOnChangeCallback();
     newRow.querySelector('.activity-input').value = row.Activity;
+    newRow.querySelector('.task-type-input').value = row.TaskType;
     const inputs = newRow.querySelectorAll("input");
     if (row.Descreption.toLowerCase().includes("leave") || row.Descreption.toLowerCase().includes("permission")) {
         inputs.forEach((input) => {
@@ -473,7 +488,6 @@ function addRow(row, index) {
             input.style.color = "";
         });
     }
-
 
     const today = new Date();
 
@@ -492,12 +506,15 @@ function addRow(row, index) {
     //datePicker.min = formatDate(today);
     //datePicker.max = formatDate(today);
 
-    setTimeout(function () {
-        $(newRow).find('.searchable-activity').select2({
-            placeholder: "",
-            width: '100%'
-        });
-    }, 1000)
+    $('.searchable-activity').select2({
+        placeholder: "",
+        width: '100%'
+    });
+
+    $('.task-type-input').select2({
+        placeholder: "",
+        width: '100%'
+    });
 
 
 };
@@ -650,7 +667,7 @@ function generateFullReport() {
 
     const { dates, seriesMap, pieMap } = prepareChartData(reportData);
 
-   // renderBarChart(dates, seriesMap);
+    // renderBarChart(dates, seriesMap);
     // renderLineChart(dates, seriesMap);
     renderPieChart(pieMap);
     // renderStackChart(dates, seriesMap);
@@ -722,7 +739,7 @@ function generateTimesheetReport() {
             _filterFromDate.max = maxDate;
 
             // Optional: set default value
-          //  _filterFromDate.value = firstDate;
+            //  _filterFromDate.value = firstDate;
         }
     }
 

@@ -45,7 +45,7 @@ namespace SparkHRMS.Utilities
         public async Task AutoCheckOutAsync(string email, string subject, string htmlMessage)
         {
             string dateTimeForCheckinCheckoutSubject = "";
-           
+
             subject = Configuration["EmailSenderSettings:Subject:AutoCheckOut"] + " on " + dateTimeForCheckinCheckoutSubject;
             try
             {
@@ -55,7 +55,7 @@ namespace SparkHRMS.Utilities
                                           join employee in _context.Employees on emp.EmployeeId equals employee.EmployeeId
                                           where emp.CheckInTime != null &&
                                                 emp.CheckInTime.Date == today
-                                                //|| emp.CheckInTime.Date == yesterday
+                                                || emp.CheckInTime.Date == yesterday
                                                 && emp.CheckOutTime == null
                                           select new
                                           {
@@ -65,12 +65,13 @@ namespace SparkHRMS.Utilities
 
                 try
                 {
+                    string _employeehtmlMessage = "";
                     foreach (var emplyoee in employeeAttendance)
                     {
                         var empAttendance = (from em in _context.EmployeeAttendance
                                              where em.EmployeeId == emplyoee.Employee.EmployeeId &&
                                                    (em.CheckInTime != null && em.CheckInTime.Date == today && em.CheckOutTime == null
-                                                   //|| em.CheckInTime.Date == yesterday
+                                                   || em.CheckInTime.Date == yesterday
                                                    )
                                              select em).FirstOrDefault();
 
@@ -79,16 +80,10 @@ namespace SparkHRMS.Utilities
                             empAttendance.CheckOutTime = emplyoee.EmployeeAttendance.CheckInTime.AddHours(9);
                             empAttendance.IsAutoCheckedOut = true;
                             empAttendance.CheckinMadeSystemIP = IPAddress.Loopback.ToString();
+
+                            _context.EmployeeAttendance.Update(empAttendance);
                         }
                         var record = empAttendance;
-                        htmlMessage += @"
-                                            <div style=""width: 100%; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4;"">
-                                                <div style=""max-width: 800px; margin: 0 auto; background: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);"">
-                                                    <div style=""background-color: #17a2b8; color: #ffffff; padding: 15px; border-top-left-radius: 8px; border-top-right-radius: 8px;"">
-                                                        <h2 style=""margin: 0;"">Employee Attendance for " + today.ToString("dd MMM yyyy") + @"</h2>
-                                                    </div>
-                                                    <div style=""padding: 20px;"">";
-
 
                         var checkInTime = record.CheckInTime != null ? ((DateTime)record.CheckInTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "Not Checked In";
                         var checkOutTime = record.CheckOutTime != null ? ((DateTime)record.CheckOutTime).ToString("hh:mm tt", CultureInfo.InvariantCulture) : "Not Checked Out";
@@ -100,14 +95,9 @@ namespace SparkHRMS.Utilities
                         var checkOutIP = emplyoee.EmployeeAttendance.CheckOutMadeSystemIP ?? "N/A";
                         var designation = emplyoee.Employee.Designation;
                         var checkOutType = emplyoee.EmployeeAttendance.IsAutoCheckedOut;
-                        string siteUrl = Configuration["AppSettings:ThisSiteUrl"];
 
-                        htmlMessage = $@"
-                                        <p>Hi,</p>
-                                        <p>Our system has detected that you did not check out properly. As a result, the system has automatically checked you out. Please note that this may affect your timesheet working hours.</p>
-                                        <p>We kindly request you to ensure proper check-out in the future to avoid any discrepancies.</p>
 
-                                        <div style='border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 15px; padding: 15px; background-color: #f9f9f9;'>
+                        _employeehtmlMessage += $@"<div style='border: 1px solid #dee2e6; border-radius: 8px; margin-bottom: 15px; padding: 15px; background-color: #f9f9f9;'>
                                             <h3 style='margin: 0 0 10px;'>{employeeName}</h3>
                                             <h5 style='margin: 0 0 10px;'>{designation}</h5>
                                             <p style='margin: 5px 0;'><strong>Check-In Time:</strong> {checkInTime}</p>
@@ -117,15 +107,29 @@ namespace SparkHRMS.Utilities
                                           <p style='margin: 5px 0;'><strong>Check-Out Type IP:</strong> <button style='margin-top: 10px; padding: 10px 15px; background-color: #28a745; color: #ffffff; border: none; border-radius: 5px; cursor: pointer;'>
                                                 Auto Check-Out
                                             </button></p>
-    
-                                        </div>
+                                           
+                                        </div>";
 
-                                        <p>Regards,</p>
-                                        <p>HR Team<br/>Spark IT Tech</p>
-                                        <p>Please visit <a href='{siteUrl}' style='color: #007bff; text-decoration: none;'>{Configuration["AppSettings:SiteTitle"]}</a> for more information.</p>";
                     }
-                   
-                    _emailService.SendEmailAsync(email, subject, htmlMessage);
+                    await _context.SaveChangesAsync();
+                    if (_employeehtmlMessage != "")
+                    {
+
+                        string siteUrl = Configuration["AppSettings:ThisSiteUrl"];
+                        htmlMessage += $@"
+                                         <p>Hi,</p>
+                                         <p>Our system has detected that you did not check out properly. As a result, the system has automatically checked you out. Please note that this may affect your timesheet working hours.</p>
+                                         <p>We kindly request you to ensure proper check-out in the future to avoid any discrepancies.</p>
+                                            {_employeehtmlMessage}
+                                         <p>Regards,</p>
+                                         <p>HR Team<br/>Spark IT Tech</p>
+                                         <p>Please visit <a href='{siteUrl}' style='color: #007bff; text-decoration: none;'>{Configuration["AppSettings:SiteTitle"]}</a> for more information.</p>";
+
+                    }
+                    if(htmlMessage != "")
+                    {
+                        _emailService.SendEmailAsync(email, subject, htmlMessage);
+                    }
 
                 }
                 catch (Exception ex)

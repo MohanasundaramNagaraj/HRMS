@@ -12,13 +12,15 @@
     var roles = user != null ? await UserManager.GetRolesAsync(user) : new List<string>();
 }
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
     var timeSheetData = @Html.Raw(Json.Serialize(Model.TimeSheetRecords));
 
     var activities = @Html.Raw(Json.Serialize(ViewBag.Activities));
+
+     var itemTypes = @Html.Raw(Json.Serialize(ViewBag.ItemType));
 </script>
 <style>
 
@@ -191,7 +193,10 @@
                                         Day
                                     </th>
                                     <th>
-                                        Task
+                                        Item Type
+                                    </th>
+                                    <th>
+                                        Item Id
                                     </th>
                                     <th>
                                         Activity
@@ -212,7 +217,10 @@
                                         <input type="text" class="column-filter form-control" placeholder="Search Day">
                                     </th>
                                     <th style="background:white;">
-                                        <input type="text" class="column-filter form-control" placeholder="Search Task Id">
+                                        <input type="text" class="column-filter form-control" placeholder="Search Item Type">
+                                    </th>
+                                    <th style="background:white;">
+                                        <input type="text" class="column-filter form-control" placeholder="Search Item Id">
                                     </th>
                                     <th style="background:white;">
                                         <input type="text" class="column-filter form-control" placeholder="Search Activity">
@@ -327,7 +335,7 @@
 
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
