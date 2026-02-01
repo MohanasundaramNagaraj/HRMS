@@ -22,7 +22,7 @@ namespace SparkHRMS.Controllers
         private readonly IConfiguration _configuration;
         private readonly Utility _utilityService;
 
-       
+
         public AdminAttendanceViewerController(Utility utilityService, ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, ApplicationDbContext context, IConfiguration configuration)
         {
             _logger = logger;
@@ -65,7 +65,7 @@ namespace SparkHRMS.Controllers
                 CheckOutMadeSystemIP = x.Attendance?.CheckOutMadeSystemIP,
                 CheckInPosition = x.Attendance?.CheckInPosition,
                 CheckOutPosition = x.Attendance?.CheckOutPosition,
-               
+
                 IsPermission = x.Attendance?.IsPermission ?? false,
                 PermissionStartTime = x.Attendance?.PermissionStartTime,
                 PermissionEndTime = x.Attendance?.PermissionEndTime,
@@ -89,7 +89,7 @@ namespace SparkHRMS.Controllers
             {
                 attendance.WorkingHours = _utilityService.CalculateWorkingHours(attendance.CheckInDateTime, attendance.CheckOutDateTime);
 
-                if(attendance.WorkingHours == string.Empty)
+                if (attendance.WorkingHours == string.Empty)
                 {
                     string status = (from lr in _context.LeaveRequest
                                      where lr.EmployeeId == attendance.EmployeeId
@@ -111,7 +111,8 @@ namespace SparkHRMS.Controllers
                 }
                 attendance.CheckInLocation = await _utilityService.GetLocationFromCoordinates(attendance.CheckInPosition);
                 attendance.CheckOutLocation = await _utilityService.GetLocationFromCoordinates(attendance.CheckOutPosition);
-            };
+            }
+            ;
 
             ViewBag.SelectedDate = selectedDate;
 
@@ -165,7 +166,7 @@ namespace SparkHRMS.Controllers
                         status = AttendanceStatus.Weekend;
                         statuses.Add(status);
                     }
-                    if(date > DateTime.Now)
+                    if (date > DateTime.Now)
                     {
                         status = AttendanceStatus.ToBeCheckIn;
                         statuses.Add(status);
@@ -177,7 +178,7 @@ namespace SparkHRMS.Controllers
                             workingTime = attendanceRecord.CheckOutTime.Value - attendanceRecord.CheckInTime;
                             totalWorkingTime += workingTime.Value;
 
-                            if (workingTime.Value.TotalHours > 0)
+                            if (workingTime.Value.TotalHours > 0 && !attendanceRecord.IsHalfDayLeave)
                             {
                                 status = AttendanceStatus.Present; // Full Day Present
                             }
@@ -196,9 +197,9 @@ namespace SparkHRMS.Controllers
 
                                 statuses.Add(status);
                             }
-                            
+
                         }
-                       
+
                         if (attendanceRecord.IsLeave)
                         {
                             status = AttendanceStatus.Absent;
@@ -218,8 +219,20 @@ namespace SparkHRMS.Controllers
                         }
                     }
 
-                   
+
                 }
+
+                var leaveAllocationDetails = (from det in _context.LeaveAllocationDetails
+                                              join alloc in _context.LeaveAllocations on det.LeaveAllocationId equals alloc.Id
+                                              join type in _context.LeaveTypes on det.LeaveTypeId equals type.LeaveTypeId
+                                              where det.LeaveTypeId == type.LeaveTypeId && emp.EmployeeId == alloc.EmployeeId 
+                                              select new LeaveAllocationDetailDto
+                                              {
+                                                  Name = type.Name,
+                                                  Code = type.Code,
+                                                  AllocatedDays = det.AllocatedDays,
+                                                  RemainingDays = det.RemainingDays
+                                              }).Distinct().ToList();
 
                 EmployeeMonthlySummaryWithStatusCount EmployeeMonthlySummaryWithStatusCount = new EmployeeMonthlySummaryWithStatusCount();
 
@@ -239,6 +252,11 @@ namespace SparkHRMS.Controllers
 
                 EmployeeAttendanceStatusCounts EmployeeAttendanceStatusCounts = new EmployeeAttendanceStatusCounts();
 
+                EmployeeAttendanceStatusCounts.LeaveAllocations = leaveAllocationDetails;
+
+                int totalDaysInMonth = endOfMonth.Day;
+                EmployeeAttendanceStatusCounts.DaysInMonth = totalDaysInMonth;
+                EmployeeAttendanceStatusCounts.TotalWorkingDays = totalDaysInMonth - (statuses.Where(x => x == AttendanceStatus.Holiday).Count()) - statuses.Where(x => x == AttendanceStatus.Weekend).Count();
                 EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth = statuses.Where(x => x == AttendanceStatus.Present).Count();
                 EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth = statuses.Where(x => x == AttendanceStatus.HalfDay).Count();
                 EmployeeAttendanceStatusCounts.EmployeeAbsentCountOnMonth = statuses.Where(x => x == AttendanceStatus.Absent).Count();
@@ -326,7 +344,7 @@ namespace SparkHRMS.Controllers
                 existingCheckIn.CheckInTime = attendance.CheckInTime;
                 existingCheckIn.CheckOutTime = attendance.CheckOutTime;
                 existingCheckIn.CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
-                
+
 
                 existingCheckIn.IsPermission = attendance.IsPermission;
                 existingCheckIn.PermissionStartTime = attendance.PermissionStartTime;
@@ -453,7 +471,7 @@ namespace SparkHRMS.Controllers
             // Leave
             attendance.IsLeave = dto.IsLeave;
             attendance.IsHalfDayLeave = dto.IsHalfDayLeave;
-            
+
             _context.Update(attendance);
             await _context.SaveChangesAsync();
 
@@ -520,7 +538,7 @@ namespace SparkHRMS.Controllers
                 }
                 else
                 {
-                   
+
                 }
 
                 return Ok();

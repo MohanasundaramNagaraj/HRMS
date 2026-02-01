@@ -86,10 +86,10 @@ namespace SparkHRMS.Controllers
                                 .Select(h => h.Date.Date)
                                 .ToListAsync();
 
-           
+
             foreach (var date in allDatesInMonth)
             {
-                var leaveRequestedDetails = await _context.LeaveRequest.Where(x => x.EmployeeId == emp.EmployeeId 
+                var leaveRequestedDetails = await _context.LeaveRequest.Where(x => x.EmployeeId == emp.EmployeeId
                 && x.StartDate.Date <= date.Date
                 && x.EndDate.Date >= date.Date
                ).FirstOrDefaultAsync();
@@ -104,7 +104,7 @@ namespace SparkHRMS.Controllers
                 }
                 else if (date.DayOfWeek == DayOfWeek.Sunday)
                 {
-                    status = AttendanceStatus.Weekend; 
+                    status = AttendanceStatus.Weekend;
                 }
                 else if (attendanceRecord != null)
                 {
@@ -139,16 +139,16 @@ namespace SparkHRMS.Controllers
                     }
                 }
 
-                if(status == AttendanceStatus.Absent && leaveRequestedDetails != null && leaveRequestedDetails.Status != "CAN-ACC")
+                if (status == AttendanceStatus.Absent && leaveRequestedDetails != null && leaveRequestedDetails.Status != "CAN-ACC")
                 {
                     status = AttendanceStatus.LeaveRequested;
 
-                    if(leaveRequestedDetails.Status == "ACC")
+                    if (leaveRequestedDetails.Status == "ACC")
                     {
                         status = AttendanceStatus.LeaveRequestApproved;
                     }
                 }
-                
+
                 // Add attendance record with status
                 dailyAttendanceRecords.Add(new EmployeeAttendanceDto
                 {
@@ -159,8 +159,8 @@ namespace SparkHRMS.Controllers
                     CheckOutDateTime = attendanceRecord?.CheckOutTime,
                     IP = attendanceRecord?.CheckinMadeSystemIP,
                     CheckOutMadeSystemIP = attendanceRecord?.CheckOutMadeSystemIP,
-                   // CheckInPosition = attendanceRecord?.CheckInPosition,
-                   // CheckOutPosition = attendanceRecord?.CheckOutPosition,
+                    // CheckInPosition = attendanceRecord?.CheckInPosition,
+                    // CheckOutPosition = attendanceRecord?.CheckOutPosition,
                     Date = date,
                     CheckInTimeInString = attendanceRecord?.CheckInTime.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "Not Checked In",
                     CheckOutTimeInString = attendanceRecord?.CheckOutTime?.ToString("hh:mm tt", CultureInfo.InvariantCulture) ?? "Not Checked Out",
@@ -237,37 +237,36 @@ namespace SparkHRMS.Controllers
             var machineService = new MachineIDService();
             string? machineId = machineService.GetMachineId();
 
-            if (machineId != null)
+            //if (machineId != null)
+            //{
+            Console.WriteLine("Machine ID: " + machineId);
+            var checkIn = new EmployeeAttendance
             {
-                Console.WriteLine("Machine ID: " + machineId);
-                var checkIn = new EmployeeAttendance
-                {
-                    EmployeeId = emp.EmployeeId,
-                    CheckInTime = DateTime.Now,
-                    CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                    CheckOutMadeSystemIP = null,
-                    CheckInPosition = CheckInPosition,
-                    CheckInMadeDateTime = DateTime.Now,
-                    CheckInMadeUserId = Convert.ToInt32(_userManager.GetUserId(User)),
-                };
+                EmployeeId = emp.EmployeeId,
+                CheckInTime = DateTime.Now,
+                CheckinMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                CheckOutMadeSystemIP = null,
+                CheckInPosition = CheckInPosition,
+                CheckInMadeDateTime = DateTime.Now,
+                CheckInMadeUserId = Convert.ToInt32(_userManager.GetUserId(User)),
+            };
 
-                _context.EmployeeAttendance.Add(checkIn);
-                await _context.SaveChangesAsync();
+            _context.EmployeeAttendance.Add(checkIn);
+            await _context.SaveChangesAsync();
 
-                try
-                {
-                    return Ok("Check-in successful.");
-                }
-                catch (Exception ex)
-                {
-                    return Ok(ex.ToString());
-                }
-            }
-            else
+            try
             {
-               
-                return BadRequest("Machine ID file not found.");
+                return Ok("Check-in successful.");
             }
+            catch (Exception ex)
+            {
+                return Ok(ex.ToString());
+            }
+            //}
+            //else
+            //{
+            //    return BadRequest("Machine ID file not found.");
+            //}
         }
 
         // POST: Attendance/CheckOut
@@ -291,19 +290,19 @@ namespace SparkHRMS.Controllers
                 return BadRequest("You have not checked in today or have already checked out.");
             }
 
-            //var timeSheet = _context.Timesheets
-            //                .Where(t => t.EmployeeId == emp.EmployeeId && t.Date.Date == today.Date)
-            //                .Any();
-            //if(!timeSheet)
-            //{
-            //    return BadRequest("You have not update your timesheet. Please update and proceed.");
-            //}
+            var timeSheet = _context.Timesheets
+                            .Where(t => t.EmployeeId == emp.EmployeeId && t.Date.Date == today.Date)
+                            .Any();
+            if (!timeSheet)
+            {
+                return BadRequest("You have not update your timesheet. Please update and proceed.");
+            }
 
             var machineService = new MachineIDService();
             string? machineId = machineService.GetMachineId();
 
-            if (machineId != null)
-            {
+            //if (machineId != null)
+            //{
                 checkInRecord.CheckOutTime = DateTime.Now;
                 checkInRecord.CheckOutPosition = CheckOutPosition;
                 checkInRecord.CheckOutMadeSystemIP = HttpContext.Connection.RemoteIpAddress?.ToString();
@@ -319,11 +318,11 @@ namespace SparkHRMS.Controllers
                 {
                     return Ok(ex.ToString());
                 }
-            }
-            else
-            {
-                return BadRequest("Machine ID file not found.");
-            }
+            //}
+            //else
+            //{
+            //    return BadRequest("Machine ID file not found.");
+            //}
         }
 
     }

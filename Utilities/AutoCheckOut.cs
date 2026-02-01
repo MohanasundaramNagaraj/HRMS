@@ -44,7 +44,7 @@ namespace SparkHRMS.Utilities
         }
         public async Task AutoCheckOutAsync(string email, string subject, string htmlMessage)
         {
-            string dateTimeForCheckinCheckoutSubject = "";
+            string dateTimeForCheckinCheckoutSubject = DateTime.Now.ToString("dd MMM yyyy");
 
             subject = Configuration["EmailSenderSettings:Subject:AutoCheckOut"] + " on " + dateTimeForCheckinCheckoutSubject;
             try
@@ -53,10 +53,12 @@ namespace SparkHRMS.Utilities
                 var yesterday = DateTime.Today.AddDays(-1);
                 var employeeAttendance = (from emp in _context.EmployeeAttendance
                                           join employee in _context.Employees on emp.EmployeeId equals employee.EmployeeId
-                                          where emp.CheckInTime != null &&
+                                          where emp.CheckInTime != null &&(
                                                 emp.CheckInTime.Date == today
-                                                || emp.CheckInTime.Date == yesterday
+                                                || emp.CheckInTime.Date == yesterday)
                                                 && emp.CheckOutTime == null
+                                                && emp.IsLeave == false
+                                                && emp.IsHalfDayLeave == false
                                           select new
                                           {
                                               EmployeeAttendance = emp,
@@ -70,8 +72,9 @@ namespace SparkHRMS.Utilities
                     {
                         var empAttendance = (from em in _context.EmployeeAttendance
                                              where em.EmployeeId == emplyoee.Employee.EmployeeId &&
-                                                   (em.CheckInTime != null && em.CheckInTime.Date == today && em.CheckOutTime == null
-                                                   || em.CheckInTime.Date == yesterday
+                                                   (em.CheckInTime != null && (em.CheckInTime.Date == today || em.CheckInTime.Date == yesterday )&& em.CheckOutTime == null
+                                                   && em.IsLeave == false
+                                                   && em.IsHalfDayLeave == false
                                                    )
                                              select em).FirstOrDefault();
 
@@ -79,8 +82,9 @@ namespace SparkHRMS.Utilities
                         {
                             empAttendance.CheckOutTime = emplyoee.EmployeeAttendance.CheckInTime.AddHours(9);
                             empAttendance.IsAutoCheckedOut = true;
-                            empAttendance.CheckinMadeSystemIP = IPAddress.Loopback.ToString();
-
+                            empAttendance.CheckOutMadeSystemIP = IPAddress.Loopback.ToString();
+                            empAttendance.CheckOutMadeDateTime = DateTime.Now;
+                            
                             _context.EmployeeAttendance.Update(empAttendance);
                         }
                         var record = empAttendance;
@@ -128,7 +132,7 @@ namespace SparkHRMS.Utilities
                     }
                     if(htmlMessage != "")
                     {
-                        _emailService.SendEmailAsync(email, subject, htmlMessage);
+                        await _emailService.SendEmailAsync(email, subject, htmlMessage);
                     }
 
                 }

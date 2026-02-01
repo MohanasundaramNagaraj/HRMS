@@ -45,7 +45,7 @@ namespace SparkHRMS.Utilities
             _smtpSettings = smtpSettings.Value;
             _emailService = emailService;
         }
-        public async Task AutoTimeSheetMailAsync(List<Employee> employees, string subject, string htmlMessage,List<EmailAddress> ccs)
+        public async Task AutoTimeSheetMailAsync(List<Employee> employees, string subject, string htmlMessage, List<EmailAddress> ccs)
         {
 
             try
@@ -58,7 +58,7 @@ namespace SparkHRMS.Utilities
                 string tableContent = "";
                 foreach (var emp in emps)
                 {
-                    string tr = "<tr><td>" + emp.EmpName + "</td><td>"+emp.Destination + "</td><td>" + emp.BalanceDayscount + "</td></tr>";
+                    string tr = "<tr><td>" + emp.EmpName + "</td><td>" + emp.Destination + "</td><td>" + emp.BalanceDayscount + "</td></tr>";
 
                     tableContent = tableContent + tr;
                     var to = new EmailAddress(emp.EmailId, emp.EmpName);
@@ -78,7 +78,7 @@ namespace SparkHRMS.Utilities
 
 
                 string dateTimeForSubject = DateTime.Now.ToString("dd MMM yyyy");
-              
+
                 subject = Configuration["EmailSenderSettings:Subject:AutoTimeSheetMailOut"] + " on " + dateTimeForSubject;
 
                 var apiKey = Configuration["EmailSenderSettings:SendGridAPIKey"];
@@ -96,32 +96,34 @@ namespace SparkHRMS.Utilities
                                         Configuration["EmailSenderSettings:From"],
                                         Configuration["EmailSenderSettings:UserName"],
                                         System.Text.Encoding.UTF8
-                                    ), 
+                                    ),
                     Subject = subject,
                     Body = htmlMessage,
                     IsBodyHtml = true,
                 };
                 tos.ForEach(t => mailMessage.To.Add(t.Email));
                 ccs.ForEach(cc => mailMessage.CC.Add(cc.Email));
-               
-
-                // var singleRecipient = tos.FirstOrDefault();
-                var emailLogs = new EmailLogs
+                int logId = 0;
+                if (emps.Count() > 0)
                 {
-                    Recipient = string.Join(",", tos.Select(t => t.Email)), // multiple recipients
-                    //Recipient = singleRecipient.Email, // multiple recipients
-                    Cc = string.Join(",", ccs.Select(c => c.Email)),
-                    Subject = subject,
-                    Body = htmlMessage,
-                    SentDate = DateTime.Now,
-                    IsSuccessful = false,
-                    ErrorMessage = string.Empty
-                };
+                    // var singleRecipient = tos.FirstOrDefault();
+                    var emailLogs = new EmailLogs
+                    {
+                        Recipient = string.Join(",", tos.Select(t => t.Email)), // multiple recipients
+                                                                                //Recipient = singleRecipient.Email, // multiple recipients
+                        Cc = string.Join(",", ccs.Select(c => c.Email)),
+                        Subject = subject,
+                        Body = htmlMessage,
+                        SentDate = DateTime.Now,
+                        IsSuccessful = false,
+                        ErrorMessage = string.Empty
+                    };
 
-                _context.EmailLogs.Add(emailLogs);
-                _context.SaveChanges();
+                    _context.EmailLogs.Add(emailLogs);
+                    _context.SaveChanges();
 
-                int logId = emailLogs.Id;
+                    logId = emailLogs.Id;
+                }
 
                 var smtpClient = new System.Net.Mail.SmtpClient(Configuration["EmailSenderSettings:SmtpServer"])
                 {
@@ -134,38 +136,18 @@ namespace SparkHRMS.Utilities
                 try
                 {
 
-                    var msg = MailHelper.CreateSingleEmailToMultipleRecipients(
-                        from,
-                        //new List<EmailAddress> { singleRecipient },
-                        tos,
-                        subject,
-                        plainTextContent,
-                        htmlContent,
-                        false
-                    );
+                    if (emps.Count() > 0)
+                    {
+                        await smtpClient.SendMailAsync(mailMessage);
+                        await Task.Delay(500);
 
-                    msg.Personalizations[0].Ccs = ccs;
-
-                    //  var response = await client.SendEmailAsync(msg);
-
-                    await smtpClient.SendMailAsync(mailMessage); 
-                    await Task.Delay(500); // Delay in milliseconds
-                  
-                    var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
-                    //if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
-                    //{
+                        var log = _context.EmailLogs.Where(x => x.Id == logId).FirstOrDefault();
 
                         log.IsSuccessful = true;
-                    //}
-                    //else
-                    //{
-                    //    string responseBody = await response.Body.ReadAsStringAsync();
-                    //    log.IsSuccessful = false;
-                    //    log.ErrorMessage = responseBody;
-                    //}
 
-                    _context.Entry(log).State = EntityState.Modified;
-                    _context.SaveChanges();
+                        _context.Entry(log).State = EntityState.Modified;
+                        _context.SaveChanges();
+                    }
 
                 }
                 catch (Exception ex)
@@ -247,21 +229,25 @@ namespace SparkHRMS.Utilities
                     {
                         bool checkedIn = checkinDates.Contains(date);
                         var entry = timesheetData.FirstOrDefault(d => d.Date == date);
-                        return checkedIn && (entry == null 
-                            //|| entry.TotalHours < 8
+                        return checkedIn && (entry == null
+                        //|| entry.TotalHours < 8
                         );
                     })
                     .ToList();
 
                 int incompleteDayCount = incompleteDays.Count;
 
-                empDetls.Add(new EmployeeMailVM
+                if (incompleteDayCount != 0)
                 {
-                    EmpName = i.Name,         // Assuming Employee model has Name
-                    EmailId = i.Email,
-                    BalanceDayscount = incompleteDayCount,
-                    Destination = i.Designation
-                });
+                    empDetls.Add(new EmployeeMailVM
+                    {
+                        EmpName = i.Name,         // Assuming Employee model has Name
+                        EmailId = i.Email,
+                        BalanceDayscount = incompleteDayCount,
+                        Destination = i.Designation
+                    });
+                }
+
             }
 
             return empDetls;

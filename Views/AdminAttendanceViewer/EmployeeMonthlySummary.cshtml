@@ -55,7 +55,7 @@
     </li>
     <li class="breadcrumb-item bcrumb-1">
         <a href="#">
-            Monthly Summary 
+            Monthly Summary
         </a>
     </li>
 </ul>
@@ -100,7 +100,7 @@
 
                     <div class="col-lg-12 col-md-12 col-sm-12">
                         <div class=" project_widget">
-                          
+
                             <div class="body">
                                 <div class="row">
                                     <div class="table-responsive">
@@ -110,14 +110,28 @@
                                                     <th class="center"> # </th>
                                                     <th class="center"> Employee Code </th>
                                                     <th class="center"> Employee Name </th>
-                                                    <th class="center"> Present Count </th>
-                                                    <th class="center"> Half Day Count </th>
-                                                    <th class="center"> Absent Count </th>
-                                                    <th class="center"> Holiday Count </th>
-                                                    <th class="center"> Weekend Count </th>
-                                                    <th class="center"> Permission Count </th>
-                                                    <th class="center"> Pending Check out Count </th>
+                                                    <th class="center"> Days in Month </th>
+                                                    <th class="center"> Working Days </th>
+                                                    <th class="center" colspan="4"> Leave Allocation </th>
+
+                                                    @* <th class="center"> Present  </th>
+                                                    <th class="center"> Half Day  </th> *@
+                                                    <th class="center"> Present  </th>
+                                                    <th class="center"> Absent  </th>
+                                                    <th class="center"> Holiday  </th>
+                                                    <th class="center"> Weekend  </th>
+                                                    <th class="center"> Permission  </th>
+                                                    <th class="center"> Pending Check out  </th>
                                                 </tr>
+                                                <tr>
+                                                    <th colspan="5"></th>
+                                                    <th class="center">Code</th>
+                                                    <th class="center">Name</th>
+                                                    <th class="center">Allocated</th>
+                                                    <th class="center">Remaining</th>
+                                                    <th colspan="6"></th>
+                                                </tr>
+
                                             </thead>
                                             <tbody>
                                                 @{
@@ -130,8 +144,33 @@
                                                         <td>@count</td>
                                                         <td>@record.EmployeeDetails.EmpCode</td>
                                                         <td>@record.EmployeeDetails.Name</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.DaysInMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.TotalWorkingDays</td>
+
+                                                            @if(record.EmployeeAttendanceStatusCounts.LeaveAllocations.Count > 0)
+                                                            {
+                                                                foreach (var r in record.EmployeeAttendanceStatusCounts.LeaveAllocations)
+                                                                {
+
+                                                                    <td>@r.Code</td>
+                                                                    <td>@r.Name</td>
+                                                                    <td>@r.AllocatedDays</td>
+                                                                    <td>@r.RemainingDays</td>
+                                                                }
+                                                            }
+                                                        else
+                                                        {
+                                                            <td colspan="4">Not Allocated</td>
+                                                        }
+
+
+                                                       
+                                                        <td>
+                                                            @(record.EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth + (record.EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth * 0.5))
+                                                        </td>
+
+                                                        @* <td>@record.EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth</td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth</td> *@
                                                         <td>@record.EmployeeAttendanceStatusCounts.EmployeeAbsentCountOnMonth</td>
                                                         <td>@record.EmployeeAttendanceStatusCounts.EmployeeHolidayCountOnMonth</td>
                                                         <td>@record.EmployeeAttendanceStatusCounts.EmployeeWeekendCountOnMonth</td>
@@ -156,7 +195,7 @@
 
 
 @section Scripts {
-  
+
 
     <script>
         function getData(obj) {

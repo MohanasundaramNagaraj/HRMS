@@ -10,6 +10,11 @@ namespace SparkHRMS.ViewModels
     }
     public class EmployeeAttendanceStatusCounts
     {
+        public int? DaysInMonth { get; set; }
+        public int? TotalWorkingDays { get; set; }
+        
+        public List<LeaveAllocationDetailDto> LeaveAllocations { get; set; }
+
         public int? EmployeePresentCountOnMonth { get; set; }
         public int? EmployeeHalfDayCountOnMonth { get; set; }
         public int? EmployeeLeaveCountOnMonth { get; set; }
@@ -18,6 +23,14 @@ namespace SparkHRMS.ViewModels
         public int? EmployeeHolidayCountOnMonth { get; set; }
         public int? EmployeePermissionNeededCountOnMonth { get; set; }
         public int? EmployeePendingCheckOutNeededCountOnMonth { get; set; } 
+    }
+
+    public class LeaveAllocationDetailDto
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public decimal? AllocatedDays { get; set; }
+        public decimal? RemainingDays { get; set; }
     }
 
     public class EmployeeAttendanceResponseDto

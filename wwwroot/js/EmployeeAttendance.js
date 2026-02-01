@@ -105,7 +105,7 @@ function initCalendar() {
             $('body').append(modalHtml);
 
             clearModalForm();
-            $(".modal").modal("show");
+           // $(".modal").modal("show");
         },
         eventClick: function (info) {
             //addEvent.style.display = "none";
@@ -120,7 +120,7 @@ function initCalendar() {
             $('body').append(modalHtml);
 
             // console.log(info.event.extendedProps.description);
-            $(".modal").modal("show");
+           // $(".modal").modal("show");
             $(".modal").find("#id").val(info.event.id);
             $(".modal").find("#title").val(info.event.title);
             $(".modal").find("#starts-at").val(startDate);
