@@ -57,23 +57,31 @@ namespace SparkHRMS.Controllers
         // GET: Employee/Create
         public IActionResult Create()
         {
-            ViewBag.ActiveUsers = _context.Users.Where(x => x.IsActive == true).ToList();
+            var activeUsers = _context.Employees   
+                                .Where(u => u.IsActive)
+                               .Select(u => u.Name + " - " + u.Designation)
+                                .ToList();
+
+            ViewBag.ActiveUsers = activeUsers;
+
             return View();
         }
 
         // POST: Employee/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,Designation,ImageUrl,DateOfJoining,Address,ReportingHeadMailID")] Employee employee)
+        public async Task<IActionResult> Create([Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,DOB,Gender,FatherName,Designation,ImageUrl,DateOfJoining,Address,ReportingHeadMailID")] Employee employee)
         {
             if (ModelState.IsValid)
             {
                 var applicationUser = new ApplicationUser
                 {
-                    UserName = employee.Email,
+                    UserName = employee.Name,
                     Email = employee.Email,
                     IsActive = true,
                     PhoneNumber = employee.PhoneNumber,
+                    
+                    
                 };
                 var defaultPassword = _configuration["AppSettings:DefaultUserPassword"];
                 var result = await _userManager.CreateAsync(applicationUser, defaultPassword);
@@ -104,8 +112,9 @@ namespace SparkHRMS.Controllers
                         }
                         if (employee.DateOfJoining == null)
                         {
-                            employee.DateOfJoining = DateTime.Now;
+                          employee.DateOfJoining = DateTime.Now;
                         }
+                        
                         _context.Add(employee);
                         await _context.SaveChangesAsync();
 
@@ -145,7 +154,7 @@ namespace SparkHRMS.Controllers
         // GET: Employee/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            ViewBag.ActiveUsers = _context.Users;
+            //ViewBag.ActiveUsers = _context.Users;
             if (id == null)
             {
                 return NotFound();
@@ -156,6 +165,15 @@ namespace SparkHRMS.Controllers
             {
                 return NotFound();
             }
+            
+
+            var activeUsers = _context.Employees
+                               .Where(u => u.IsActive)
+                              .Select(u => u.Name + " - " + u.Designation)
+                               .ToList();
+
+            ViewBag.ActiveUsers = activeUsers;
+
             ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.ApplicationUserId);
             return View(employee);
         }
@@ -164,42 +182,76 @@ namespace SparkHRMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,Gender,Designation,ImageUrl,Address,ApplicationUserId,IsActive")] Employee employee)
+        public async Task<IActionResult> Edit(
+      int id,
+      [Bind("EmployeeId,EmployeeCode,Name,Email,PhoneNumber,Gender,Designation,ImageUrl,FatherName,DOB,DateOfJoining,Address,ReportingHeadMailID,IsActive")]
+    Employee employee)
         {
             if (id != employee.EmployeeId)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            
+            ViewBag.ActiveUsers = await _context.Employees
+                .Where(u => u.IsActive)
+                .Select(u => u.Name + " - " + u.Designation)
+                .ToListAsync();
+
+            if (!ModelState.IsValid)
             {
-                employee.ApplicationUserId = _context.Employees.Where(x => x.EmployeeId == employee.EmployeeId).Select(x => x.ApplicationUserId).FirstOrDefault();
-                if (employee.ImageUrl == null)
+                return View(employee);
+            }
+
+            try
+            {
+               
+                var existingEmployee = await _context.Employees
+                    .FirstOrDefaultAsync(x => x.EmployeeId == employee.EmployeeId);
+
+                if (existingEmployee == null)
+                {
+                    return NotFound();
+                }
+
+                
+                employee.ApplicationUserId = existingEmployee.ApplicationUserId;
+
+                
+                if (string.IsNullOrWhiteSpace(employee.ImageUrl))
                 {
                     employee.ImageUrl = "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png";
                 }
+
                 
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.EmployeeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                existingEmployee.EmployeeCode = employee.EmployeeCode;
+                existingEmployee.Name = employee.Name;
+                existingEmployee.Email = employee.Email;
+                existingEmployee.PhoneNumber = employee.PhoneNumber;
+                existingEmployee.Gender = employee.Gender;
+                existingEmployee.Designation = employee.Designation;
+                existingEmployee.ImageUrl = employee.ImageUrl;
+                existingEmployee.Address = employee.Address;
+                existingEmployee.FatherName = employee.FatherName;
+                existingEmployee.DOB = employee.DOB;
+                existingEmployee.DateOfJoining = employee.DateOfJoining;
+                existingEmployee.ReportingHeadMailID = employee.ReportingHeadMailID;
+                existingEmployee.IsActive = employee.IsActive;
+
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", employee.ApplicationUserId);
-            return View(employee);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!EmployeeExists(employee.EmployeeId))
+                {
+                    return NotFound();
+                }
+                throw;
+            }
         }
+
 
         // GET: Employee/Delete/5
         public async Task<IActionResult> Delete(int? id)

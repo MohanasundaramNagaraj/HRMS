@@ -8,6 +8,7 @@
 
 <link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
 
+
 <ul class="breadcrumb breadcrumb-style ">
     <li class="breadcrumb-item">
         <h4 class="page-title"> Employees</h4>
@@ -18,14 +19,14 @@
         </a>
     </li>
     @* <li class="breadcrumb-item bcrumb-1">
-    <a href="../../index.html">
-    <i class="fas fa-home"></i> Home
-    </a>
-    </li>
-    <li class="breadcrumb-item bcrumb-2">
-    <a href="#" onClick="return false;">Employees</a>
-    </li>
-    <li class="breadcrumb-item active">Add Employee</li> *@
+        <a href="../../index.html">
+        <i class="fas fa-home"></i> Home
+        </a>
+        </li>
+        <li class="breadcrumb-item bcrumb-2">
+        <a href="#" onClick="return false;">Employees</a>
+        </li>
+        <li class="breadcrumb-item active">Add Employee</li> *@
 </ul>
 <hr />
 <div class="card">
@@ -35,17 +36,21 @@
             <div class="row clearfix">
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Employee Code" asp-for="EmployeeCode" />
-
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" class="form-control" asp-for="EmployeeCode">
+                                <label class="form-label">EmployeeCode</label>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Name" asp-for="Name" />
-
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" class="form-control" asp-for="Name">
+                                <label class="form-label">Name</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -54,17 +59,18 @@
                 <div class="col-sm-6">
                     <div class="form-group form-float">
                         <div class="form-line">
-                            <input type="text" class="form-control" name="Gender" asp-for="Gender" placeholder="Gender" />
-
+                            <input type="text" class="form-control" asp-for="FatherName" />
+                            <label class="form-label">FatherName</label>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <div class="form-line">
-                            <input id="email" type="email" class="validate form-control" asp-for="Email"
-                                   placeholder="Email">
-
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" class="form-control" asp-for="Gender">
+                                <label class="form-label">Gender</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -73,73 +79,122 @@
             <div class="row clearfix">
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Designation" asp-for="Designation" />
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input asp-for="Email" class="form-control" />
+                                <label class="form-label">Email</label>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
 
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        @*    <input  class="form-control datetimepicker" asp-for="DateOfJoining"
-                        placeholder="Joining Date" name="date1" id="date1"> *@
-                        <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DateOfJoining"
-                               value="" placeholder="Joining Date" name="date1" id="date1" fdprocessedid="ivq72r">
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" class="form-control" asp-for="Designation">
+                                <label class="form-label">Designation</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="row clearfix">
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Telephone" asp-for="PhoneNumber" />
-
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text"
+                                       class="form-control datetimepicker"
+                                       asp-for="DateOfJoining"
+                                       id="date1"
+                                       autocomplete="off" />
+                                <label class="form-label">Date of joining</label>
+                            </div>
                         </div>
                     </div>
+
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group">
-                        @* <input  class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
-                        name="date2" id="date2"> *@
-                        <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DOB"
-                               value="" placeholder="Birth Date" name="date2" id="date2" fdprocessedid="ivq72r">
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input asp-for="PhoneNumber"
+                                       class="form-control"
+                                       maxlength="10"
+                                       oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                                <label class="form-label">Telephone</label>
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="row clearfix">
                 <div class="col-sm-6">
                     <div class="form-group">
-                        <div class="form-line">
-                            <textarea rows="4" class="form-control no-resize" asp-for="Address"
-                                      placeholder="Address"></textarea>
-
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text"
+                                       class="form-control datetimepicker"
+                                       asp-for="DOB"
+                                       id="date2"
+                                       autocomplete="off" />
+                                <label class="form-label">Date of Birth</label>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="col-sm-6">
                     <div class="form-group">
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" class="form-control" asp-for="Address">
+                                <label class="form-label">Address</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+
+            <div class="row clearfix">
+                <div class="col-md-6" style="top: 8px;">
+                    <div class="form-group form-float">
                         <div class="form-line">
-                            <input type="text" id="reportingHead" class="form-control" asp-for="ReportingHeadMailID" style="display:none;" />
-                            <select id="reportingHeadSelect" style="width:35%;margin-right:10px;display:inline-block" onchange="document.getElementById('reportingHead').value = this.value">
-                                <option value="">Select Reporting Head</option>
-                                @foreach (var user in ViewBag.ActiveUsers)
+                            <input type="hidden"
+                                   id="reportingHead"
+                                   asp-for="ReportingHeadMailID" />
+
+                            <select id="reportingHeadSelect"
+                                    class="form-control select2"
+                                    onchange="document.getElementById('reportingHead').value = this.value">
+                                <option value=""></option>
+                                @foreach (var name in ViewBag.ActiveUsers)
                                 {
-                                    <option value="@user.Email">@user.Email</option>
+                                    <option value="@name">@name</option>
                                 }
                             </select>
+
+                            <label class="form-label" style="margin-top: 0px; top: -10px">Reporting Head</label>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-sm-6 mb-3 form-check">
+                <div class="class= col-md-6  form-check">
                     <br />
                     <br />
                     <input asp-for="IsActive" class="form-check-input" value="true" checked />
-                    <label class="form-check-label">Is Active</label>
+                    <label class="form-check-label"style="bottom: 13px;left: 16px;">Is Active</label>
                 </div>
             </div>
-            @* <div class="row">
+                @* <div class="row">
                 <div class="col-sm-12">
                     <label class="control-label col-md-3">Upload Your Profile Photo</label>
                     <form action="/" id="frmFileUpload" class="dropzone" method="post"
@@ -161,15 +216,15 @@
                     </form>
                 </div>
             </div> *@
-            <div class="col-lg-12 p-t-20 text-center">
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary waves-effect m-r-15" />
-                    <a asp-action="Index" type="button" class="btn btn-danger waves-effect">Cancel</a>
+                <div class="col-lg-12 p-t-20 text-center">
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary waves-effect m-r-15" />
+                        <a asp-action="Index" type="button" class="btn btn-danger waves-effect">Cancel</a>
+                    </div>
                 </div>
-            </div>
 
-        </div>
-    </form>
+            </div>
+</form>
 </div>
 
 <!-- Include jQuery -->

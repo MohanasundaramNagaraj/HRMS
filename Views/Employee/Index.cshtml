@@ -68,7 +68,11 @@
                                     <td class="center"> @Html.DisplayFor(modelItem => item.Designation)</td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.PhoneNumber)</td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.Email)</td>
-                                    <td class="center"> @Html.DisplayFor(modelItem => item.DateOfJoining)</td>
+                                    <td class="center">
+                                        @(item.DateOfJoining?.ToString("dd-MM-yyyy"))
+                                    </td>
+
+
 
                                     <td class="center">
                                         <a asp-action="Edit" asp-route-id="@item.EmployeeId" class="btn btn-tbl-edit btn-light">
