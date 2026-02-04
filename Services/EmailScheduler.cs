@@ -16,21 +16,21 @@ public class EmailScheduler
         var autoCheckOutCron = _configuration["EmailSenderSettings:JobSchedules:AutoCheckOutJobCron"];
         var autoTimeSheetCron = _configuration["EmailSenderSettings:JobSchedules:AutoTimeSheetMailJobCron"];
 
-        RecurringJob.AddOrUpdate<EmailQueueManager>(
-            "CheckInJob",
-            job => job.SendAttendanceEmail("CheckIn"),
-            checkInCron);
+        //RecurringJob.AddOrUpdate<EmailQueueManager>(
+        //    "CheckInJob",
+        //    job => job.SendAttendanceEmail("CheckIn"),
+        //    checkInCron);
 
 
-        RecurringJob.AddOrUpdate<EmailQueueManager>(
-           "AutoCheckOutJob",
-           job => job.AutoCheckOutEmail("CheckOut"),
-           autoCheckOutCron);
+        //RecurringJob.AddOrUpdate<EmailQueueManager>(
+        //   "AutoCheckOutJob",
+        //   job => job.AutoCheckOutEmail("CheckOut"),
+        //   autoCheckOutCron);
 
-        RecurringJob.AddOrUpdate<EmailQueueManager>(
-         "AutoMailTimeSheetJob",
-         job => job.AutoTimeSheetEmail("TimeSheet"),
-         autoTimeSheetCron);
+        //RecurringJob.AddOrUpdate<EmailQueueManager>(
+        // "AutoMailTimeSheetJob",
+        // job => job.AutoTimeSheetEmail("TimeSheet"),
+        // autoTimeSheetCron);
 
 
     }
