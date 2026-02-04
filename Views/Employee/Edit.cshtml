@@ -24,7 +24,7 @@
 
     <!-- Right side name -->
     <li class="breadcrumb-item ms-auto"  style="list-style:none;">
-        <h4 class="mb-0">@Model.Name</h4>
+        <h4 class="mb-0">@Model.Name - @Model.EmployeeCode</h4>
     </li>
 </ul>
 
@@ -41,7 +41,7 @@
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" class="form-control" asp-for="EmployeeCode">
-                                <label class="form-label">EmployeeCode</label>
+                                <label class="form-label">Employee Code</label>
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                     <div class="form-group form-float">
                         <div class="form-line">
                             <input type="text" class="form-control" asp-for="FatherName" />
-                            <label class="form-label">FatherName</label>
+                            <label class="form-label">Father's Name</label>
                         </div>
                     </div>
                 </div>
