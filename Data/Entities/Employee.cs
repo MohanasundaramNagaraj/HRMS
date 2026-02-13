@@ -45,7 +45,59 @@ namespace SparkHRMS.Data.Entities
         [ValidateNever]
         public ApplicationUser? ApplicationUser { get; set; }
 
+
         public string? ReportingHeadMailID { get; set; }
+        [MaxLength(5)]
+        public string? BloodGroup { get; set; }   
+
+
+        // Personal Details
+        [MaxLength(50)]
+        public string? Nationality { get; set; }
+
+        [MaxLength(20)]
+        public string? MaritalStatus { get; set; }   
+
+        [Phone]
+        [MaxLength(15)]
+        public string? AlternateMobileNumber { get; set; }
+
+        [MaxLength(100)]
+        public string? MotherName { get; set; }
+
+        [MaxLength(100)]
+        public string? SpouseName { get; set; }
+
+        public int? NumberOfDependents { get; set; }
+
+       
+        [MaxLength(100)]
+        public string? EmergencyContactName { get; set; }
+
+        [MaxLength(50)]
+        public string? EmergencyContactRelation { get; set; }
+
+        [Phone]
+        [MaxLength(15)]
+        public string? EmergencyContactNumber { get; set; }
+
+        [Phone]
+        [MaxLength(15)]
+        public string? EmergencyAlternateNumber { get; set; }
+
+       
+        [MaxLength(12)]
+        public string? AadhaarNumber { get; set; }
+
+        [MaxLength(10)]
+        public string? PANNumber { get; set; }
+
+        [MaxLength(20)]
+        public string? PassportNumber { get; set; }
+
+        [MaxLength(20)]
+        public string? DrivingLicenseNumber { get; set; }
+
 
     }
 }

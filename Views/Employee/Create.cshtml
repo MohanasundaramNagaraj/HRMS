@@ -8,169 +8,729 @@
 
 <link href="~/app/assets/js/bundles/flatpicker/flatpickr.min.css" rel="stylesheet">
 
-<ul class="breadcrumb breadcrumb-style ">
-    <li class="breadcrumb-item">
-        <h4 class="page-title"> Employees</h4>
-    </li>
-    <li class="breadcrumb-item bcrumb-1">
-        <a href="#">
-            <i class="fas fa-add"></i> Add
-        </a>
-    </li>
-    @* <li class="breadcrumb-item bcrumb-1">
-    <a href="../../index.html">
-    <i class="fas fa-home"></i> Home
-    </a>
-    </li>
-    <li class="breadcrumb-item bcrumb-2">
-    <a href="#" onClick="return false;">Employees</a>
-    </li>
-    <li class="breadcrumb-item active">Add Employee</li> *@
-</ul>
-<hr />
-<div class="card">
-    <form asp-action="Create" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="body">
-            <div class="row clearfix">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Employee Code" asp-for="EmployeeCode" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Name" asp-for="Name" />
+<style>
+    .identity-header {
+        background-color: #009688;
+        color: #fff;
+        cursor: pointer;
+        padding: 14px 18px;
+        border-radius: 8px 8px 0 0;
+        font-family: 'Montserrat', 'Segoe UI', sans-serif;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 15px;
+    }
 
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row clearfix">
-                <div class="col-sm-6">
+
+        .identity-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+    .toggle-icon {
+        transition: transform 0.3s ease;
+    }
+    
+    .form-float select.form-control {
+        border: none;
+        border-bottom: 1px solid #ddd;
+        background: transparent;
+        box-shadow: none;
+    }
+
+        
+        .form-float select.form-control:focus {
+            border-bottom: 2px solid #ff9800;
+            outline: none;
+        }
+</style>
+
+
+<div class="card shadow-sm mb-3">
+
+  
+    <div class="card-header identity-header text-white"
+         data-bs-toggle="collapse"
+         data-bs-target="#identityInfo"
+         aria-expanded="true"
+         style="cursor:pointer;">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-person-badge me-2"></i>
+                Identity Information
+            </h5>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+        </div>
+    </div>
+
+
+    
+    <div id="identityInfo" class="collapse show">
+        <div class="card-body" style="padding-top: 37px;padding-bottom: 45px;">
+
+            <div class="row">
+
+                
+                <div class="col-md-4">
                     <div class="form-group form-float">
                         <div class="form-line">
-                            <input type="text" class="form-control" name="Gender" asp-for="Gender" placeholder="Gender" />
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <div class="form-line">
-                            <input id="email" type="email" class="validate form-control" asp-for="Email"
-                                   placeholder="Email">
-
+                            <input type="text"asp-for="Name" class="form-control">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i> Full Name
+                                <span class="text-danger">*</span>
+                            </label>
                         </div>
                     </div>
                 </div>
 
-            </div>
-            <div class="row clearfix">
-                <div class="col-sm-6">
-                    <div class="form-group">
+               
+                <div class="col-md-4">
+                    <div class="form-group form-float">
                         <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Designation" asp-for="Designation" />
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        @*    <input  class="form-control datetimepicker" asp-for="DateOfJoining"
-                        placeholder="Joining Date" name="date1" id="date1"> *@
-                        <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DateOfJoining"
-                               value="" placeholder="Joining Date" name="date1" id="date1" fdprocessedid="ivq72r">
-                    </div>
-                </div>
-            </div>
-            <div class="row clearfix">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" class="form-control" placeholder="Telephone" asp-for="PhoneNumber" />
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        @* <input  class="form-control datetimepicker" placeholder="Birth Date" asp-for="DOB"
-                        name="date2" id="date2"> *@
-                        <input type="text" class="form-control datetimepicker flatpickr-input" asp-for="DOB"
-                               value="" placeholder="Birth Date" name="date2" id="date2" fdprocessedid="ivq72r">
-                    </div>
-                </div>
-            </div>
-            <div class="row clearfix">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <div class="form-line">
-                            <textarea rows="4" class="form-control no-resize" asp-for="Address"
-                                      placeholder="Address"></textarea>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <div class="form-line">
-                            <input type="text" id="reportingHead" class="form-control" asp-for="ReportingHeadMailID" style="display:none;" />
-                            <select id="reportingHeadSelect" style="width:35%;margin-right:10px;display:inline-block" onchange="document.getElementById('reportingHead').value = this.value">
-                                <option value="">Select Reporting Head</option>
-                                @foreach (var user in ViewBag.ActiveUsers)
-                                {
-                                    <option value="@user.Email">@user.Email</option>
-                                }
+                            <select class="form-control select2">
+                                <option value=""></option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Transgender</option>
                             </select>
+                            <label class="form-label">
+                                <i class="bi bi-gender-ambiguous"></i> Gender
+                                <span class="text-danger">*</span>
+                            </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-6 mb-3 form-check">
-                    <br />
-                    <br />
-                    <input asp-for="IsActive" class="form-check-input" value="true" checked />
-                    <label class="form-check-label">Is Active</label>
+               
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"
+                                   class="form-control datetimepicker"
+                                   autocomplete="off" />
+                            <label class="form-label">
+                                <i class="bi bi-calendar-event"></i>
+                                Date of Birth
+                                <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="number" class="form-control">
+                            <label class="form-label">
+                                <i class="bi bi-person-circle age-icon"></i>
+                                Age
+                                <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <select class="form-control select2">
+                                <option value=""></option>
+                                <option>A+</option>
+                                <option>A-</option>
+                                <option>B+</option>
+                                <option>B-</option>
+                                <option>O+</option>
+                                <option>O-</option>
+                                <option>AB+</option>
+                                <option>AB-</option>
+                            </select>
+                            <label class="form-label">
+                                <i class="bi bi-droplet"></i> Blood Group
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <select class="form-control select2">
+                                <option value=""></option>
+                                <option>Indian</option>
+                                <option>Others</option>
+                            </select>
+                            <label class="form-label">
+                                <i class="bi bi-flag"></i>
+                                Nationality <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+              
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <select class="form-control select2">
+                                <option value=""></option>
+                                <option>Single</option>
+                                <option>Married</option>
+                                <option>Divorced</option>
+                                <option>Widowed</option>
+                            </select>
+                            <label class="form-label">
+                                <i class="bi bi-heart"></i>
+                                Marital Status <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="col-md-4 mt-3">
+                    <label class="form-label"><i class="bi bi-camera"></i> Photograph</label>
+                    <input type="file"
+                           class="form-control"
+                           accept=".jpg,.png">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+
+    
+    <div class="card-header identity-header collapsed"
+         data-bs-toggle="collapse"
+         data-bs-target="#contactInfo"
+         aria-expanded="false">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 d-flex align-items-center">
+                <span class="icon-box me-2">
+                    <i class="bi bi-telephone"></i>
+                </span>
+                Contact Information
+            </h5>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+        </div>
+    </div>
+
+
+    <div id="contactInfo" class="collapse">
+        <div class="card-body" style="padding-top: 37px;padding-bottom: 35px;">
+
+            <div class="row">
+
+                
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input asp-for="PhoneNumber"
+                                   class="form-control"
+                                   maxlength="10"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                            <label class="form-label">
+                                <i class="bi bi-telephone"></i>
+                                Personal Mobile Number <span class="text-danger">*</span>
+                            </label>
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input class="form-control"
+                                   maxlength="10"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                            <label class="form-label">
+                                <i class="bi bi-telephone"></i>
+                                Alternate Mobile Number
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input asp-for="Email" class="form-control" />
+                            <label class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Personal Email ID <span class="text-danger">*</span>
+                            </label>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+
+    
+    <div class="card-header identity-header collapsed"
+         data-bs-toggle="collapse"
+         data-bs-target="#addressInfo"
+         aria-expanded="false">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 d-flex align-items-center">
+                <span class="icon-box me-2">
+                    <i class="bi bi-geo-alt"></i>
+                </span>
+                Address Information
+            </h5>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+        </div>
+    </div>
+
+    
+    <div id="addressInfo" class="collapse">
+        <div class="card-body" style="padding-top:37px;padding-bottom:35px;">
+
+         
+            <h6 class="fw-semibold mb-3">
+                <i class="bi bi-house-door"></i> Current Address
+            </h6>
+          
+            <div class="row"  style="padding-top: 10px;">
+
+                <div class="col-md-6">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"  asp-for="Address" class="form-control" id="cAddress1">
+                            <label class="form-label">
+                                <i class="bi bi-house"></i> Address Line 1
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control" id="cAddress2">
+                            <label class="form-label"><i class="bi bi-building"></i>  Address Line 2</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control" id="cCity">
+                            <label class="form-label">
+                                City <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3" style="top:8px;">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <select id="cState" class="form-control select2">
+                                <option value=""></option>
+                                <option>Tamil Nadu</option>
+                                <option>Kerala</option>
+                            </select>
+                            <label class="form-label"><i class="fa fa-university"></i>  State</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control" maxlength="6" id="cPincode">
+                            <label class="form-label">
+                                <i class="bi bi-mailbox"></i>
+                                Pincode <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
-            @* <div class="row">
-                <div class="col-sm-12">
-                    <label class="control-label col-md-3">Upload Your Profile Photo</label>
-                    <form action="/" id="frmFileUpload" class="dropzone" method="post"
-                          enctype="multipart/form-data">
-                        <div class="dz-message">
-                            <div class="drag-icon-cph">
-                                <i class="material-icons">touch_app</i>
-                            </div>
-                            <h3>Drop files here or click to upload.</h3>
-                            <em>
-                                (This is just a demo dropzone. Selected files are
-                                <strong>not</strong>
-                                actually uploaded.)
-                            </em>
+
+            
+            <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="sameAddress">
+                <label class="form-check-label">
+                    Permanent Address same as Current Address
+                </label>
+            </div>
+
+            <hr class="my-4">
+
+            
+            <h6 class="fw-semibold mb-3">
+                <i class="bi bi-house-check"></i> Permanent Address
+            </h6>
+
+            <div class="row" style="padding-top: 10px;" >
+
+                <div class="col-md-6">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control" id="pAddress1">
+                            <label class="form-label"><i class="bi bi-house"></i> Address Line 1</label>
                         </div>
-                        <div class="fallback">
-                            <input name="file" asp-for="ImageUrl" type="file" multiple />
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </div> *@
-            <div class="col-lg-12 p-t-20 text-center">
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary waves-effect m-r-15" />
-                    <a asp-action="Index" type="button" class="btn btn-danger waves-effect">Cancel</a>
+
+                <div class="col-md-6">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control" id="pAddress2">
+                            <label class="form-label"> <i class="bi bi-building"></i>   Address Line 2</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control" id="pCity">
+                            <label class="form-label">
+                                City <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3" style="top:8px;">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <select id="pState" class="form-control select2">
+                                <option value=""></option>
+                                <option>Tamil Nadu</option>
+                                <option>Kerala</option>
+                            </select>
+                            <label class="form-label">State</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control" maxlength="6" id="pPincode">
+                            <label class="form-label">
+                                <i class="bi bi-mailbox"></i>
+                                Pincode <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
-    </form>
+    </div>
 </div>
+
+<div class="card shadow-sm mb-3">
+
+   
+    <div class="card-header identity-header collapsed"
+         data-bs-toggle="collapse"
+         data-bs-target="#emergencyContact"
+         aria-expanded="false">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 d-flex align-items-center">
+                <span class="icon-box me-2">
+                    <i class="bi bi-person-lines-fill"></i>
+                </span>
+                Emergency Contact Information
+            </h5>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+        </div>
+    </div>
+
+   
+    <div id="emergencyContact" class="collapse">
+        <div class="card-body" style="padding-top:37px;padding-bottom:35px;">
+
+            <div class="row">
+
+                
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input class="form-control" />
+                            <label class="form-label">
+                                <i class="bi bi-person"></i>
+                                Contact Person Name <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="col-md-4" style="bottom: -9px;">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <select id="pState" class="form-control select2">
+                                <option value=""></option>
+                                <option>Father</option>
+                                <option>Mother</option>
+                                <option>Sibling</option>
+                                <option>Spouse</option>
+                                <option>Friend</option>
+                            </select>
+                            <label class="form-label"><i class="fa fa-users"></i> Relationship</label>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input class="form-control"
+                                   maxlength="10"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                            <label class="form-label">
+                                <i class="bi bi-telephone"></i>
+                                Contact Number <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input class="form-control"
+                                   maxlength="10"
+                                   oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                            <label class="form-label">
+                                <i class="bi bi-telephone"></i>
+                                Alternate Contact Number <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="card shadow-sm mb-3">
+
+    
+    <div class="card-header identity-header collapsed"
+         data-bs-toggle="collapse"
+         data-bs-target="#familyDetails"
+         aria-expanded="false">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 d-flex align-items-center">
+                <span class="icon-box me-2">
+                    <i class="bi bi-people-fill"></i>
+                </span>
+                Family Details
+            </h5>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+        </div>
+    </div>
+
+  
+    <div id="familyDetails" class="collapse">
+        <div class="card-body" style="padding-top:37px;padding-bottom:35px;">
+
+            <div class="row">
+
+                
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i>
+                                Father's Name <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control">
+                            <label class="form-label">
+                                <i class="bi bi-person"></i>
+                                Mother Name
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text" class="form-control">
+                            <label class="form-label">
+                                <i class="bi bi-heart"></i>
+                                Spouse Name
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"
+                                   class="form-control"
+                                   maxlength="10" />
+                            <label class="form-label">
+                                <i class="bi bi-credit-card"></i>
+                                Number of Dependents<span class="text-danger">*</span>
+                            </label>
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+
+   
+    <div class="card-header identity-header collapsed"
+         data-bs-toggle="collapse"
+         data-bs-target="#identificationDetails"
+         aria-expanded="false">
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 d-flex align-items-center">
+                <span class="icon-box me-2">
+                    <i class="bi bi-person-badge"></i>
+                </span>
+                Identification Details
+            </h5>
+            <i class="bi bi-chevron-down toggle-icon"></i>
+        </div>
+    </div>
+
+  
+    <div id="identificationDetails" class="collapse">
+        <div class="card-body" style="padding-top:37px;padding-bottom:35px;">
+
+            <div class="row">
+
+              
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"
+                                   class="form-control"
+                                   maxlength="10" />
+                            <label class="form-label">
+                                <i class="bi bi-credit-card"></i>
+                                PAN Number <span class="text-danger">*</span>
+                            </label>
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"
+                                   class="form-control"
+                                   maxlength="12" />
+                            <label class="form-label">
+                                <i class="bi bi-fingerprint"></i>
+                                Aadhaar Number <span class="text-danger">*</span>
+                            </label>
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"
+                                   class="form-control"
+                                   maxlength="10" />
+                            <label class="form-label">
+                                <i class="bi bi-globe"></i>
+                                Passport Number
+                            </label>
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="col-md-4 mt-3">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"
+                                   class="form-control datetimepicker"
+                                   id="passportExpiry"
+                                   autocomplete="off" />
+                            <label class="form-label">
+                                <i class="bi bi-calendar-event"></i>
+                                Passport Expiry Date
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input type="text"
+                                   class="form-control"
+                                   maxlength="10" />
+                            <label class="form-label">
+                                <i class="bi bi-globe"></i>
+                                Driving License Number
+                            </label>
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="text-end mt-4 mb-5">
+    <button class="btn btn-secondary">Save</button>
+    <button class="btn btn-primary">Close</button>
+</div>
+
+
+
+
 
 <!-- Include jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

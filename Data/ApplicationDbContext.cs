@@ -49,6 +49,11 @@ namespace SparkHRMS.Data
         public DbSet<UsersActionRight> UsersActionRight { get; set; }
         public DbSet<MenuPermission> MenuPermission { get; set; }
         public DbSet<UsersAction> UsersAction { get; set; }
+        public DbSet<State> MST_State { get; set; }
+        public DbSet<Address> MST_Address { get; set; }
+        public DbSet<DocAttachments> Doc_Attachments { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
