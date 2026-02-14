@@ -31,38 +31,92 @@
 <table class="table table-bordered mt-3 dataTable">
     <thead>
         <tr>
-            <th>Employee</th>
-            <th>Year</th>
-            <th>Total Allocated</th>
-            <th>Total Used</th>
-            <th>Total Leave Balance</th>
+            <th rowspan="2">Employee</th>
+            <th rowspan="2">Year</th>
+
+            <th colspan="3" style="text-align:center;">Allocated</th>
+            <th colspan="3" style="text-align:center;">Total Used</th>
+            <th colspan="3" style="text-align:center;">Leave Balance</th>
+
             @if (ViewBag.IsUserAdmin)
             {
-                <th>Actions</th>
+                <th rowspan="2">Actions</th>
             }
         </tr>
+
+        <tr>
+            <!-- Allocated -->
+            <th style="text-align:center;">CL</th>
+            <th style="text-align:center;">EL</th>
+            <th style="text-align:center;">Total</th>
+
+            <!-- Total Used -->
+            <th style="text-align:center;">CL</th>
+            <th style="text-align:center;">EL</th>
+            <th style="text-align:center;">Total</th>
+
+            <!-- Leave Balance -->
+            <th style="text-align:center;">CL</th>
+            <th style="text-align:center;">EL</th>
+            <th style="text-align:center;">Total</th>
+        </tr>
     </thead>
+
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            var cl = item.LeaveDetails?.FirstOrDefault(x => x.LeaveTypeId == 1);
+            var el = item.LeaveDetails?.FirstOrDefault(x => x.LeaveTypeId == 2);
 
-                <td style="text-align-last: start;">@UtilityService.GetEmployeeCodeById(item.EmployeeId) - @UtilityService.GetEmployeeNameById(item.EmployeeId)</td>
-                <td style="text-align-last: end;">@UtilityService.GetYearById(item.YearId).Year</td>
-                <td style="text-align-last: end;">@item.TotalLeaveAllocated</td>
-                <td style="text-align-last: end;">@item.TotalUsedDays</td>
-                <td style="text-align-last: end;">@item.TotalLeaveBalance</td>
+            decimal clAllocated = cl?.AllocatedDays ?? 0;
+            decimal elAllocated = el?.AllocatedDays ?? 0;
+
+            decimal clUsed = cl?.UsedDays ?? 0;
+            decimal elUsed = el?.UsedDays ?? 0;
+
+            decimal clBalance = cl?.RemainingDays ?? 0;
+            decimal elBalance = el?.RemainingDays ?? 0;
+
+            <tr>
+                <!-- Employee -->
+                <td style="text-align:left;">
+                    @UtilityService.GetEmployeeCodeById(item.EmployeeId) -
+                    @UtilityService.GetEmployeeNameById(item.EmployeeId)
+                </td>
+
+                <!-- Year -->
+                <td style="text-align:right;">
+                    @UtilityService.GetYearById(item.YearId).Year
+                </td>
+
+                <!-- Allocated -->
+                <td style="text-align:right;">@clAllocated</td>
+                <td style="text-align:right;">@elAllocated</td>
+                <td style="text-align:right;">@(clAllocated + elAllocated)</td>
+
+                <!-- Used -->
+                <td style="text-align:right;">@clUsed</td>
+                <td style="text-align:right;">@elUsed</td>
+                <td style="text-align:right;">@(clUsed + elUsed)</td>
+
+                <!-- Balance -->
+                <td style="text-align:right;">@(clBalance = clAllocated - clUsed)</td>
+                <td style="text-align:right;">@(elBalance =elAllocated - elUsed)</td>
+                <td style="text-align:right;">@(clBalance + elBalance)</td>
+
                 @if (ViewBag.IsUserAdmin)
                 {
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                        <button onclick="confirmDelete('@item.Id')" class="btn btn-danger">Delete</button>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <button onclick="confirmDelete('@item.Id')" class="btn btn-danger btn-sm">Delete</button>
                     </td>
                 }
             </tr>
         }
     </tbody>
+
 </table>
+
 
 @section Scripts {
 
