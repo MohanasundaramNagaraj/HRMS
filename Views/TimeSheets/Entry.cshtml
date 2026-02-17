@@ -54,43 +54,44 @@
 
 <div>
 
-    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
-    {
-        <div class="col-md-12 mb-3">
-            <div>
-                <div class="">
-                    <select id="yearSelector" style="width:20%; margin-right:10px; display:inline-block">
-                        <option value="">Select Year</option>
-                        @{
-                            var yearList = ViewBag.YearList;
-                        }
-                        @* @for (int year = 0; year <= yearList; year++) *@
-                        @foreach (var year in yearList)
+
+    <div class="col-md-12 mb-3">
+        <div>
+            <div class="">
+                <select id="yearSelector" style="width:20%; margin-right:10px; display:inline-block">
+                    <option value="">Select Year</option>
+                    @{
+                        var yearList = ViewBag.YearList;
+                    }
+                    @* @for (int year = 0; year <= yearList; year++) *@
+                    @foreach (var year in yearList)
+                    {
+                        if (year.Id == ViewBag.SelectedYear)
                         {
-                            if (year.Id == ViewBag.SelectedYear)
-                            {
-                                <option value="@year.Id" id="@year.Id" selected>@year.Year</option>
-                            }
-                            else
-                            {
-                                <option value="@year.Id" id="@year.Id">@year.Year</option>
-                            }
+                            <option value="@year.Id" id="@year.Id" selected>@year.Year</option>
                         }
-                    </select>
-                    <select id="monthSelector" style="width:20%;margin-right:10px;display:inline-block">
-                        <option value="">Select Month</option>
-                        @for (int month = 1; month <= 12; month++)
+                        else
                         {
-                            if (month == ViewBag.SelectedMonth)
-                            {
-                                <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
-                            }
-                            else
-                            {
-                                <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
-                            }
+                            <option value="@year.Id" id="@year.Id">@year.Year</option>
                         }
-                    </select>
+                    }
+                </select>
+                <select id="monthSelector" style="width:20%;margin-right:10px;display:inline-block">
+                    <option value="">Select Month</option>
+                    @for (int month = 1; month <= 12; month++)
+                    {
+                        if (month == ViewBag.SelectedMonth)
+                        {
+                            <option value="@month" selected>@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                        }
+                        else
+                        {
+                            <option value="@month">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month)</option>
+                        }
+                    }
+                </select>
+                @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                {
                     <select style="width:35%;margin-right:10px;display:inline-block" id="empSelector">
                         @{
                             var employeeList = ViewBag.EmployeeList;
@@ -108,13 +109,14 @@
                             }
                         }
                     </select>
-                    <button onclick="getData()" class="btn btn-info">
-                        Filter
-                    </button>
-                </div>
+                }
+                <button onclick="getData()" class="btn btn-info">
+                    Filter
+                </button>
             </div>
         </div>
-    }
+    </div>
+
 
     <div class="col-lg-12 col-md-12">
 
@@ -335,7 +337,7 @@
 
 
 @section Scripts {
-  
+
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
