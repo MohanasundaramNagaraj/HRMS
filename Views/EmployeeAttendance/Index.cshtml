@@ -96,19 +96,19 @@
 
     <div class="col-lg-12 col-md-12">
         <div class="">
-        <div class="">
-        <div class="">
-        <ul class="nav ">
-        <li class="nav-item tab-all">
-        <a class="nav-link active show" href="#project"
-        data-bs-toggle="tab">Attendance</a>
-        </li>
-        <li class="nav-item tab-all p-l-20">
-        <a class="nav-link" href="#usersettings" data-bs-toggle="tab">Report</a>
-        </li>
-        </ul>
-        </div>
-        </div>
+            <div class="">
+                <div class="">
+                    <ul class="nav ">
+                        <li class="nav-item tab-all">
+                            <a class="nav-link active show" href="#project"
+                                data-bs-toggle="tab">Attendance</a>
+                        </li>
+                        <li class="nav-item tab-all p-l-20">
+                            <a class="nav-link" href="#usersettings" data-bs-toggle="tab">Report</a>
+                        </li>
+                     </ul>
+                 </div>
+            </div>
         </div>
         <div class="tab-content">
 
@@ -230,115 +230,115 @@
                                        @*  <div id="pieChart"></div> *@
 
                                         <div class="table-responsive">
-                                    <table class="table table-hover js-basic-example contact_list">
-                                        <thead>
-                                            <tr>
-                                                <th class="center"> Date </th>
-                                                <th class="center"> Check In </th>
-                                                <th class="center"> Check Out </th>
-                                                <th class="center"> Working Hours </th>
-                                                @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
-                                                {
-                                                    <th class="center"> Check In IP </th>
-                                                    <th class="center"> Check Out IP </th>
-                                                }
-                                                <th class="center"> Status </th>
-                                                @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
-                                                {
-                                                    <th class="center"> Action </th>
-                                                }
+                                                <table class="table table-hover js-basic-example contact_list">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="center"> Date </th>
+                                                            <th class="center"> Check In </th>
+                                                            <th class="center"> Check Out </th>
+                                                            <th class="center"> Working Hours </th>
+                                                            @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                            {
+                                                                <th class="center"> Check In IP </th>
+                                                                <th class="center"> Check Out IP </th>
+                                                            }
+                                                            <th class="center"> Status </th>
+                                                            @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                            {
+                                                                <th class="center"> Action </th>
+                                                            }
 
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
 
-                                            @foreach (var record in Model.MonthlySummary.DailyAttendanceRecords)
-                                            {
-                                                <tr class="odd gradeX">
-                                                    <td class="center">@record.Date.ToString("dd MMM yyyy")</td>
-                                                    <td class="center" style="width: 200px !important;
-                                                                      max-width: 300px !important;
-                                                                      min-width: 200px !important;
-                                                                      word-wrap: anywhere;">
-                                                        @if (record.CheckInTimeInString == "Not Checked In" && (record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday || record.Status == AttendanceStatus.Weekend))
+                                                        @foreach (var record in Model.MonthlySummary.DailyAttendanceRecords)
                                                         {
-                                                            <span>-</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            @record.CheckInTimeInString
-                                                        }
-                                                        <br />
-                                                        @record.CheckInLocation
-                                                    </td>
-                                                    <td class="center" style="width: 200px !important;
-                                                                      max-width: 300px !important;
-                                                                      min-width: 200px !important;
-                                                                      word-wrap: anywhere;">
-                                                        @if (record.CheckOutTimeInString == "Not Checked Out" && record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday || record.Status == AttendanceStatus.Weekend)
-                                                        {
-                                                            <span>-</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            @record.CheckOutTimeInString
+                                                            <tr class="odd gradeX">
+                                                                <td class="center">@record.Date.ToString("dd MMM yyyy")</td>
+                                                                <td class="center" style="width: 200px !important;
+                                                                                  max-width: 300px !important;
+                                                                                  min-width: 200px !important;
+                                                                                  word-wrap: anywhere;">
+                                                                    @if (record.CheckInTimeInString == "Not Checked In" && (record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday || record.Status == AttendanceStatus.Weekend))
+                                                                    {
+                                                                        <span>-</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @record.CheckInTimeInString
+                                                                    }
+                                                                    <br />
+                                                                    @record.CheckInLocation
+                                                                </td>
+                                                                <td class="center" style="width: 200px !important;
+                                                                                  max-width: 300px !important;
+                                                                                  min-width: 200px !important;
+                                                                                  word-wrap: anywhere;">
+                                                                    @if (record.CheckOutTimeInString == "Not Checked Out" && record.Status == AttendanceStatus.Absent || record.Status == AttendanceStatus.Holiday || record.Status == AttendanceStatus.Weekend)
+                                                                    {
+                                                                        <span>-</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @record.CheckOutTimeInString
+                                                                    }
+
+                                                                    <br />
+                                                                    @record.CheckOutLocation
+                                                                </td>
+                                                                <td class="center">@record.WorkingHours</td>
+                                                                @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                                {
+                                                                    <td class="center">@record.IP</td>
+                                                                    <td class="center">@record.CheckOutMadeSystemIP</td>
+                                                                }
+                                                                <td class="center">
+
+                                                                    @{
+                                                                        if (record.Status == AttendanceStatus.Present)
+                                                                        {
+                                                                            <div class="badge col-green">Present</div>
+                                                                        }
+                                                                        else if (record.Status == AttendanceStatus.Absent)
+                                                                        {
+                                                                            <div class="badge col-red">Absent</div>
+                                                                        }
+                                                                        else if (record.Status == AttendanceStatus.Holiday)
+                                                                        {
+                                                                            <div class="badge col-cyan">Holiday</div>
+                                                                        }
+                                                                        else if (record.Status == AttendanceStatus.PermissionNeeded)
+                                                                        {
+                                                                            <div class="badge col-green">Taken Permission</div>
+                                                                        }
+                                                                        else if (record.Status == AttendanceStatus.Weekend)
+                                                                        {
+                                                                            <div class="badge col-cyan">Holiday</div>
+                                                                        }
+                                                                        else if (record.Status == AttendanceStatus.LeaveRequested)
+                                                                        {
+                                                                            <div class="badge col-cyan">Leave Requested</div>
+                                                                        }
+                                                                    }
+                                                                </td>
+                                                                @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
+                                                                {
+                                                                    <td>
+                                                                        <a href="@Url.Action("Add","AdminAttendanceViewer", new { EmployeeId = @Model.EmployeeDetails.EmployeeId,
+                                                                            date = @record.Date
+                                                                        })" class="btn btn-warning btn-sm p-t-10">
+                                                                            <i class="material-icons">create</i>
+                                                                        </a>
+                                                                    </td>
+                                                                }
+                                                            </tr>
                                                         }
 
-                                                        <br />
-                                                        @record.CheckOutLocation
-                                                    </td>
-                                                    <td class="center">@record.WorkingHours</td>
-                                                    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
-                                                    {
-                                                        <td class="center">@record.IP</td>
-                                                        <td class="center">@record.CheckOutMadeSystemIP</td>
-                                                    }
-                                                    <td class="center">
+                                                    </tbody>
 
-                                                        @{
-                                                            if (record.Status == AttendanceStatus.Present)
-                                                            {
-                                                                <div class="badge col-green">Present</div>
-                                                            }
-                                                            else if (record.Status == AttendanceStatus.Absent)
-                                                            {
-                                                                <div class="badge col-red">Absent</div>
-                                                            }
-                                                            else if (record.Status == AttendanceStatus.Holiday)
-                                                            {
-                                                                <div class="badge col-cyan">Holiday</div>
-                                                            }
-                                                            else if (record.Status == AttendanceStatus.PermissionNeeded)
-                                                            {
-                                                                <div class="badge col-green">Taken Permission</div>
-                                                            }
-                                                            else if (record.Status == AttendanceStatus.Weekend)
-                                                            {
-                                                                <div class="badge col-cyan">Holiday</div>
-                                                            }
-                                                            else if (record.Status == AttendanceStatus.LeaveRequested)
-                                                            {
-                                                                <div class="badge col-cyan">Leave Requested</div>
-                                                            }
-                                                        }
-                                                    </td>
-                                                    @if (roles.Contains("Admin") || roles.Contains("SuperAdmin") || roles.Contains("User"))
-                                                    {
-                                                        <td>
-                                                            <a href="@Url.Action("Add","AdminAttendanceViewer", new { EmployeeId = @Model.EmployeeDetails.EmployeeId,
-                                                                date = @record.Date
-                                                            })" class="btn btn-warning btn-sm p-t-10">
-                                                                <i class="material-icons">create</i>
-                                                            </a>
-                                                        </td>
-                                                    }
-                                                </tr>
-                                            }
-
-                                        </tbody>
-
-                                    </table>
-                                </div>
+                                                </table>
+                                            </div>
                                     </div>
                                 </div>
                             </div>

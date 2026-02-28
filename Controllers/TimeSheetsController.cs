@@ -310,12 +310,13 @@ namespace SparkHRMS.Controllers
                                     .OrderBy(x => x.Date)
                                     .ToListAsync();
 
-            var checkInRecords = await _context.EmployeeAttendance.Where(t => t.Date >= FromDate && t.Date <= ToDate && t.EmployeeId == EmployeeID && !t.IsDeleted)
-                                    .OrderBy(x => x.Date)
+            var AttendanceDetails = await _context.EmployeeAttendance.Where(t => t.CheckInMadeDateTime >= FromDate && t.CheckInMadeDateTime <= ToDate && t.EmployeeId == EmployeeID)
+                                    .OrderBy(x => x.CheckInMadeDateTime)
                                     .ToListAsync();
 
             var response = new EmployeeTimeSheetViewModel
             {
+                AttendanceDetails = AttendanceDetails,
                 EmployeeDetails = employeeDetails,
                 TimeSheetRecords = timeSheetRecords
             };
