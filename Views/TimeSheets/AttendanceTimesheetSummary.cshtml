@@ -140,30 +140,6 @@
                 <input type="date" id="filterToDate" class="form-control" value="@ViewBag.SelectedToDate.ToString("yyyy-MM-dd")">
             </div>
 
-            <div style="width:15%;margin-right:15px;display:inline-block">
-                <label class="fw-bold">Group By</label>
-                <br />    <br />
-                <div class="d-flex gap-4">
-                    <label>
-                        <input type="checkbox" class="group-by" value="date" checked> Date
-                    </label>
-                    <label>
-                        <input type="checkbox" class="group-by" value="task" checked> Task
-                    </label>
-                    <label>
-                        <input type="checkbox" class="group-by" value="activity" checked> Activity
-                    </label>
-                </div>
-            </div>
-            <div style="width:10%;margin-right:15px;display:inline-block">
-                <label>Task</label>
-                <input type="text" id="filterTask" class="form-control" placeholder="Task Id">
-            </div>
-            <div style="width:10%;margin-right:15px;display:inline-block">
-                <label>Activity</label>
-                <input type="text" id="filterActivity" class="form-control" placeholder="Activity">
-            </div>
-
             <button class="btn btn-warning" style="margin-left:25px;display:inline-block" onclick="exportExcel()">
                 <i class="fa fa-file-excel"></i>
                 Export to Excel
@@ -224,271 +200,297 @@
                 </div>
 
                 <form id="userForm">
+
                     <div>
-                        <div>
 
-                            <div class="col-lg-12 col-md-12 col-sm-12">
-                                <div class="project_widget">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="project_widget">
 
-                                    <div class="body">
-                                        <div class="row" style="margin-top: 10px;">
-                                            <div class="row">
-                                                <div class="card col-lg-6">
-                                                    <div class="row">
-                                                        <div class="col-lg-4 col-sm-4">
-                                                            <div class="text-center">
-                                                                <h4 class="col-green" id="totalWorkingHours">120</h4>
-                                                                <div class="text font-15">Total Working Hours</div>
-                                                            </div>
+                                <div class="body">
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="row">
+                                            <div class="card col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-sm-4">
+                                                        <div class="text-center">
+                                                            <h4 class="col-green" id="totalWorkingHours">120</h4>
+                                                            <div class="text font-15">Total Working Hours</div>
                                                         </div>
-
-                                                        <div class="col-lg-4 col-sm-4">
-                                                            <div class="text-center">
-                                                                <h4 class="col-green" id="totalPermissionHours">4</h4>
-                                                                <div class="text font-15">Total Permission Hours</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-4 col-sm-4">
-                                                            <div class="text-center">
-                                                                <h4 class="col-green" id="totalLeaveDays">2</h4>
-                                                                <div class="text font-15">Total Leave Days</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="text font-20 text-center col-green"> Attendance Details</div>
                                                     </div>
 
+                                                    <div class="col-lg-4 col-sm-4">
+                                                        <div class="text-center">
+                                                            <h4 class="col-green" id="totalPermissionHours">4</h4>
+                                                            <div class="text font-15">Total Permission Hours</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4">
+                                                        <div class="text-center">
+                                                            <h4 class="col-green" id="totalLeaveDays">2</h4>
+                                                            <div class="text font-15">Total Leave Days</div>
+                                                        </div>
+                                                    </div>
+                                                    <br />
+                                                    <div class="text font-20 text-center col-blue" style="margin-top: 10px;"> Attendance Details</div>
                                                 </div>
-                                                <div class="card col-lg-6">
-                                                    <div class="row">
-                                                        <div class="col-lg-4 col-sm-4">
-                                                            <div class="text-center">
-                                                                <h4 class="col-green" id="totalWorkingHours">110</h4>
-                                                                <div class="text font-15">Total Working Hours</div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div class="col-lg-4 col-sm-4">
-                                                            <div class="text-center">
-                                                                <h4 class="col-green" id="totalPermissionHours">3</h4>
-                                                                <div class="text font-15">Total Permission Hours</div>
-                                                            </div>
+                                            </div>
+                                            <div class="card col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-sm-4">
+                                                        <div class="text-center">
+                                                            <h4 class="col-green" id="totalWorkingHours">110</h4>
+                                                            <div class="text font-15">Total Working Hours</div>
                                                         </div>
-                                                        <div class="col-lg-4 col-sm-4">
-                                                            <div class="text-center">
-                                                                <h4 class="col-green" id="totalLeaveDays">2</h4>
-                                                                <div class="text font-15">Total Leave Days</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="text font-20 text-center col-green"> Timesheet Details</div>
                                                     </div>
+
+                                                    <div class="col-lg-4 col-sm-4">
+                                                        <div class="text-center">
+                                                            <h4 class="col-green" id="totalPermissionHours">3</h4>
+                                                            <div class="text font-15">Total Permission Hours</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-4">
+                                                        <div class="text-center">
+                                                            <h4 class="col-green" id="totalLeaveDays">2</h4>
+                                                            <div class="text font-15">Total Leave Days</div>
+                                                        </div>
+                                                    </div>
+                                                      <br />
+                                                    <div class="text font-20 text-center col-blue" style="margin-top: 10px;"> Timesheet Details</div>
                                                 </div>
                                             </div>
-
-
                                         </div>
 
+
                                     </div>
-                                </div>
-                            </div>
-                            <br />
-                            <div class="row col-md-12">
-                                <div class="table-responsive">
-                                    <table class="table table-hover js-basic-example contact_list">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Day</th>
-                                                <th>Attendance Details</th>
-                                                <th>Timesheet Details</th>
-                                                <th>Mismatch Details</th>
-                                            </tr>
-
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>01-02-2026</td>
-                                                <td>Sunday</td>
-                                                <td>09:15 AM - 06:35 PM<br>9 hours 20 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>20</td>
-                                            </tr>
-                                            <tr>
-                                                <td>02-02-2026</td>
-                                                <td>Monday</td>
-                                                <td>09:05 AM - 06:10 PM<br>9 hours 5 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>5</td>
-                                            </tr>
-                                            <tr>
-                                                <td>03-02-2026</td>
-                                                <td>Tuesday</td>
-                                                <td>08:50 AM - 05:55 PM<br>9 hours 5 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>5</td>
-                                            </tr>
-                                            <tr>
-                                                <td>04-02-2026</td>
-                                                <td>Wednesday</td>
-                                                <td>09:20 AM - 06:40 PM<br>9 hours 20 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>20</td>
-                                            </tr>
-                                            <tr>
-                                                <td>05-02-2026</td>
-                                                <td>Thursday</td>
-                                                <td>09:00 AM - 06:00 PM<br>9 hours 0 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>06-02-2026</td>
-                                                <td>Friday</td>
-                                                <td>09:30 AM - 06:45 PM<br>9 hours 15 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>15</td>
-                                            </tr>
-                                            <tr>
-                                                <td>07-02-2026</td>
-                                                <td>Saturday</td>
-                                                <td>10:00 AM - 04:30 PM<br>6 hours 30 minutes</td>
-                                                <td>6 hours</td>
-                                                <td>30</td>
-                                            </tr>
-                                            <tr>
-                                                <td>08-02-2026</td>
-                                                <td>Sunday</td>
-                                                <td>09:10 AM - 06:25 PM<br>9 hours 15 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>15</td>
-                                            </tr>
-                                            <tr>
-                                                <td>09-02-2026</td>
-                                                <td>Monday</td>
-                                                <td>08:55 AM - 06:05 PM<br>9 hours 10 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>10</td>
-                                            </tr>
-                                            <tr>
-                                                <td>10-02-2026</td>
-                                                <td>Tuesday</td>
-                                                <td>09:25 AM - 06:50 PM<br>9 hours 25 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>25</td>
-                                            </tr>
-                                            <tr>
-                                                <td>11-02-2026</td>
-                                                <td>Wednesday</td>
-                                                <td>09:00 AM - 05:50 PM<br>8 hours 50 minutes</td>
-                                                <td>8 hours</td>
-                                                <td>50</td>
-                                            </tr>
-                                            <tr>
-                                                <td>12-02-2026</td>
-                                                <td>Thursday</td>
-                                                <td>09:40 AM - 07:00 PM<br>9 hours 20 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>20</td>
-                                            </tr>
-                                            <tr>
-                                                <td>13-02-2026</td>
-                                                <td>Friday</td>
-                                                <td>09:05 AM - 06:15 PM<br>9 hours 10 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>10</td>
-                                            </tr>
-                                            <tr>
-                                                <td>14-02-2026</td>
-                                                <td>Saturday</td>
-                                                <td>10:15 AM - 04:45 PM<br>6 hours 30 minutes</td>
-                                                <td>6 hours</td>
-                                                <td>30</td>
-                                            </tr>
-                                            <tr>
-                                                <td>15-02-2026</td>
-                                                <td>Sunday</td>
-                                                <td>09:20 AM - 06:30 PM<br>9 hours 10 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>10</td>
-                                            </tr>
-                                            <tr>
-                                                <td>16-02-2026</td>
-                                                <td>Monday</td>
-                                                <td>08:45 AM - 05:55 PM<br>9 hours 10 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>10</td>
-                                            </tr>
-                                            <tr>
-                                                <td>17-02-2026</td>
-                                                <td>Tuesday</td>
-                                                <td>09:10 AM - 06:20 PM<br>9 hours 10 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>10</td>
-                                            </tr>
-                                            <tr>
-                                                <td>18-02-2026</td>
-                                                <td>Wednesday</td>
-                                                <td>09:35 AM - 06:55 PM<br>9 hours 20 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>20</td>
-                                            </tr>
-                                            <tr>
-                                                <td>19-02-2026</td>
-                                                <td>Thursday</td>
-                                                <td>09:00 AM - 06:05 PM<br>9 hours 5 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>5</td>
-                                            </tr>
-                                            <tr>
-                                                <td>20-02-2026</td>
-                                                <td>Friday</td>
-                                                <td>08:50 AM - 05:45 PM<br>8 hours 55 minutes</td>
-                                                <td>8 hours</td>
-                                                <td>55</td>
-                                            </tr>
-                                            <tr>
-                                                <td>21-02-2026</td>
-                                                <td>Saturday</td>
-                                                <td>10:00 AM - 04:00 PM<br>6 hours 0 minutes</td>
-                                                <td>6 hours</td>
-                                                <td>0</td>
-                                            </tr>
-                                            <tr>
-                                                <td>22-02-2026</td>
-                                                <td>Sunday</td>
-                                                <td>09:30 AM - 06:40 PM<br>9 hours 10 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>10</td>
-                                            </tr>
-                                            <tr>
-                                                <td>23-02-2026</td>
-                                                <td>Monday</td>
-                                                <td>09:05 AM - 06:00 PM<br>8 hours 55 minutes</td>
-                                                <td>8 hours</td>
-                                                <td>55</td>
-                                            </tr>
-                                            <tr>
-                                                <td>24-02-2026</td>
-                                                <td>Tuesday</td>
-                                                <td>08:55 AM - 06:10 PM<br>9 hours 15 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>15</td>
-                                            </tr>
-                                            <tr>
-                                                <td>25-02-2026</td>
-                                                <td>Wednesday</td>
-                                                <td>09:15 AM - 06:30 PM<br>9 hours 15 minutes</td>
-                                                <td>9 hours</td>
-                                                <td>15</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
 
                                 </div>
                             </div>
-
                         </div>
+                        <br />
+                        <div class="row col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-hover js-basic-example contact_list">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Day</th>
+                                            <th>Attendance Details</th>
+                                            <th>Working Hours</th>
+                                            <th>Timesheet Working Hourse</th>
+                                            <th>Mismatch Details</th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>01-02-2026</td>
+                                            <td>Sunday</td>
+                                            <td>09:15 AM - 06:35 PM</td>
+                                            <td>9h 20m</td>
+                                            <td>9h 00m</td>
+                                            <td>+20m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>02-02-2026</td>
+                                            <td>Monday</td>
+                                            <td>09:05 AM - 06:10 PM</td>
+                                            <td>9h 05m</td>
+                                            <td>9h 00m</td>
+                                            <td>+05m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>03-02-2026</td>
+                                            <td>Tuesday</td>
+                                            <td>08:50 AM - 05:55 PM</td>
+                                            <td>9h 05m</td>
+                                            <td>9h 15m</td>
+                                            <td>-10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>04-02-2026</td>
+                                            <td>Wednesday</td>
+                                            <td>09:20 AM - 06:40 PM</td>
+                                            <td>9h 20m</td>
+                                            <td>9h 00m</td>
+                                            <td>+20m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>05-02-2026</td>
+                                            <td>Thursday</td>
+                                            <td>09:00 AM - 06:00 PM</td>
+                                            <td>9h 00m</td>
+                                            <td>9h 00m</td>
+                                            <td>0m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>06-02-2026</td>
+                                            <td>Friday</td>
+                                            <td>09:30 AM - 06:45 PM</td>
+                                            <td>9h 15m</td>
+                                            <td>9h 00m</td>
+                                            <td>+15m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>07-02-2026</td>
+                                            <td>Saturday</td>
+                                            <td>10:00 AM - 04:30 PM</td>
+                                            <td>6h 30m</td>
+                                            <td>6h 00m</td>
+                                            <td>+30m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>08-02-2026</td>
+                                            <td>Sunday</td>
+                                            <td>09:10 AM - 06:25 PM</td>
+                                            <td>9h 15m</td>
+                                            <td>9h 00m</td>
+                                            <td>+15m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>09-02-2026</td>
+                                            <td>Monday</td>
+                                            <td>08:55 AM - 06:05 PM</td>
+                                            <td>9h 10m</td>
+                                            <td>9h 00m</td>
+                                            <td>+10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>10-02-2026</td>
+                                            <td>Tuesday</td>
+                                            <td>09:25 AM - 06:50 PM</td>
+                                            <td>9h 25m</td>
+                                            <td>9h 00m</td>
+                                            <td>+25m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>11-02-2026</td>
+                                            <td>Wednesday</td>
+                                            <td>09:00 AM - 05:50 PM</td>
+                                            <td>8h 50m</td>
+                                            <td>9h 00m</td>
+                                            <td>-10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>12-02-2026</td>
+                                            <td>Thursday</td>
+                                            <td>09:40 AM - 07:00 PM</td>
+                                            <td>9h 20m</td>
+                                            <td>9h 00m</td>
+                                            <td>+20m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>13-02-2026</td>
+                                            <td>Friday</td>
+                                            <td>09:05 AM - 06:15 PM</td>
+                                            <td>9h 10m</td>
+                                            <td>9h 00m</td>
+                                            <td>+10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>14-02-2026</td>
+                                            <td>Saturday</td>
+                                            <td>10:15 AM - 04:45 PM</td>
+                                            <td>6h 30m</td>
+                                            <td>6h 00m</td>
+                                            <td>+30m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>15-02-2026</td>
+                                            <td>Sunday</td>
+                                            <td>09:20 AM - 06:30 PM</td>
+                                            <td>9h 10m</td>
+                                            <td>9h 00m</td>
+                                            <td>+10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>16-02-2026</td>
+                                            <td>Monday</td>
+                                            <td>08:45 AM - 05:55 PM</td>
+                                            <td>9h 10m</td>
+                                            <td>9h 00m</td>
+                                            <td>+10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>17-02-2026</td>
+                                            <td>Tuesday</td>
+                                            <td>09:10 AM - 06:20 PM</td>
+                                            <td>9h 10m</td>
+                                            <td>9h 00m</td>
+                                            <td>+10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>18-02-2026</td>
+                                            <td>Wednesday</td>
+                                            <td>09:35 AM - 06:55 PM</td>
+                                            <td>9h 20m</td>
+                                            <td>9h 00m</td>
+                                            <td>+20m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>19-02-2026</td>
+                                            <td>Thursday</td>
+                                            <td>09:00 AM - 06:05 PM</td>
+                                            <td>9h 05m</td>
+                                            <td>9h 00m</td>
+                                            <td>+05m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>20-02-2026</td>
+                                            <td>Friday</td>
+                                            <td>08:50 AM - 05:45 PM</td>
+                                            <td>8h 55m</td>
+                                            <td>9h 00m</td>
+                                            <td>-05m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>21-02-2026</td>
+                                            <td>Saturday</td>
+                                            <td>10:00 AM - 04:00 PM</td>
+                                            <td>6h 00m</td>
+                                            <td>6h 00m</td>
+                                            <td>0m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>22-02-2026</td>
+                                            <td>Sunday</td>
+                                            <td>09:30 AM - 06:40 PM</td>
+                                            <td>9h 10m</td>
+                                            <td>9h 00m</td>
+                                            <td>+10m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>23-02-2026</td>
+                                            <td>Monday</td>
+                                            <td>09:05 AM - 06:00 PM</td>
+                                            <td>8h 55m</td>
+                                            <td>9h 00m</td>
+                                            <td>-05m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>24-02-2026</td>
+                                            <td>Tuesday</td>
+                                            <td>08:55 AM - 06:10 PM</td>
+                                            <td>9h 15m</td>
+                                            <td>9h 00m</td>
+                                            <td>+15m</td>
+                                        </tr>
+                                        <tr>
+                                            <td>25-02-2026</td>
+                                            <td>Wednesday</td>
+                                            <td>09:15 AM - 06:30 PM</td>
+                                            <td>9h 15m</td>
+                                            <td>9h 00m</td>
+                                            <td>+15m</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
                 </form>
 
             </div>
@@ -497,6 +499,7 @@
 
     </div>
 </div>
+
 
 
 
