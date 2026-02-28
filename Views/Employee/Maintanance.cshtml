@@ -33,6 +33,7 @@
         text-transform: uppercase;
         font-size: 15px;
     }
+
     .view-mode {
         background-color: #fff !important;
         color: #000 !important;
@@ -40,9 +41,9 @@
     }
 
 
-        .identity-header.collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
+    .identity-header.collapsed .toggle-icon {
+        transform: rotate(-90deg);
+    }
 
     .toggle-icon {
         transition: transform 0.3s ease;
@@ -55,32 +56,71 @@
         box-shadow: none;
     }
 
-
+    select.form-control {
+        display: block;
+        height: 34px;
+    }
         .form-float select.form-control:focus {
             border-bottom: 2px solid #ff9800;
             outline: none;
         }
 
+    select.form-control {
+        appearance: auto;
+    }
+    .breadcrumb-item.ms-auto::before {
+        content: none !important;
+    }
 </style>
-<script>
-    document.getElementById("date2").addEventListener("change", function () {
+@if (isAdd)
+{
+    <ul class="breadcrumb breadcrumb-style d-flex align-items-center">
+        <li class="breadcrumb-item">
+            <h4 class="page-title mb-0">Add Employees</h4>
+        </li>
 
-        var dob = new Date(this.value);
-        if (!dob || isNaN(dob)) return;
+        <li class="breadcrumb-item bcrumb-1">
+            <a href="#">Add</a>
+        </li>
 
-        var today = new Date();
 
-        var age = today.getFullYear() - dob.getFullYear();
-        var monthDiff = today.getMonth() - dob.getMonth();
+    </ul>
+}
+@if (isEdit)
+{
+    <ul class="breadcrumb breadcrumb-style d-flex align-items-center">
+        <li class="breadcrumb-item">
+            <h4 class="page-title mb-0">Edit Employees</h4>
+        </li>
 
-        // If birthday hasn't occurred yet this year
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-            age--;
-        }
+        <li class="breadcrumb-item bcrumb-1">
+            <a href="#">Edit</a>
+        </li>
 
-        document.getElementById("age").value = age;
-    });
-</script>
+        <!-- Right side name -->
+        <li class="breadcrumb-item ms-auto" style="list-style:none;">
+            <h4 class="mb-0">@Model.EmployeeName - @Model.EmployeeCode</h4>
+        </li>
+    </ul>
+}
+@if(isView)
+{
+    <ul class="breadcrumb breadcrumb-style d-flex align-items-center">
+        <li class="breadcrumb-item">
+            <h4 class="page-title mb-0">View Employees</h4>
+        </li>
+
+        <li class="breadcrumb-item bcrumb-1">
+            <a href="#">View</a>
+        </li>
+
+        <!-- Right side name -->
+        <li class="breadcrumb-item ms-auto" style="list-style:none;">
+            <h4 class="mb-0">@Model.EmployeeName - @Model.EmployeeCode</h4>
+        </li>
+    </ul>
+
+}
 
 <div id="employee">
     <div class="card shadow-sm mb-3">
@@ -179,18 +219,30 @@
 
 
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <div class="form-group form-float">
-                                <div class="form-line">
-                                    <input type="text"
-                                           class="form-control datetimepicker @(isView ? "view-mode" : "")"
-                                           value="@Model.DOB"
-                                           @(isView ? "readonly" : "")
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                @if (isView)
+                                {
+                                    <input asp-for="DOB"
+                                           type="text"
+                                           class="form-control datetimepicker view-mode"
+                                           readonly
                                            id="date2"
                                            autocomplete="off" />
+                                }
+                                else
+                                {
+                                    <input asp-for="DOB"
+                                           type="text"
+                                           class="form-control datetimepicker"
+                                           id="date2"
+                                           autocomplete="off" />
+                                }
 
-                                    <label class="form-label"><i class="bi bi-calendar-event">  </i>Date of Birth</label>
-                                </div>
+                                <label class="form-label">
+                                    <i class="bi bi-calendar-event"></i>
+                                    Date of Birth
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -210,19 +262,22 @@
                     </div>
 
 
-
                     <div class="col-md-4 mt-3">
                         <div class="form-group form-float">
                             <div class="form-line">
 
-
                                 @if (isView)
                                 {
-                                    <input type="text" class="form-control" value="@Model.BloodGroup" readonly />
+                                    <input asp-for="BloodGroup"
+                                           type="text"
+                                           class="form-control"
+                                           readonly />
                                 }
                                 else
                                 {
-                                    <select class="form-control blood-group" asp-for="BloodGroup">
+                                    <select asp-for="BloodGroup"
+                                            class="form-control blood-group"
+                                            required>
                                         <option value=""></option>
                                         <option value="A+">A+</option>
                                         <option value="A-">A-</option>
@@ -235,24 +290,36 @@
                                     </select>
                                 }
 
-                                <label class="form-label">
-                                    <i class="bi bi-droplet"></i> Blood Group
-                                </label>
+                                <label class="form-label">Blood Group</label>
+
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <div class="form-group form-float">
-                                <div class="form-line">
-                                    <input type="text"
-                                           class="form-control datetimepicker @(isView ? "view-mode" : "")"
-                                           value="@Model.DateOfJoining"
-                                           @(isView ? "readonly" : "")
-                                           id="date3"
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                @if (isView)
+                                {
+                                    <input asp-for="DateOfJoining"
+                                           type="text"
+                                           class="form-control datetimepicker view-mode"
+                                           readonly
+                                           id="date2"
                                            autocomplete="off" />
-                                    <label class="form-label"><i class="bi bi-calendar-event"></i>  Date Of Joining</label>
-                                </div>
+                                }
+                                else
+                                {
+                                    <input asp-for="DateOfJoining"
+                                           type="text"
+                                           class="form-control datetimepicker"
+                                           id="date2"
+                                           autocomplete="off" />
+                                }
+
+                                <label class="form-label">
+                                    <i class="bi bi-calendar-event"></i>
+                                    Date Of Joining
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -303,13 +370,23 @@
                                 <div class="form-line">
                                     @if (isView)
                                     {
-                                        <input asp-for="ReportingHeadMailID" class="form-control" readonly />
+                                        <input asp-for="ReportingHeadMailID"
+                                               class="form-control"
+                                               readonly />
                                     }
                                     else
                                     {
-                                        <input asp-for="ReportingHeadMailID" class="form-control" />
+                                        <select asp-for="ReportingHeadMailID"
+                                                class="form-control select2"
+                                                id="reportingHeadSelect">
+                                            <option value=""></option>
+                                            @foreach (var name in ViewBag.ActiveUsers)
+                                            {
+                                                <option value="@name">@name</option>
+                                            }
+                                        </select>
                                     }
-                                    <label class="form-label">ReportingHead</label>
+                                    <label class="form-label">Reporting Head</label>
                                 </div>
                             </div>
                         </div>
@@ -384,11 +461,11 @@
                             <div class="form-line">
                                 @if (isView)
                                 {
-                                    <input asp-for="PhoneNumber" maxlength="10"  oninput="this.value=this.value.replace(/[^0-9]/g,'');"class="form-control" readonly />
+                                    <input asp-for="PhoneNumber" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" readonly />
                                 }
                                 else
                                 {
-                                    <input asp-for="PhoneNumber" maxlength="10"  oninput="this.value=this.value.replace(/[^0-9]/g,'');"  class="form-control" />
+                                    <input asp-for="PhoneNumber" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="form-control" />
                                 }
                                 <label class="form-label">
                                     <i class="bi bi-telephone"></i>
@@ -450,7 +527,7 @@
 
     <div class="card shadow-sm mb-3">
 
-        
+
         <div class="card-header identity-header collapsed"
              data-bs-toggle="collapse"
              data-bs-target="#addressInfo"
@@ -515,8 +592,8 @@
                             <div class="form-line">
                                 <input type="text"
                                        id="cCity"
-                                      value="@(Model.CurrentAddress?.City ?? "")"
-@(isView ? "readonly" : "")
+                                       value="@(Model.CurrentAddress?.City ?? "")"
+                                       @(isView ? "readonly" : "")
                                        class="form-control">
                                 <label class="form-label">
                                     City <span class="text-danger">*</span>
@@ -532,18 +609,19 @@
                                 {
                                     <input type="text"
                                            class="form-control"
-                                           value="@Model.CurrentAddress?.StateID"
+                                           id="cState"
+                                            asp-for="CurrentAddress.StateID"
                                            readonly />
                                 }
                                 else
                                 {
-                            <select id="cState"
-                                    asp-for="CurrentAddress.StateID"
-                                    class="form-control select2">
-                                <option value=""></option>
-                                <option value="1">Tamil Nadu</option>
-                                <option value="2">Kerala</option>
-                            </select>
+                                    <select id="cState"
+                                            asp-for="CurrentAddress.StateID"
+                                            class="form-control select2">
+                                        <option value=""></option>
+                                        <option value="1">Tamil Nadu</option>
+                                        <option value="2">Kerala</option>
+                                    </select>
                                 }
                                 <label class="form-label">State</label>
                             </div>
@@ -559,14 +637,14 @@
                                 }
                                 else
                                 {
-                            <select id="cCountry"
-                                    asp-for="CurrentAddress.Country"
-                                    class="form-control select2">
+                                    <select id="cCountry"
+                                            asp-for="CurrentAddress.Country"
+                                            class="form-control select2">
 
-                                <option value=""></option>
-                                <option value="India">India</option>
+                                        <option value=""></option>
+                                        <option value="India">India</option>
 
-                            </select>
+                                    </select>
                                 }
                                 <label class="form-label">Country</label>
                             </div>
@@ -577,7 +655,7 @@
                             <div class="form-line">
                                 <input type="text"
                                        id="cPincode"
-                                       value="@(Model.CurrentAddress?.Pincode ?? "")"@(isView ? "readonly" : "")
+                                       value="@(Model.CurrentAddress?.Pincode ?? "")" @(isView ? "readonly" : "")
                                        maxlength="6"
                                        class="form-control">
                                 <label class="form-label">
@@ -591,9 +669,10 @@
 
                 <!-- SAME AS CURRENT -->
                 <div class="form-check mt-4">
-                <input class="form-check-input" type="checkbox" id="sameAddress" name="IsSameAsCurrent">
-                <label class="form-check-label" for="sameAddress"> 
-                    Permanent Address same as Current Address </label>
+                    <input class="form-check-input" type="checkbox" id="sameAddress" name="IsSameAsCurrent">
+                    <label class="form-check-label" for="sameAddress">
+                        Permanent Address same as Current Address
+                    </label>
                 </div>
 
 
@@ -615,7 +694,7 @@
                             </label>
                             <input type="text"
                                    id="pAddress1"
-                                value="@(Model.PermanentAddress?.Address1 ?? "")"@(isView ? "readonly" : "")
+                                   value="@(Model.PermanentAddress?.Address1 ?? "")" @(isView ? "readonly" : "")
                                    class="form-control">
                         </div>
                     </div>
@@ -627,7 +706,7 @@
                             </label>
                             <input type="text"
                                    id="pAddress2"
-                                  value="@(Model.PermanentAddress?.Address2 ?? "")"@(isView ? "readonly" : "")
+                                   value="@(Model.PermanentAddress?.Address2 ?? "")" @(isView ? "readonly" : "")
                                    class="form-control">
                         </div>
                     </div>
@@ -639,7 +718,7 @@
                             </label>
                             <input type="text"
                                    id="pCity"
-                                     value="@(Model.PermanentAddress?.City ?? "")"@(isView ? "readonly" : "")
+                                   value="@(Model.PermanentAddress?.City ?? "")" @(isView ? "readonly" : "")
                                    class="form-control">
                         </div>
                     </div>
@@ -653,14 +732,14 @@
                             }
                             else
                             {
-                        <select id="pState"
-                                asp-for="PermanentAddress.StateID"
-                                class="form-control select2">
+                                <select id="pState"
+                                        asp-for="PermanentAddress.StateID"
+                                        class="form-control select2">
 
-                            <option value=""></option>
-                            <option value="1">Tamil Nadu</option>
-                            <option value="2">Kerala</option>
-                        </select>
+                                    <option value=""></option>
+                                    <option value="1">Tamil Nadu</option>
+                                    <option value="2">Kerala</option>
+                                </select>
                             }
                         </div>
                     </div>
@@ -674,12 +753,12 @@
                             }
                             else
                             {
-                        <select id="pCountry"
-                                asp-for="PermanentAddress.Country"
-                                class="form-control select2">
-                            <option value=""></option>
-                            <option value="India">India</option>
-                        </select>
+                                <select id="pCountry"
+                                        asp-for="PermanentAddress.Country"
+                                        class="form-control select2">
+                                    <option value=""></option>
+                                    <option value="India">India</option>
+                                </select>
                             }
                         </div>
                     </div>
@@ -692,7 +771,7 @@
                             </label>
                             <input type="text"
                                    id="pPincode"
-                                   value="@(Model.PermanentAddress?.Pincode ?? "")"@(isView ? "readonly" : "")
+                                   value="@(Model.PermanentAddress?.Pincode ?? "")" @(isView ? "readonly" : "")
                                    maxlength="6"
                                    class="form-control">
                         </div>
@@ -751,19 +830,22 @@
                     </div>
 
 
-                    <div class="col-md-4" style="bottom: -9px;">
+                    <div class="col-md-4">
                         <div class="form-group form-float">
                             <div class="form-line">
+
                                 @if (isView)
                                 {
-                                    <input type="text" class="form-control" value="@Model.EmergencyContactRelation" readonly />
+                                    <input asp-for="EmergencyContactRelation"
+                                           class="form-control"
+                                           readonly />
                                 }
                                 else
                                 {
-                                    <select id="emgRelation"
-                                            class="form-control select2 emergency-relation"
-                                            asp-for="EmergencyContactRelation">
-                                        <option value=""></option>
+                                    <select asp-for="EmergencyContactRelation"
+                                            id="EmergencyContactRelation"
+                                            class="form-control select2 emergency-relation">
+                                        <option value="">Select Relationship</option>
                                         <option value="Father">Father</option>
                                         <option value="Mother">Mother</option>
                                         <option value="Sibling">Sibling</option>
@@ -772,11 +854,13 @@
                                     </select>
                                 }
 
-                                <label class="form-label"><i class="fa fa-users"></i> Relationship</label>
+                                <label class="form-label">
+                                    <i class="fa fa-users"></i> Relationship
+                                </label>
+
                             </div>
                         </div>
                     </div>
-
 
                     <div class="col-md-4">
                         <div class="form-group form-float">
@@ -961,7 +1045,7 @@
                             <div class="form-line">
                                 @if (isView)
                                 {
-                                    <input asp-for="PanNumber"   maxlength="10" class="form-control" readonly />
+                                    <input asp-for="PanNumber" maxlength="10" class="form-control" readonly />
                                 }
                                 else
                                 {
@@ -986,7 +1070,7 @@
                                 }
                                 else
                                 {
-                                    <input asp-for="AadhaarNumber"maxlength="12" class="form-control" />
+                                    <input asp-for="AadhaarNumber" maxlength="12" class="form-control" />
                                 }
                                 <label class="form-label">
                                     <i class="bi bi-fingerprint"></i>

@@ -17,7 +17,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SparkHRMS.Controllers
 {
-    [Authorize(Roles = "SuperAdmin,Admin")]
+    //[Authorize(Roles = "SuperAdmin,Admin")]
     public class EmployeeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -60,6 +60,13 @@ namespace SparkHRMS.Controllers
         [HttpPost]
         public async Task<IActionResult> Maintanance(string FMode, int EntryID)
         {
+            var activeUsers = _context.Employees
+                                .Where(u => u.IsActive)
+                               .Select(u => u.Name + " - " + u.Designation)
+                                .ToList();
+
+            ViewBag.ActiveUsers = activeUsers;
+
             EmployeeDetails model = new EmployeeDetails
             {
                 FMode = FMode
@@ -71,6 +78,7 @@ namespace SparkHRMS.Controllers
                     .Include(e => e.ApplicationUser)
                     .FirstOrDefaultAsync(e => e.EmployeeId == EntryID);
 
+               
 
                 if (employee == null)
                 {

@@ -35,6 +35,7 @@ $(document).ready(function () {
         }
     });
 
+
     $("#viewButton").click(function () {
         debugger;
 
@@ -106,7 +107,6 @@ $(document).ready(function () {
 
     });
 
-
 });
 
 function OpenEmployeeCreate(fMode, entryId) {
@@ -126,32 +126,9 @@ function OpenEmployeeCreate(fMode, entryId) {
 
 
 
-function calculateAge(dob) {
-    let birthDate = new Date(dob);
-    let today = new Date();
 
-    let age = today.getFullYear() - birthDate.getFullYear();
-    let monthDiff = today.getMonth() - birthDate.getMonth();
 
-    if (monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
 
-    return age;
-}
-
-$('#date3').on('change', function () {
-    debugger;
-    let dobValue = $(this).val();
-
-    if (dobValue) {
-        let age = calculateAge(dobValue);
-        $('#age').val(age);
-    } else {
-        $('#age').val('');
-    }
-});
 function saveEmployee() {
     debugger;
     var formData = new FormData();
@@ -159,13 +136,13 @@ function saveEmployee() {
     formData.append("Designation", $("#Designation").val());
     formData.append("EmployeeName", $("input[name='EmployeeName']").val());
     formData.append("Gender", $(".gender-select").val());
-    formData.append("DOB", $(".datetimepicker").val());
+    formData.append("DOB", $("#date2").val());
 
     formData.append("BloodGroup", $(".blood-group").val());
     formData.append("Nationality", $(".nationality").val());
     formData.append("MartialStatus", $(".marital-status").val());
-    formData.append("ReportingHeadMailID", $("#ReportingHeadMailID").val());
-    formData.append("DateOfJoining", $("#date3").val());
+    formData.append("ReportingHeadMailID", $("#reportingHeadSelect").val());
+    formData.append("DateOfJoining", $("input[name='DateOfJoining']").val());
 
    
     formData.append("PhoneNumber", $("input[name='PhoneNumber']").val());
@@ -174,7 +151,8 @@ function saveEmployee() {
 
     
     formData.append("EmergencyContactName", $("#EmergencyContactName").val());
-    formData.append("EmergencyContactRelation", $("#emgRelation").val());
+    var relation = $("#EmergencyContactRelation").val() || "";
+    formData.append("EmergencyContactRelation", relation);
     formData.append("EmergencyContactNumber", $("#EmergencyContactNumber").val());
 
     formData.append("EmergencyAlternateNumber", $("#EmergencyAlternateNumber").val());
@@ -259,7 +237,7 @@ function updateEmployeeDetails() {
     formData.append("EmployeeId", $("#hdnEmployeeId").val());
     formData.append("EmployeeName", $("input[name='EmployeeName']").val());
     formData.append("Gender", $("#Gender").val());
-    formData.append("DOB", $("#DOB").val());
+    formData.append("DOB", $("#date2").val());
     formData.append("BloodGroup", $(".blood-group").val());
     formData.append("Nationality", $("#Nationality").val());
     formData.append("MartialStatus", $("#MartialStatus").val());
@@ -273,12 +251,13 @@ function updateEmployeeDetails() {
     formData.append("PassportNumber", $("#PassportNumber").val());
     formData.append("DrivingLicenseNumber", $("#DrivingLicenseNumber").val());
     formData.append("Designation", $("#Designation").val());
-    formData.append("DateOfJoining", $("#DateOfJoining").val());
-    formData.append("ReportingHeadMailID", $("#ReportingHeadMailID").val());
+    formData.append("DateOfJoining", $("input[name='DateOfJoining']").val());
+    formData.append("ReportingHeadMailID", $("#reportingHeadSelect").val());
     formData.append("AlternateMoblieNumber", $("#AlternateMoblieNumber").val());
     formData.append("EmergencyContactName", $("#EmergencyContactName").val());
     formData.append("EmergencyContactNumber", $("#EmergencyContactNumber").val());
-    formData.append("EmergencyContactRelation", $("#EmergencyContactRelation").val());
+    var relation = $("#EmergencyContactRelation").val() || "";
+    formData.append("EmergencyContactRelation", relation);
     formData.append("EmergencyAlternateNumber", $("#EmergencyAlternateNumber").val());
 
  
