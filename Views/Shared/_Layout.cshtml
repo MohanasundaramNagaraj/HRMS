@@ -56,6 +56,19 @@
         .body-content {
             min-height: 80vh;
         }
+
+        /* Fallback solid background for the fixed top navbar so scrolled
+           content does not show through it when no theme class is applied.
+           Theme rules (e.g. `theme-cyan .navbar`) have higher specificity
+           and still override this when a theme is selected. */
+        .navbar,
+        .navbar-header {
+            background-color: #fff;
+        }
+
+        .navbar {
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+        }
     </style>
 
 </head>

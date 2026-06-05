@@ -8,6 +8,15 @@
     bool isView = Model.FMode == "VIEW";
     bool isEdit = Model.FMode == "EDIT";
     bool isAdd = Model.FMode == "ADD";
+
+    // State id -> name map (mirrors the State dropdown options below). Used to
+    // display the state name instead of the raw id when in VIEW mode.
+    var stateNames = new Dictionary<int, string>
+    {
+        { 1, "Tamil Nadu" },
+        { 2, "Kerala" }
+    };
+    Func<int?, string> StateName = id => id.HasValue && stateNames.ContainsKey(id.Value) ? stateNames[id.Value] : "";
 }
 
 
@@ -71,55 +80,59 @@
     .breadcrumb-item.ms-auto::before {
         content: none !important;
     }
+
+    .employee-page-header {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background-color: #fff;
+        padding: 8px 0;
+    }
+
+    .employee-page-header .breadcrumb {
+        margin-bottom: 0;
+    }
 </style>
 @if (isAdd)
 {
-    <ul class="breadcrumb breadcrumb-style d-flex align-items-center">
-        <li class="breadcrumb-item">
-            <h4 class="page-title mb-0">Add Employees</h4>
-        </li>
-
-        <li class="breadcrumb-item bcrumb-1">
-            <a href="#">Add</a>
-        </li>
-
-
-    </ul>
+    <div class="employee-page-header d-flex justify-content-between align-items-center flex-nowrap mb-2">
+        <ul class="breadcrumb breadcrumb-style d-flex align-items-center mb-0">
+            <li class="breadcrumb-item">
+                <h4 class="page-title mb-0">Add Employees</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">Add</a>
+            </li>
+        </ul>
+    </div>
 }
 @if (isEdit)
 {
-    <ul class="breadcrumb breadcrumb-style d-flex align-items-center">
-        <li class="breadcrumb-item">
-            <h4 class="page-title mb-0">Edit Employees</h4>
-        </li>
-
-        <li class="breadcrumb-item bcrumb-1">
-            <a href="#">Edit</a>
-        </li>
-
-        <!-- Right side name -->
-        <li class="breadcrumb-item ms-auto" style="list-style:none;">
-            <h4 class="mb-0">@Model.EmployeeName - @Model.EmployeeCode</h4>
-        </li>
-    </ul>
+    <div class="employee-page-header d-flex justify-content-between align-items-center flex-nowrap mb-2">
+        <ul class="breadcrumb breadcrumb-style d-flex align-items-center mb-0">
+            <li class="breadcrumb-item">
+                <h4 class="page-title mb-0">Edit Employees</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">Edit</a>
+            </li>
+        </ul>
+        <h4 class="mb-0 text-end text-truncate">@Model.EmployeeName - @Model.EmployeeCode</h4>
+    </div>
 }
-@if(isView)
+@if (isView)
 {
-    <ul class="breadcrumb breadcrumb-style d-flex align-items-center">
-        <li class="breadcrumb-item">
-            <h4 class="page-title mb-0">View Employees</h4>
-        </li>
-
-        <li class="breadcrumb-item bcrumb-1">
-            <a href="#">View</a>
-        </li>
-
-        <!-- Right side name -->
-        <li class="breadcrumb-item ms-auto" style="list-style:none;">
-            <h4 class="mb-0">@Model.EmployeeName - @Model.EmployeeCode</h4>
-        </li>
-    </ul>
-
+    <div class="employee-page-header d-flex justify-content-between align-items-center flex-nowrap mb-2">
+        <ul class="breadcrumb breadcrumb-style d-flex align-items-center mb-0">
+            <li class="breadcrumb-item">
+                <h4 class="page-title mb-0">View Employees</h4>
+            </li>
+            <li class="breadcrumb-item bcrumb-1">
+                <a href="#">View</a>
+            </li>
+        </ul>
+        <h4 class="mb-0 text-end text-truncate">@Model.EmployeeName - @Model.EmployeeCode</h4>
+    </div>
 }
 
 <div id="employee">
@@ -262,7 +275,7 @@
                     </div>
 
 
-                    <div class="col-md-4 mt-3">
+                    <div class="col-md-4">
                         <div class="form-group form-float">
                             <div class="form-line">
 
@@ -324,7 +337,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4 mt-3">
+                    <div class="col-md-4">
                         <div class="form-group form-float">
                             <div class="form-line">
                                 @if (isView)
@@ -392,7 +405,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4 mt-3">
+                    <div class="col-md-4">
                         <div class="form-group form-float">
                             <div class="form-line">
                                 @if (isView)
@@ -419,7 +432,7 @@
                     </div>
 
 
-                    <div class="col-md-4 mt-3">
+                    <div class="col-md-4">
                         <label class="form-label"><i class="bi bi-camera"></i> Photograph</label>
                         <input type="file" id="Photo" name="Photo" />
 
@@ -610,7 +623,7 @@
                                     <input type="text"
                                            class="form-control"
                                            id="cState"
-                                            asp-for="CurrentAddress.StateID"
+                                           value="@StateName(Model.CurrentAddress?.StateID)"
                                            readonly />
                                 }
                                 else
@@ -728,7 +741,7 @@
                             <label for="pState" class="form-label">State</label>
                             @if (isView)
                             {
-                                <input type="text" class="form-control" value="@Model.PermanentAddress?.StateID" readonly />
+                                <input type="text" class="form-control" value="@StateName(Model.PermanentAddress?.StateID)" readonly />
                             }
                             else
                             {
@@ -845,7 +858,7 @@
                                     <select asp-for="EmergencyContactRelation"
                                             id="EmergencyContactRelation"
                                             class="form-control select2 emergency-relation">
-                                        <option value="">Select Relationship</option>
+                                        <option value=""></option>
                                         <option value="Father">Father</option>
                                         <option value="Mother">Mother</option>
                                         <option value="Sibling">Sibling</option>
@@ -1179,4 +1192,70 @@
 
 <script src="~/app/assets/js/pages/forms/selectitem-data.js"></script>
 <script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
+
+<script>
+    // Auto-calculate Age from Date of Birth.
+    $(function () {
+        // DOB input uses flatpickr with format d-m-Y (e.g. 10-06-2026).
+        var dobEl = document.querySelector('input[name="DOB"]');
+        var $age = $('#age');
+        if (!dobEl) return;
+
+        function calculateAge(dobStr) {
+            if (!dobStr) return '';
+            var parts = dobStr.split('-');
+            if (parts.length !== 3) return '';
+            var day = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10);
+            var year = parseInt(parts[2], 10);
+            if (!day || !month || !year) return '';
+
+            var dob = new Date(year, month - 1, day);
+            if (isNaN(dob.getTime())) return '';
+
+            var today = new Date();
+            var age = today.getFullYear() - dob.getFullYear();
+            var monthDiff = today.getMonth() - dob.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+            // Guard against a future DOB.
+            return age >= 0 ? age : '';
+        }
+
+        function updateAge() {
+            var age = calculateAge(dobEl.value);
+            $age.val(age);
+            // Toggle the floating-label ".focused" class so the "Age" label moves up
+            // and reveals the value when present, and rests in place when empty.
+            $age.closest('.form-line').toggleClass('focused', age !== '');
+        }
+
+        // admin.js floats a field's label on focus regardless of its value. The Age
+        // field is readonly but still clickable/focusable, which would float an empty
+        // label and leave it misaligned with its row neighbours. Keep it resting when
+        // there is no calculated value.
+        $age.on('focus', function () {
+            if (!$age.val()) {
+                $age.closest('.form-line').removeClass('focused');
+            }
+        });
+
+        // Hook flatpickr's own callbacks (fires whether the date is picked from
+        // the calendar or typed in). flatpicker-data.js initializes it first.
+        if (dobEl._flatpickr) {
+            dobEl._flatpickr.config.onChange.push(updateAge);
+            dobEl._flatpickr.config.onValueUpdate.push(updateAge);
+            dobEl._flatpickr.config.onClose.push(updateAge);
+        }
+
+        // Fallbacks for manual typing / non-flatpickr cases.
+        $(dobEl).on('change blur keyup input', updateAge);
+
+        // Prefill in edit/view mode when a DOB already exists.
+        if (dobEl.value) {
+            updateAge();
+        }
+    });
+</script>
 <script src="~/app/assets/js/pages/forms/dropzone-data.js"></script>

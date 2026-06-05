@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SparkHRMS.Data.Entities.Employee>
+@model IEnumerable<SparkHRMS.Data.Entities.Employee>
 
 @{
     ViewData["Title"] = "Index";
@@ -8,35 +8,35 @@
 
 <div class="row mr-0">
     <div class="col-lg-12 col-md-12 col-sm-12">
-        <ul class="breadcrumb breadcrumb-style" style="display:inline">
-            <li class="breadcrumb-item">
-                <h4 class="page-title">All Employees</h4>
-            </li>
-            <li class="breadcrumb-item bcrumb-1">
-                <a href="#">
-                    <i class="fas fa-add"></i> List
-                </a>
-            </li>
-        </ul>
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+            <ul class="breadcrumb breadcrumb-style mb-0" style="display:inline">
+                <li class="breadcrumb-item">
+                    <h4 class="page-title">All Employees</h4>
+                </li>
+                <li class="breadcrumb-item bcrumb-1">
+                    <a href="#">
+                        <i class="fas fa-add"></i> List
+                    </a>
+                </li>
+            </ul>
 
-        <div class="d-flex justify-content-end mb-2">
-            <button type="button" id="addButton" class="btn btn-success me-2">
-                Add
-            </button>
+            <div class="d-flex">
+                <button type="button" id="addButton" class="btn btn-success me-2">
+                    Add
+                </button>
 
-            <button type="button" id="editButton" class="btn btn-primary me-2">
-                Edit
-            </button>
+                <button type="button" id="editButton" class="btn btn-primary me-2">
+                    Edit
+                </button>
 
-            <button type="button" id="viewButton" class="btn btn-secondary me-2">
-                View
-            </button>
-            <button type="button" id="deleteButton" class="btn btn-danger">
-                Delete
-            </button>
-
+                <button type="button" id="viewButton" class="btn btn-secondary me-2">
+                    View
+                </button>
+                <button type="button" id="deleteButton" class="btn btn-danger">
+                    Delete
+                </button>
+            </div>
         </div>
-
     </div>
 </div>
 
@@ -49,9 +49,7 @@
                            class="table table-hover table-checkable order-column contact_list">
                         <thead>
                             <tr>
-                                <th class="center">
-                                    <input type="checkbox" id="selectAll" />
-                                </th>
+                                <th class="center"></th>
                                 <th class="center">#</th>
                                 <th class="center"></th>
                                 <th class="center"> Code </th>
@@ -60,7 +58,7 @@
                                 <th class="center"> Mobile </th>
                                 <th class="center"> Email </th>
                                 <th class="center"> Joining Date </th>
-                               
+
                             </tr>
                         </thead>
                         <tbody>
@@ -87,7 +85,7 @@
                                     <td class="center"> @Html.DisplayFor(modelItem => item.PhoneNumber)</td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.Email)</td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.DateOfJoining)</td>
-                                   
+
                                 </tr>
                             }
                         </tbody>
@@ -98,13 +96,18 @@
     </div>
 </div>
 
-@*<style>
-    /* Highlight selected row */
-    .selected-row {
-        background-color: #d9edf7 !important;
-    }
-</style>*@
-
-@*<script>
-    $('#employeeListTable').DataTable();
-</script>*@
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#employeeListTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                order: [],
+                columnDefs: [
+                    { orderable: false, targets: [0, 2] },
+                    { searchable: false, targets: [0, 1, 2] }
+                ]
+            });
+        });
+    </script>
+}

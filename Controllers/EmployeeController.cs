@@ -508,7 +508,17 @@ public async Task<IActionResult> UpdateEmployeeDetails(EmployeeDetails model, IF
         var currentAddress = addresses.FirstOrDefault(x => !x.IsPermanentAddress);
         var permanentAddress = addresses.FirstOrDefault(x => x.IsPermanentAddress);
 
-    
+        var isNewCurrent = currentAddress == null;
+        if (isNewCurrent)
+        {
+            currentAddress = new Address
+            {
+                DocumentType = "MST_Employee",
+                DocumentId = employee.EmployeeId,
+                IsPermanentAddress = false
+            };
+        }
+
         currentAddress.Address1 = model.CurrentAddress.Address1;
         currentAddress.Address2 = model.CurrentAddress.Address2;
         currentAddress.City = model.CurrentAddress.City;
@@ -516,7 +526,20 @@ public async Task<IActionResult> UpdateEmployeeDetails(EmployeeDetails model, IF
         currentAddress.Country = model.CurrentAddress.Country;
         currentAddress.Pincode = model.CurrentAddress.Pincode;
 
-      
+        if (isNewCurrent)
+            _context.MST_Address.Add(currentAddress);
+
+        var isNewPermanent = permanentAddress == null;
+        if (isNewPermanent)
+        {
+            permanentAddress = new Address
+            {
+                DocumentType = "MST_Employee",
+                DocumentId = employee.EmployeeId,
+                IsPermanentAddress = true
+            };
+        }
+
         if (model.CurrentAddress.IsPermanentAddress)
         {
             permanentAddress.Address1 = model.CurrentAddress.Address1;
@@ -535,6 +558,9 @@ public async Task<IActionResult> UpdateEmployeeDetails(EmployeeDetails model, IF
             permanentAddress.Country = model.PermanentAddress.Country;
             permanentAddress.Pincode = model.PermanentAddress.Pincode;
         }
+
+        if (isNewPermanent)
+            _context.MST_Address.Add(permanentAddress);
 
         await _context.SaveChangesAsync();
 
