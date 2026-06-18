@@ -31,6 +31,22 @@ namespace SparkHRMS.Controllers
             _configuration = configuration;
         }
 
+        // Minimum age (in years) an employee must be, based on Date of Birth.
+        private const int MinimumEmployeeAge = 18;
+
+        // True when a DOB is provided and the resulting age (as of today) is below
+        // the minimum. A null DOB is not validated here (it is optional).
+        private static bool IsUnderMinimumAge(DateTime? dob)
+        {
+            if (!dob.HasValue) return false;
+
+            var today = DateTime.Today;
+            var age = today.Year - dob.Value.Year;
+            if (dob.Value.Date > today.AddYears(-age)) age--;
+
+            return age < MinimumEmployeeAge;
+        }
+
         // GET: Employee
         public async Task<IActionResult> Index()
         {
@@ -173,6 +189,9 @@ namespace SparkHRMS.Controllers
             
             if (string.IsNullOrWhiteSpace(model.EmployeeName))
                 return Json(new { success = false, message = "Employee name is required." });
+
+            if (IsUnderMinimumAge(model.DOB))
+                return Json(new { success = false, message = $"Employee must be at least {MinimumEmployeeAge} years old. Please check the Date of Birth." });
 
             if (string.IsNullOrWhiteSpace(model.PhoneNumber))
                 return Json(new { success = false, message = "Phone number is required." });
@@ -400,6 +419,9 @@ public async Task<IActionResult> UpdateEmployeeDetails(EmployeeDetails model, IF
 
     if (string.IsNullOrWhiteSpace(model.EmployeeName))
         return Json(new { success = false, message = "Employee name is required." });
+
+    if (IsUnderMinimumAge(model.DOB))
+        return Json(new { success = false, message = $"Employee must be at least {MinimumEmployeeAge} years old. Please check the Date of Birth." });
 
     if (string.IsNullOrWhiteSpace(model.PhoneNumber))
         return Json(new { success = false, message = "Phone number is required." });

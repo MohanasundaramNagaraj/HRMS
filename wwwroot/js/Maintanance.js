@@ -1,4 +1,58 @@
 ﻿
+// Minimum age (in years) an employee must be, based on Date of Birth.
+var MINIMUM_EMPLOYEE_AGE = 18;
+
+// Calculate age from a flatpickr "d-m-Y" date string using the current date.
+// Returns null when the value is empty or not a valid date.
+function getAgeFromDob(dobStr) {
+    if (!dobStr) return null;
+    var parts = dobStr.split('-');
+    if (parts.length !== 3) return null;
+    var day = parseInt(parts[0], 10);
+    var month = parseInt(parts[1], 10);
+    var year = parseInt(parts[2], 10);
+    if (!day || !month || !year) return null;
+
+    var dob = new Date(year, month - 1, day);
+    if (isNaN(dob.getTime())) return null;
+
+    var today = new Date();
+    var age = today.getFullYear() - dob.getFullYear();
+    var monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+    return age;
+}
+
+// Returns true when the DOB is missing or makes the employee at least 18.
+// Shows an alert and returns false when the employee would be under 18.
+function validateDobAge() {
+    var dobStr = $("input[name='DOB']").val();
+    if (!dobStr) return true; // DOB optional; only validate when provided.
+
+    var age = getAgeFromDob(dobStr);
+    if (age === null) return true; // Let the existing date handling deal with invalid input.
+
+    if (age < MINIMUM_EMPLOYEE_AGE) {
+        var warningMessage = "Employee must be at least " + MINIMUM_EMPLOYEE_AGE +
+            " years old.";
+
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Date of Birth",
+                text: warningMessage,
+                confirmButtonText: "OK"
+            });
+        } else {
+            alert(warningMessage);
+        }
+        return false;
+    }
+    return true;
+}
+
 $(document).ready(function () {
 
     debugger;
@@ -131,6 +185,7 @@ function OpenEmployeeCreate(fMode, entryId) {
 
 function saveEmployee() {
     debugger;
+    if (!validateDobAge()) return;
     var formData = new FormData();
     formData.append("EmployeeCode", $("input[name='EmployeeCode']").val());
     formData.append("Designation", $("#Designation").val());
@@ -232,9 +287,10 @@ function saveEmployee() {
 }
 function updateEmployeeDetails() {
     debugger;
+    if (!validateDobAge()) return;
     var formData = new FormData();
 
-    
+
     formData.append("EmployeeId", $("#hdnEmployeeId").val());
     formData.append("EmployeeName", $("input[name='EmployeeName']").val());
     formData.append("Gender", $("#Gender").val());
