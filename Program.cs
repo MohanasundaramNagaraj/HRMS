@@ -24,6 +24,8 @@ using Serilog;
 using Serilog.Events;
 using System.Configuration;
 using Serilog.Ui.Web.Extensions;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -188,6 +190,18 @@ app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(externalFolderPath),
     RequestPath = "/uploads"
+});
+
+// Use a fixed culture (en-GB, dd-MM-yyyy) so model binding parses the
+// dd-MM-yyyy dates produced by the flatpickr date pickers regardless of the
+// server's OS culture. Without this, "09-06-2026" was parsed as MM-dd-yyyy and
+// silently dropped (e.g. Date of Joining was saved as null).
+var fixedCulture = new CultureInfo("en-GB");
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(fixedCulture),
+    SupportedCultures = new[] { fixedCulture },
+    SupportedUICultures = new[] { fixedCulture }
 });
 
 app.UseRouting();

@@ -95,6 +95,8 @@ namespace SparkHRMS.Data.Entities
         [MaxLength(20)]
         public string? PassportNumber { get; set; }
 
+        public DateTime? PassportExpiryDate { get; set; }
+
         [MaxLength(20)]
         public string? DrivingLicenseNumber { get; set; }
 

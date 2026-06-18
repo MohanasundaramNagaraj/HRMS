@@ -167,6 +167,7 @@ function saveEmployee() {
     formData.append("PanNumber", $("#PanNumber").val());
     formData.append("AadhaarNumber", $("#AadhaarNumber").val());
     formData.append("PassportNumber", $("#PassportNumber").val());
+    formData.append("PassportExpiryDate", $("input[name='PassportExpiryDate']").val());
     formData.append("DrivingLicenseNumber", $("#DrivingLicenseNumber").val());
     debugger;
     var isSame = $("#sameAddress").is(":checked");
@@ -246,9 +247,11 @@ function updateEmployeeDetails() {
     formData.append("FatherName", $("#FatherName").val());
     formData.append("MotherName", $("#MotherName").val());
     formData.append("SpouseName", $("#SpouseName").val());
+    formData.append("NumberOfDependents", $("#NumberOfDependents").val());
     formData.append("AadhaarNumber", $("#AadhaarNumber").val());
     formData.append("PanNumber", $("#PanNumber").val());
     formData.append("PassportNumber", $("#PassportNumber").val());
+    formData.append("PassportExpiryDate", $("input[name='PassportExpiryDate']").val());
     formData.append("DrivingLicenseNumber", $("#DrivingLicenseNumber").val());
     formData.append("Designation", $("#Designation").val());
     formData.append("DateOfJoining", $("input[name='DateOfJoining']").val());

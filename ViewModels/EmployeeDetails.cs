@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System.ComponentModel.DataAnnotations;
 
 namespace SparkHRMS.ViewModels
 {
@@ -9,7 +10,11 @@ namespace SparkHRMS.ViewModels
         public string EmployeeName { get; set; }
         public int ? EmployeeId { get; set; }
         public string Gender { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? DOB { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? DateOfJoining { get; set; }
 
         public int ApplicationUserId { get; set; }
@@ -34,6 +39,8 @@ namespace SparkHRMS.ViewModels
         public string AadhaarNumber { get; set; }
         public string PanNumber { get; set; }
         public string PassportNumber { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? PassportExpiryDate { get; set; }
         public string DrivingLicenseNumber { get; set; }
         public string EmployeeCode {  get; set; }

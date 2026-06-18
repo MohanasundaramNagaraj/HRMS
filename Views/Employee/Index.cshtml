@@ -84,7 +84,7 @@
                                     <td class="center"> @Html.DisplayFor(modelItem => item.Designation)</td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.PhoneNumber)</td>
                                     <td class="center"> @Html.DisplayFor(modelItem => item.Email)</td>
-                                    <td class="center"> @Html.DisplayFor(modelItem => item.DateOfJoining)</td>
+                                    <td class="center"> @(item.DateOfJoining.HasValue ? item.DateOfJoining.Value.ToString("dd/MM/yyyy") : "")</td>
 
                                 </tr>
                             }

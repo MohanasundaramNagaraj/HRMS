@@ -123,6 +123,7 @@ namespace SparkHRMS.Controllers
                     AadhaarNumber = employee.AadhaarNumber,
                     PanNumber = employee.PANNumber,
                     PassportNumber = employee.PassportNumber,
+                    PassportExpiryDate = employee.PassportExpiryDate,
                     DrivingLicenseNumber = employee.DrivingLicenseNumber,
 
                     EmergencyContactName = employee.EmergencyContactName,
@@ -283,6 +284,8 @@ namespace SparkHRMS.Controllers
                     AadhaarNumber = model.AadhaarNumber,
                     PANNumber = model.PanNumber,
                     PassportNumber = model.PassportNumber,
+                    PassportExpiryDate = model.PassportExpiryDate,
+                    NumberOfDependents = model.NumberOfDependents,
                     DrivingLicenseNumber = model.DrivingLicenseNumber,
                     Designation = model.Designation,
                     ImageUrl = photoPath,
@@ -486,6 +489,8 @@ public async Task<IActionResult> UpdateEmployeeDetails(EmployeeDetails model, IF
         employee.AadhaarNumber = model.AadhaarNumber;
         employee.PANNumber = model.PanNumber;
         employee.PassportNumber = model.PassportNumber;
+        employee.PassportExpiryDate = model.PassportExpiryDate;
+        employee.NumberOfDependents = model.NumberOfDependents;
         employee.DrivingLicenseNumber = model.DrivingLicenseNumber;
         employee.Designation = model.Designation;
         employee.DateOfJoining = model.DateOfJoining;

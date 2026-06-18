@@ -389,11 +389,19 @@
                                     }
                                     else
                                     {
+                                        var activeUsers = ViewBag.ActiveUsers as IEnumerable<string> ?? Enumerable.Empty<string>();
+                                        var currentReportingHead = Model.ReportingHeadMailID;
                                         <select asp-for="ReportingHeadMailID"
                                                 class="form-control select2"
                                                 id="reportingHeadSelect">
                                             <option value=""></option>
-                                            @foreach (var name in ViewBag.ActiveUsers)
+                                            @* Keep the saved reporting head selectable even if it is no
+                                               longer in the active-users list, so it isn't blank on reopen. *@
+                                            @if (!string.IsNullOrEmpty(currentReportingHead) && !activeUsers.Contains(currentReportingHead))
+                                            {
+                                                <option value="@currentReportingHead">@currentReportingHead</option>
+                                            }
+                                            @foreach (var name in activeUsers)
                                             {
                                                 <option value="@name">@name</option>
                                             }
@@ -1120,12 +1128,23 @@
                         <div class="form-group">
                             <div class="form-group form-float">
                                 <div class="form-line">
-                                    <input type="text"
-                                           class="form-control datetimepicker @(isView ? "view-mode" : "")"
-                                           value="@Model.PassportExpiryDate"
-                                           @(isView ? "readonly" : "")
-                                           id="date2"
-                                           autocomplete="off" />
+                                    @if (isView)
+                                    {
+                                        <input asp-for="PassportExpiryDate"
+                                               type="text"
+                                               class="form-control datetimepicker view-mode"
+                                               readonly
+                                               id="passportExpiryDate"
+                                               autocomplete="off" />
+                                    }
+                                    else
+                                    {
+                                        <input asp-for="PassportExpiryDate"
+                                               type="text"
+                                               class="form-control datetimepicker"
+                                               id="passportExpiryDate"
+                                               autocomplete="off" />
+                                    }
                                     <label class="form-label"><i class="bi bi-calendar-event">  </i> Passport Expiry Date</label>
                                 </div>
                             </div>
@@ -1194,6 +1213,20 @@
 <script src="~/app/assets/js/pages/forms/flatpicker-data.js"></script>
 
 <script>
+    // Passport Expiry uses its own id (the shared #date2 picker only covers DOB
+    // and Date of Joining), so initialise flatpickr for it with the same d-m-Y format.
+    $(function () {
+        if (typeof flatpickr === "function") {
+            flatpickr("input[name='PassportExpiryDate']", {
+                allowInput: true,
+                dateFormat: "d-m-Y",
+                onOpen: function (selectedDates, dateStr, instance) {
+                    instance.setDate(instance.input.value, false);
+                }
+            });
+        }
+    });
+
     // Auto-calculate Age from Date of Birth.
     $(function () {
         // DOB input uses flatpickr with format d-m-Y (e.g. 10-06-2026).
