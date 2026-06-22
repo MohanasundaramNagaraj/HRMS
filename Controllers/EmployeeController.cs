@@ -47,6 +47,46 @@ namespace SparkHRMS.Controllers
             return age < MinimumEmployeeAge;
         }
 
+        // Normalize a mobile number for comparison: digits only, leading zeros
+        // removed, so "7604900125" and "07604900125" compare as equal.
+        private static string NormalizeMobile(string number)
+        {
+            if (string.IsNullOrWhiteSpace(number)) return string.Empty;
+            return new string(number.Where(char.IsDigit).ToArray()).TrimStart('0');
+        }
+
+        // True when both numbers are present and refer to the same mobile number.
+        private static bool AreMobileNumbersSame(string phone, string altPhone)
+        {
+            var p = NormalizeMobile(phone);
+            var a = NormalizeMobile(altPhone);
+            return p.Length > 0 && p == a;
+        }
+
+        // Checks that the mobile number and email are not already used by another
+        // employee. Returns an error message when a duplicate is found, otherwise null.
+        // Pass excludeEmployeeId on edit so the employee's own record is ignored.
+        private async Task<string?> GetDuplicateContactErrorAsync(string phone, string email, int? excludeEmployeeId)
+        {
+            var normalizedPhone = NormalizeMobile(phone);
+            var trimmedEmail = (email ?? string.Empty).Trim();
+
+            var others = await _context.Employees
+                .Where(e => !excludeEmployeeId.HasValue || e.EmployeeId != excludeEmployeeId.Value)
+                .Select(e => new { e.PhoneNumber, e.Email })
+                .ToListAsync();
+
+            if (normalizedPhone.Length > 0 &&
+                others.Any(o => NormalizeMobile(o.PhoneNumber) == normalizedPhone))
+                return "This mobile number is already used by another employee."; 
+
+            if (trimmedEmail.Length > 0 &&
+                others.Any(o => string.Equals((o.Email ?? string.Empty).Trim(), trimmedEmail, StringComparison.OrdinalIgnoreCase)))
+                return "This email is already used by another employee.";
+
+            return null;
+        }
+
         // GET: Employee
         public async Task<IActionResult> Index()
         {
@@ -196,9 +236,16 @@ namespace SparkHRMS.Controllers
             if (string.IsNullOrWhiteSpace(model.PhoneNumber))
                 return Json(new { success = false, message = "Phone number is required." });
 
+            if (AreMobileNumbersSame(model.PhoneNumber, model.AlternateMoblieNumber))
+                return Json(new { success = false, message = "Personal Mobile Number and Alternate Mobile Number cannot be the same." });
+
             if (!string.IsNullOrWhiteSpace(model.Email) &&
                 !new EmailAddressAttribute().IsValid(model.Email))
                 return Json(new { success = false, message = "Invalid email address." });
+
+            var duplicateContactError = await GetDuplicateContactErrorAsync(model.PhoneNumber, model.Email, null);
+            if (duplicateContactError != null)
+                return Json(new { success = false, message = duplicateContactError });
 
             if (model.CurrentAddress == null)
                 return Json(new { success = false, message = "Current address is required." });
@@ -426,9 +473,16 @@ public async Task<IActionResult> UpdateEmployeeDetails(EmployeeDetails model, IF
     if (string.IsNullOrWhiteSpace(model.PhoneNumber))
         return Json(new { success = false, message = "Phone number is required." });
 
+    if (AreMobileNumbersSame(model.PhoneNumber, model.AlternateMoblieNumber))
+        return Json(new { success = false, message = "Personal Mobile Number and Alternate Mobile Number cannot be the same." });
+
     if (!string.IsNullOrWhiteSpace(model.Email) &&
         !new EmailAddressAttribute().IsValid(model.Email))
         return Json(new { success = false, message = "Invalid email address." });
+
+    var duplicateContactError = await GetDuplicateContactErrorAsync(model.PhoneNumber, model.Email, model.EmployeeId);
+    if (duplicateContactError != null)
+        return Json(new { success = false, message = duplicateContactError });
 
     if (model.CurrentAddress == null)
         return Json(new { success = false, message = "Current address is required." });

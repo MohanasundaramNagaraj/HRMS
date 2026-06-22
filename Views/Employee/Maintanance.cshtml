@@ -1294,9 +1294,50 @@
         // Fallbacks for manual typing / non-flatpickr cases.
         $(dobEl).on('change blur keyup input', updateAge);
 
-        // Prefill in edit/view mode when a DOB already exists.
-        if (dobEl.value) {
+        // A DOB is "real" only when it has a sensible year. Records with no DOB are
+        // stored as the .NET min date (01-01-0001) and must not be shown as-is.
+        function hasRealDob() {
+            if (!dobEl.value) return false;
+            var parts = dobEl.value.split('-');
+            if (parts.length !== 3) return false;
+            var year = parseInt(parts[2], 10);
+            return year >= 1900;
+        }
+
+        if (hasRealDob()) {
+            // Prefill in edit/view mode when a valid DOB already exists.
             updateAge();
+        }
+        else if (!dobEl.readOnly) {
+            // No real DOB (Add screen, or an existing record with a missing/min-date
+            // DOB): default to exactly 18 years before today, calculated from the
+            // current system date, so the minimum valid date of birth is shown.
+            var defaultDob = new Date();
+            defaultDob.setFullYear(defaultDob.getFullYear() - 18);
+
+            if (dobEl._flatpickr) {
+                dobEl._flatpickr.setDate(defaultDob, false); // d-m-Y formatting handled by flatpickr
+            } else {
+                var dd = ("0" + defaultDob.getDate()).slice(-2);
+                var mm = ("0" + (defaultDob.getMonth() + 1)).slice(-2);
+                dobEl.value = dd + "-" + mm + "-" + defaultDob.getFullYear();
+            }
+            updateAge();
+        }
+        else {
+            // View mode with no real DOB: show it blank rather than 01-01-0001.
+            dobEl.value = '';
+            updateAge();
+        }
+
+        // Edit mode: remember the initial form state so the Update can be blocked
+        // when nothing has changed. Delay slightly so dropdowns/pickers finish
+        // initializing first (otherwise the baseline would be incomplete).
+        var editEmployeeId = parseInt($("#hdnEmployeeId").val(), 10);
+        if (!dobEl.readOnly && editEmployeeId > 0 && typeof getEmployeeFormState === "function") {
+            setTimeout(function () {
+                window.__employeeEditSnapshot = getEmployeeFormState();
+            }, 400);
         }
     });
 </script>

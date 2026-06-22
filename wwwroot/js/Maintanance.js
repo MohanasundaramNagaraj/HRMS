@@ -53,23 +53,99 @@ function validateDobAge() {
     return true;
 }
 
+// Normalize a mobile number for comparison: keep digits only and drop leading
+// zeros, so "7604900125" and "07604900125" are treated as the same number.
+function normalizeMobile(num) {
+    if (!num) return "";
+    return (num + "").replace(/\D/g, "").replace(/^0+/, "");
+}
+
+// Returns false (and shows a warning) when the personal and alternate mobile
+// numbers are the same; true otherwise.
+function validateMobileNumbersDistinct(phone, altPhone) {
+    var p = normalizeMobile(phone);
+    var a = normalizeMobile(altPhone);
+
+    if (p && a && p === a) {
+        var warningMessage = "Personal Mobile Number and Alternate Mobile Number cannot be the same.";
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: "warning",
+                title: "Duplicate Mobile Number",
+                text: warningMessage,
+                confirmButtonText: "OK"
+            });
+        } else {
+            alert(warningMessage);
+        }
+        return false;
+    }
+    return true;
+}
+
+// Build a snapshot string of every editable field on the employee form. Used to
+// detect whether anything actually changed before allowing an Update.
+function getEmployeeFormState() {
+    var values = [
+        $("input[name='EmployeeName']").val(),
+        $("#Gender").val(),
+        $("input[name='DOB']").val(),
+        $(".blood-group").val(),
+        $("#Nationality").val(),
+        $("#MartialStatus").val(),
+        $("#PhoneNumber").val(),
+        $("#Email").val(),
+        $("#FatherName").val(),
+        $("#MotherName").val(),
+        $("#SpouseName").val(),
+        $("#NumberOfDependents").val(),
+        $("#AadhaarNumber").val(),
+        $("#PanNumber").val(),
+        $("#PassportNumber").val(),
+        $("input[name='PassportExpiryDate']").val(),
+        $("#DrivingLicenseNumber").val(),
+        $("#Designation").val(),
+        $("input[name='DateOfJoining']").val(),
+        $("#reportingHeadSelect").val(),
+        $("#AlternateMoblieNumber").val(),
+        $("#EmergencyContactName").val(),
+        $("#EmergencyContactNumber").val(),
+        $("#EmergencyContactRelation").val(),
+        $("#EmergencyAlternateNumber").val(),
+        $("#cAddress1").val(), $("#cAddress2").val(), $("#cCity").val(),
+        $("#cState").val(), $("#cCountry").val(), $("#cPincode").val(),
+        $("#sameAddress").is(":checked") ? "1" : "0",
+        $("#pAddress1").val(), $("#pAddress2").val(), $("#pCity").val(),
+        $("#pState").val(), $("#pCountry").val(), $("#pPincode").val()
+    ];
+
+    // Include whether a new photo file was chosen.
+    var photoInput = document.getElementById("Photo");
+    values.push(photoInput && photoInput.files && photoInput.files.length > 0 ? "photo-selected" : "");
+
+    return values.map(function (v) {
+        return (v === undefined || v === null) ? "" : ("" + v);
+    }).join("||");
+}
+
 $(document).ready(function () {
 
     debugger;
     var selectedEmployeeId = null;
 
-    $(document).on('change', '.row-checkbox', function () {
+    // Select an employee by double-clicking (double-tapping) its row in the list.
+    // This replaces the old per-row checkbox; the Edit/View/Delete buttons act on
+    // the row selected here.
+    $(document).on('dblclick', '#employeeListTable tbody tr.employee-row', function () {
+        var id = $(this).data('id') || null;
+        if (!id) return;
 
-        // Uncheck all other checkboxes
-        $('.row-checkbox').not(this).prop('checked', false);
+        // Highlight only the selected row.
+        $('#employeeListTable tbody tr.employee-row').removeClass('selected-row');
+        $(this).addClass('selected-row');
 
-        if ($(this).is(':checked')) {
-            selectedEmployeeId = $(this).data('id') || null;
-            $('#hdnEmployeeId').val(selectedEmployeeId);
-        } else {
-            selectedEmployeeId = null;
-            $('#hdnEmployeeId').val('');
-        }
+        selectedEmployeeId = id;
+        $('#hdnEmployeeId').val(selectedEmployeeId);
     });
 
     $("#addButton").click(function () {
@@ -85,7 +161,7 @@ $(document).ready(function () {
             $('#hdnEmployeeId').val(selectedEmployeeId);
             OpenEmployeeCreate("EDIT", selectedEmployeeId);
         } else {
-            alert("Please select an employee first.");
+            alert("Please double-click an employee row to select it first.");
         }
     });
 
@@ -97,7 +173,7 @@ $(document).ready(function () {
             $('#hdnEmployeeId').val(selectedEmployeeId);
             OpenEmployeeCreate("VIEW", selectedEmployeeId);
         } else {
-            alert("Please select an employee first.");
+            alert("Please double-click an employee row to select it first.");
         }
     });
 
@@ -156,7 +232,7 @@ $(document).ready(function () {
             }
 
         } else {
-            alert("Please select an employee first.");
+            alert("Please double-click an employee row to select it first.");
         }
 
     });
@@ -186,6 +262,7 @@ function OpenEmployeeCreate(fMode, entryId) {
 function saveEmployee() {
     debugger;
     if (!validateDobAge()) return;
+    if (!validateMobileNumbersDistinct($("input[name='PhoneNumber']").val(), $("#AlternateMoblieNumber").val())) return;
     var formData = new FormData();
     formData.append("EmployeeCode", $("input[name='EmployeeCode']").val());
     formData.append("Designation", $("#Designation").val());
@@ -287,7 +364,26 @@ function saveEmployee() {
 }
 function updateEmployeeDetails() {
     debugger;
+
+    // Block the update when nothing on the form has changed since it loaded.
+    if (typeof window.__employeeEditSnapshot !== "undefined" &&
+        getEmployeeFormState() === window.__employeeEditSnapshot) {
+        var noChangeMessage = "No changes detected. Please modify at least one field before updating.";
+        if (typeof Swal !== "undefined") {
+            Swal.fire({
+                icon: "info",
+                title: "No Changes",
+                text: noChangeMessage,
+                confirmButtonText: "OK"
+            });
+        } else {
+            alert(noChangeMessage);
+        }
+        return;
+    }
+
     if (!validateDobAge()) return;
+    if (!validateMobileNumbersDistinct($("#PhoneNumber").val(), $("#AlternateMoblieNumber").val())) return;
     var formData = new FormData();
 
 
