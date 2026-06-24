@@ -215,7 +215,22 @@
 
         function removeRow(button) {
             var row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
+            var tbody = row.parentNode;
+            var rowCount = tbody.getElementsByTagName('tr').length;
+
+            if (rowCount > 1) {
+                // More than one row: delete this row.
+                tbody.removeChild(row);
+            } else {
+                // Only one row left: keep the row but clear its data.
+                row.querySelectorAll('select').forEach(function (sel) {
+                    sel.selectedIndex = 0;
+                });
+                row.querySelectorAll('input').forEach(function (inp) {
+                    // Mirror a freshly added row: Used Days resets to 0, others blank.
+                    inp.value = (inp.name && inp.name.indexOf('.UsedDays') !== -1) ? '0' : '';
+                });
+            }
         }
 
         if (FMode == 'Add') {
