@@ -107,31 +107,36 @@
                                         <table id="dataTable" class="display nowrap table table-hover" style="width:100%">
                                             <thead>
                                                 <tr>
+                                                    <th class="center"> </th>
+                                                    <th class="center" colspan="3"> Employee Details </th>
+                                                    <th class="center" colspan="4"> Working Day Detail </th>
+                                                    <th class="center" colspan="4"> Leave Detail </th>
+                                                    <th class="center" colspan="3"> Attendance Detail </th>
+                                                </tr>
+                                                <tr>
                                                     <th class="center"> # </th>
+
                                                     <th class="center"> Employee Code </th>
                                                     <th class="center"> Employee Name </th>
-                                                    <th class="center"> Days in Month </th>
-                                                    <th class="center"> Working Days </th>
-                                                    <th class="center" colspan="4"> Leave Allocation </th>
+                                                    <th class="center"> Designation </th>
 
-                                                    @* <th class="center"> Present  </th>
-                                                    <th class="center"> Half Day  </th> *@
-                                                    <th class="center"> Present  </th>
-                                                    <th class="center"> Absent  </th>
+                                                    <th class="center"> Days in Month </th>
                                                     <th class="center"> Holiday  </th>
                                                     <th class="center"> Weekend  </th>
+                                                    <th class="center"> Working Days </th>
+
+
+                                                    <th class="center"> CL Taken </th>
+                                                    <th class="center"> EL Taken </th>
+                                                    <th class="center"> LOP </th>
+                                                    <th class="center"> Total Leave Taken </th>
+
+
+                                                    <th class="center"> Present  </th>
                                                     <th class="center"> Permission  </th>
                                                     <th class="center"> Pending Check out  </th>
                                                 </tr>
-                                                <tr>
-                                                    <th colspan="5"></th>
-                                                    <th class="center">Code</th>
-                                                    <th class="center">Name</th>
-                                                    <th class="center">Allocated</th>
-                                                    <th class="center">Remaining</th>
-                                                    <th colspan="6"></th>
-                                                </tr>
-
+                                               
                                             </thead>
                                             <tbody>
                                                 @{
@@ -139,43 +144,52 @@
                                                 }
                                                 @foreach (var record in Model)
                                                 {
+                                                    int rowspan = 1;
                                                     count = count + 1;
                                                     <tr class="odd gradeX">
-                                                        <td>@count</td>
-                                                        <td>@record.EmployeeDetails.EmpCode</td>
-                                                        <td>@record.EmployeeDetails.Name</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.DaysInMonth</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.TotalWorkingDays</td>
+                                                        <td rowspan="@rowspan">@count</td>
 
-                                                            @if(record.EmployeeAttendanceStatusCounts.LeaveAllocations.Count > 0)
-                                                            {
-                                                                foreach (var r in record.EmployeeAttendanceStatusCounts.LeaveAllocations)
-                                                                {
+                                                        <td rowspan="@rowspan">@record.EmployeeDetails.EmpCode</td>
+                                                        <td rowspan="@rowspan">@record.EmployeeDetails.Name</td>
+                                                        <td rowspan="@rowspan">@record.EmployeeDetails.Designation</td>
 
-                                                                    <td>@r.Code</td>
-                                                                    <td>@r.Name</td>
-                                                                    <td>@r.AllocatedDays</td>
-                                                                    <td>@r.RemainingDays</td>
-                                                                }
-                                                            }
+                                                        <td rowspan="@rowspan">@record.EmployeeAttendanceStatusCounts.DaysInMonth</td>
+                                                        <td rowspan="@rowspan">@record.EmployeeAttendanceStatusCounts.EmployeeHolidayCountOnMonth</td>
+                                                        <td rowspan="@rowspan">@record.EmployeeAttendanceStatusCounts.EmployeeWeekendCountOnMonth</td>
+                                                        <td rowspan="@rowspan">@record.EmployeeAttendanceStatusCounts.TotalWorkingDays</td>
+
+                                                        @* @if (record.EmployeeAttendanceStatusCounts.LeaveAllocations.Count > 0)
+                                                        {
+                                                            <td colspan="4">
+                                                                <table class="table table-sm table-bordered mb-0">
+
+                                                                    @foreach (var r in record.EmployeeAttendanceStatusCounts.LeaveAllocations)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>@r.Code</td>
+                                                                            <td>@r.Name</td>
+                                                                            <td>@r.AllocatedDays</td>
+                                                                            <td>@r.RemainingDays</td>
+                                                                        </tr>
+                                                                    }
+                                                                </table>
+                                                            </td>
+                                                        }
                                                         else
                                                         {
-                                                            <td colspan="4">Not Allocated</td>
-                                                        }
+                                                            <td colspan="4"></td>
+                                                        } *@
 
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeAbsentCountOnMonth</td>
 
-                                                       
-                                                        <td>
+                                                        <td rowspan="@rowspan">
                                                             @(record.EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth + (record.EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth * 0.5))
                                                         </td>
-
-                                                        @* <td>@record.EmployeeAttendanceStatusCounts.EmployeePresentCountOnMonth</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeHalfDayCountOnMonth</td> *@
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeAbsentCountOnMonth</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeHolidayCountOnMonth</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeeWeekendCountOnMonth</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeePermissionNeededCountOnMonth</td>
-                                                        <td>@record.EmployeeAttendanceStatusCounts.EmployeePendingCheckOutNeededCountOnMonth</td>
+                                                        <td rowspan="@rowspan">@record.EmployeeAttendanceStatusCounts.EmployeePermissionNeededCountOnMonth</td>
+                                                        <td rowspan="@rowspan">@record.EmployeeAttendanceStatusCounts.EmployeePendingCheckOutNeededCountOnMonth</td>
                                                     </tr>
                                                 }
                                             </tbody>

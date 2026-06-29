@@ -234,6 +234,8 @@ namespace SparkHRMS.Controllers
                                                   RemainingDays = det.RemainingDays
                                               }).Distinct().ToList();
 
+               
+
                 EmployeeMonthlySummaryWithStatusCount EmployeeMonthlySummaryWithStatusCount = new EmployeeMonthlySummaryWithStatusCount();
 
                 var employeeDetails = new EmployeeDetailsDto
