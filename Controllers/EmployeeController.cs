@@ -23,12 +23,144 @@ namespace SparkHRMS.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly SparkHRMS.Services.IEmployeeImportService _importService;
 
-        public EmployeeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        public EmployeeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IConfiguration configuration, SparkHRMS.Services.IEmployeeImportService importService)
         {
             _context = context;
             _userManager = userManager;
             _configuration = configuration;
+            _importService = importService;
+        }
+
+        private const string ExcelContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+        // History item for session storage
+        private sealed class ImportHistorySessionItem
+        {
+            public string ImportId { get; set; }
+            public string FileName { get; set; }
+            public string ImportedOn { get; set; }
+            public string ImportedBy { get; set; }
+            public int Total { get; set; }
+            public int Succeeded { get; set; }
+            public int Duplicates { get; set; }
+            public int Failed { get; set; }
+            public bool HasErrorFile { get; set; }
+        }
+
+        // GET: Employee/DownloadTemplate
+        // Returns the blank Excel template (column headers + an Instructions sheet).
+        [HttpGet]
+        public IActionResult DownloadTemplate()
+        {
+            var bytes = _importService.GenerateTemplate();
+            return File(bytes, ExcelContentType, "EmployeeImportTemplate.xlsx");
+        }
+
+        // POST: Employee/BulkUploadStart
+        // Validates the uploaded workbook and kicks off background processing.
+        // Returns an importId the client polls for progress.
+        [HttpPost]
+        [RequestSizeLimit(20 * 1024 * 1024)]
+        public async Task<IActionResult> BulkUploadStart(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return Json(new { success = false, message = "Please choose an Excel file to upload." });
+
+            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (ext != ".xlsx")
+                return Json(new { success = false, message = "Only .xlsx files are supported. Please use the downloaded template." });
+
+            byte[] bytes;
+            using (var ms = new MemoryStream())
+            {
+                await file.CopyToAsync(ms);
+                bytes = ms.ToArray();
+            }
+
+            var (ok, importId, total, error) = _importService.Begin(bytes, file.FileName, User?.Identity?.Name);
+            if (!ok)
+                return Json(new { success = false, message = error });
+
+            return Json(new { success = true, importId, total });
+        }
+
+        // GET: Employee/BulkUploadProgress?importId=...
+        [HttpGet]
+        public IActionResult BulkUploadProgress(string importId)
+        {
+            var p = _importService.GetProgress(importId);
+            if (p == null)
+                return Json(new { success = false, message = "Import not found." });
+
+            // When done, add to session history (clears on modal close).
+            if (p.Done)
+            {
+                var historyJson = HttpContext.Session.GetString("EmployeeImportHistory") ?? "[]";
+                var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var history = System.Text.Json.JsonSerializer.Deserialize<List<ImportHistorySessionItem>>(historyJson, options) ?? new List<ImportHistorySessionItem>();
+
+                history.Add(new ImportHistorySessionItem
+                {
+                    ImportId = p.ImportId,
+                    FileName = p.FileName,
+                    ImportedOn = DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
+                    ImportedBy = User?.Identity?.Name ?? "System",
+                    Total = p.Total,
+                    Succeeded = p.Succeeded,
+                    Duplicates = p.Duplicates,
+                    Failed = p.Failed,
+                    HasErrorFile = p.HasErrorFile
+                });
+
+                var updated = System.Text.Json.JsonSerializer.Serialize(history);
+                HttpContext.Session.SetString("EmployeeImportHistory", updated);
+            }
+
+            return Json(new
+            {
+                success = true,
+                p.Percent,
+                p.Total,
+                p.Processed,
+                p.Succeeded,
+                p.Duplicates,
+                p.Failed,
+                p.Done,
+                p.HasErrorFile,
+                p.Message
+            });
+        }
+
+        // GET: Employee/DownloadErrorFile?importId=...
+        [HttpGet]
+        public IActionResult DownloadErrorFile(string importId)
+        {
+            var bytes = _importService.GetErrorFile(importId, out var fileName);
+            if (bytes == null)
+                return NotFound();
+
+            return File(bytes, ExcelContentType, fileName ?? "ImportErrors.xlsx");
+        }
+
+        // GET: Employee/ImportHistory
+        [HttpGet]
+        public IActionResult ImportHistory()
+        {
+            var historyJson = HttpContext.Session.GetString("EmployeeImportHistory") ?? "[]";
+            var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var history = System.Text.Json.JsonSerializer.Deserialize<List<ImportHistorySessionItem>>(historyJson, options) ?? new List<ImportHistorySessionItem>();
+            return Json(new { success = true, history });
+        }
+
+        // POST: Employee/ClearImportHistory
+        // Clears the current session's import history (called when modal closes).
+        [HttpPost]
+        public IActionResult ClearImportHistory()
+        {
+            HttpContext.Session.Remove("EmployeeImportHistory");
+            return Json(new { success = true });
         }
 
         // Minimum age (in years) an employee must be, based on Date of Birth.
@@ -90,6 +222,9 @@ namespace SparkHRMS.Controllers
         // GET: Employee
         public async Task<IActionResult> Index()
         {
+            // Clear import history on page load so each session/tab has fresh history.
+            HttpContext.Session.Remove("EmployeeImportHistory");
+
             var applicationDbContext = _context.Employees.Include(e => e.ApplicationUser);
             return View(await applicationDbContext.ToListAsync());
         }

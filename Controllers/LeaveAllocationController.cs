@@ -75,7 +75,7 @@ public class LeaveAllocationController : Controller
             allocation.TotalLeaveBalance = totalAllocatedDays;
             _context.Add(allocation);
             await _context.SaveChangesAsync();
-
+                    
             return RedirectToAction("Index", "LeaveAllocation");
         }
         return View("Maintanance", allocation);

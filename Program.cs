@@ -45,6 +45,9 @@ builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddScoped<Utility>();
 builder.Services.AddScoped<UserResolverService>();
 
+// Bulk employee Excel import: holds in-memory progress + history, so singleton.
+builder.Services.AddSingleton<IEmployeeImportService, EmployeeImportService>();
+
 
 if (builder.Environment.IsDevelopment())
 {
@@ -211,6 +214,7 @@ SeedDatabase();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 //app.UseElmah();
 
